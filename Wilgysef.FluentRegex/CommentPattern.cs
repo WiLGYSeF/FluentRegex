@@ -1,25 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class CommentPattern : Pattern
+    internal class CommentPattern : AbstractGroupPattern
     {
-        internal override bool IsSinglePattern => true;
+        public CommentPattern(Pattern? pattern) : base(pattern) { }
 
-        private readonly Pattern _pattern;
-
-        public CommentPattern(Pattern pattern)
+        protected override void GroupContents(StringBuilder builder)
         {
-            _pattern = pattern;
-        }
-
-        internal override void ToString(StringBuilder builder)
-        {
-            builder.Append("(?#");
-            _pattern.ToString(builder);
-            builder.Append(')');
+            builder.Append("?#");
+            _pattern?.ToString(builder);
         }
     }
 }

@@ -3,27 +3,18 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class InlineModifierPattern : Pattern
+    internal class InlineModifierPattern : AbstractGroupPattern
     {
-        internal override bool IsSinglePattern => true;
-
-        private readonly Pattern? _pattern;
         private readonly InlineModifier _modifier;
 
-        public InlineModifierPattern(Pattern pattern, InlineModifier modifier)
-        {
-            _pattern = pattern;
-            _modifier = modifier;
-        }
-
-        public InlineModifierPattern(InlineModifier modifier)
+        public InlineModifierPattern(Pattern? pattern, InlineModifier modifier) : base(pattern)
         {
             _modifier = modifier;
         }
 
-        internal override void ToString(StringBuilder builder)
+        protected override void GroupContents(StringBuilder builder)
         {
-            builder.Append("(?");
+            builder.Append('?');
 
             if ((_modifier & InlineModifier.IgnoreCase) != 0)
             {
@@ -51,8 +42,6 @@ namespace Wilgysef.FluentRegex
                 builder.Append(':');
                 _pattern.ToString(builder);
             }
-
-            builder.Append(')');
         }
     }
 

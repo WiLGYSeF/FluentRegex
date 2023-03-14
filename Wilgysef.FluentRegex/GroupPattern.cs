@@ -1,11 +1,8 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    // TODO: balancing, atomic, comment, conditional, lookahead, lookbehind groups
-
-    public class GroupPattern : Pattern
+    public class GroupPattern : AbstractGroupPattern
     {
         public string? Name
         {
@@ -52,20 +49,14 @@ namespace Wilgysef.FluentRegex
         }
         private bool _capturing;
 
-        internal override bool IsSinglePattern => true;
-
-        protected readonly Pattern _pattern;
-
-        public GroupPattern(Pattern pattern, string? name = null, bool capture = true)
+        public GroupPattern(Pattern? pattern, string? name = null, bool capture = true) : base(pattern)
         {
-            _pattern = pattern;
             Name = name;
             IsCapturing = capture;
         }
 
-        public GroupPattern(Pattern pattern, string name1, string name2)
+        public GroupPattern(Pattern? pattern, string name1, string name2) : base(pattern)
         {
-            _pattern = pattern;
             Balancing(name1, name2);
         }
 
@@ -94,10 +85,8 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        internal override void ToString(StringBuilder builder)
+        protected override void GroupContents(StringBuilder builder)
         {
-            builder.Append('(');
-
             if (IsCapturing)
             {
                 if (Name != null || SecondName != null)
@@ -123,8 +112,7 @@ namespace Wilgysef.FluentRegex
                 builder.Append("?:");
             }
 
-            _pattern.ToString(builder);
-            builder.Append(')');
+            _pattern?.ToString(builder);
         }
 
         internal static void NonCaptureGroup(StringBuilder builder, Pattern pattern)

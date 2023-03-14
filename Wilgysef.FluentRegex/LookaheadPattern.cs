@@ -2,7 +2,7 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal class LookaheadPattern : Pattern
+    internal class LookaheadPattern : AbstractGroupPattern
     {
         public static Pattern PositiveLookahead(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookahead);
 
@@ -12,20 +12,16 @@ namespace Wilgysef.FluentRegex
 
         public static Pattern NegativeLookbehind(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookbehind);
 
-        internal override bool IsSinglePattern => true;
-
-        private readonly Pattern _pattern;
         private readonly LookaheadType _type;
 
-        private LookaheadPattern(Pattern pattern, LookaheadType type)
+        private LookaheadPattern(Pattern pattern, LookaheadType type) : base(pattern)
         {
-            _pattern = pattern;
             _type = type;
         }
 
-        internal override void ToString(StringBuilder builder)
+        protected override void GroupContents(StringBuilder builder)
         {
-            builder.Append("(?");
+            builder.Append('?');
 
             switch (_type)
             {
@@ -43,9 +39,7 @@ namespace Wilgysef.FluentRegex
                     break;
             }
 
-            _pattern.ToString(builder);
-
-            builder.Append(')');
+            _pattern!.ToString(builder);
         }
 
         private enum LookaheadType

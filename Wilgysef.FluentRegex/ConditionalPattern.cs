@@ -1,45 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class ConditionalPattern : Pattern
+    internal class ConditionalPattern : AbstractGroupPattern
     {
-        internal override bool IsSinglePattern => true;
-
         private readonly int? _groupNumber;
         private readonly string? _groupName;
         private readonly Pattern? _expression;
-        private readonly Pattern _yes;
         private readonly Pattern? _no;
         private readonly bool _lookahead;
 
         public ConditionalPattern(Pattern expression, Pattern yes, Pattern? no, bool lookahead = true)
+            : base(yes)
         {
             _expression = expression;
-            _yes = yes;
             _no = no;
             _lookahead = lookahead;
         }
 
-        public ConditionalPattern(int group, Pattern yes, Pattern? no)
+        public ConditionalPattern(int group, Pattern yes, Pattern? no) : base(yes)
         {
             _groupNumber = group;
-            _yes = yes;
             _no = no;
         }
 
-        public ConditionalPattern(string group, Pattern yes, Pattern? no)
+        public ConditionalPattern(string group, Pattern yes, Pattern? no) : base(yes)
         {
             _groupName = group;
-            _yes = yes;
             _no = no;
         }
 
-        internal override void ToString(StringBuilder builder)
+        protected override void GroupContents(StringBuilder builder)
         {
-            builder.Append("(?(");
+            if (_expression == null && _groupName == null && _groupNumber == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            builder.Append("?(");
 
             if (_expression != null)
             {
@@ -66,15 +65,13 @@ namespace Wilgysef.FluentRegex
 
             builder.Append(')');
 
-            _yes.Wrap(builder);
+            _pattern!.Wrap(builder);
 
             if (_no != null)
             {
                 builder.Append('|');
                 _no.Wrap(builder);
             }
-
-            builder.Append(')');
         }
     }
 }
