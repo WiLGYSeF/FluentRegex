@@ -40,6 +40,8 @@ namespace Wilgysef.FluentRegex
             return new RawPattern(regex);
         }
 
+        public static Pattern Single => new SingleCharacterPattern();
+
         #endregion
 
         #region Quantifiers

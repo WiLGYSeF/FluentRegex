@@ -74,11 +74,15 @@ namespace Wilgysef.FluentRegex
             {
                 builder.Append('{');
                 builder.Append(Min);
-                builder.Append(',');
 
-                if (Max.HasValue)
+                if (!Max.HasValue || Min != Max.Value)
                 {
-                    builder.Append(Max.Value);
+                    builder.Append(',');
+
+                    if (Max.HasValue)
+                    {
+                        builder.Append(Max.Value);
+                    }
                 }
 
                 builder.Append('}');
