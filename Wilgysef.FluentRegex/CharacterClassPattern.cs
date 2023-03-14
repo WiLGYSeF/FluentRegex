@@ -5,8 +5,6 @@ namespace Wilgysef.FluentRegex
 {
     internal class CharacterClassPattern : CharacterPattern
     {
-        private readonly string? _category;
-
         public static new CharacterClassPattern Word => new CharacterClassPattern(CharacterType.Word);
 
         public static new CharacterClassPattern NonWord => new CharacterClassPattern(CharacterType.NonWord);
@@ -22,6 +20,8 @@ namespace Wilgysef.FluentRegex
         public static new CharacterClassPattern Category(string category) => new CharacterClassPattern(CharacterType.Category, category);
 
         public static new CharacterClassPattern NonCategory(string category) => new CharacterClassPattern(CharacterType.NonCategory, category);
+
+        private readonly string? _category;
 
         private CharacterClassPattern(CharacterType type, string? category = null)
         {

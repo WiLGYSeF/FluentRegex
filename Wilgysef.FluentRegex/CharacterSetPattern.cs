@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class CharacterSetPattern : Pattern
+    public class CharacterSetPattern : Pattern
     {
         public ICollection<CharacterRange> CharacterRanges => _characterRanges;
 

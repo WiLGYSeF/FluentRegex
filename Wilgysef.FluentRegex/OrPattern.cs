@@ -3,16 +3,9 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class OrPattern : Pattern
+    internal class OrPattern : ContainerPattern
     {
-        internal override bool IsSinglePattern => _children.Count <= 1;
-
-        private readonly List<Pattern> _children = new List<Pattern>();
-
-        public OrPattern(IEnumerable<Pattern> patterns)
-        {
-            _children.AddRange(patterns);
-        }
+        public OrPattern(IEnumerable<Pattern> patterns) : base(patterns) { }
 
         internal override void ToString(StringBuilder builder)
         {

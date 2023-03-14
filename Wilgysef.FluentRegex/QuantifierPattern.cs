@@ -2,7 +2,7 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal class QuantifierPattern : Pattern
+    public class QuantifierPattern : Pattern
     {
         public Pattern Pattern { get; set; }
 
@@ -20,6 +20,26 @@ namespace Wilgysef.FluentRegex
             Min = min;
             Max = max;
             Greedy = greedy;
+        }
+
+        public QuantifierPattern WithZeroOrOne(bool greedy = true) => Set(0, 1, greedy);
+
+        public QuantifierPattern WithZeroOrMore(bool greedy = true) => Set(0, null, greedy);
+
+        public QuantifierPattern WithOneOrMore(bool greedy = true) => Set(1, null, greedy);
+
+        public QuantifierPattern WithExactly(int number) => Set(number, number, true);
+
+        public QuantifierPattern WithBetween(int min, int max, bool greedy = true) => Set(min, max, greedy);
+
+        public QuantifierPattern WithAtLeast(int min, bool greedy = true) => Set(min, null, greedy);
+
+        public QuantifierPattern WithAtMost(int max, bool greedy = true) => Set(0, max, greedy);
+
+        public QuantifierPattern GreedyCapture(bool greedy = true)
+        {
+            Greedy = greedy;
+            return this;
         }
 
         internal override void ToString(StringBuilder builder)
@@ -68,6 +88,14 @@ namespace Wilgysef.FluentRegex
             {
                 builder.Append('?');
             }
+        }
+
+        private QuantifierPattern Set(int min, int? max, bool greedy)
+        {
+            Min = min;
+            Max = max;
+            Greedy = greedy;
+            return this;
         }
     }
 }

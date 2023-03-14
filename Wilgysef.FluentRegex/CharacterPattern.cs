@@ -2,10 +2,6 @@
 {
     public abstract class CharacterPattern : Pattern
     {
-        internal override bool IsSinglePattern => true;
-
-        protected CharacterType Type { get; set; }
-
         public static CharacterPattern Character(char character) => CharacterLiteralPattern.Character(character);
 
         public static CharacterPattern Control(char character) => CharacterLiteralPattern.Control(character);
@@ -33,6 +29,10 @@
         public static CharacterPattern Category(string category) => CharacterClassPattern.Category(category);
 
         public static CharacterPattern NonCategory(string category) => CharacterClassPattern.NonCategory(category);
+
+        protected CharacterType Type { get; set; }
+
+        internal override bool IsSinglePattern => true;
 
         public abstract bool TryGetChar(out char character);
 

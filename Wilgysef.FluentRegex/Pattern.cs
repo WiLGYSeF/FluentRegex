@@ -44,40 +44,19 @@ namespace Wilgysef.FluentRegex
 
         #region Quantifiers
 
-        public Pattern ZeroOrOne(bool greedy = true)
-        {
-            return new QuantifierPattern(this, 0, 1, greedy);
-        }
+        public Pattern ZeroOrOne(bool greedy = true) => new QuantifierPattern(this, 0, 1, greedy);
 
-        public Pattern ZeroOrMore(bool greedy = true)
-        {
-            return new QuantifierPattern(this, 0, null, greedy);
-        }
+        public Pattern ZeroOrMore(bool greedy = true) => new QuantifierPattern(this, 0, null, greedy);
 
-        public Pattern OneOrMore(bool greedy = true)
-        {
-            return new QuantifierPattern(this, 1, null, greedy);
-        }
+        public Pattern OneOrMore(bool greedy = true) => new QuantifierPattern(this, 1, null, greedy);
 
-        public Pattern Exactly(int number)
-        {
-            return new QuantifierPattern(this, number, number, true);
-        }
+        public Pattern Exactly(int number) => new QuantifierPattern(this, number, number, true);
 
-        public Pattern Between(int min, int max, bool greedy = true)
-        {
-            return new QuantifierPattern(this, min, max, greedy);
-        }
+        public Pattern Between(int min, int max, bool greedy = true) => new QuantifierPattern(this, min, max, greedy);
 
-        public Pattern AtLeast(int min, bool greedy = true)
-        {
-            return new QuantifierPattern(this, min, null, greedy);
-        }
+        public Pattern AtLeast(int min, bool greedy = true) => new QuantifierPattern(this, min, null, greedy);
 
-        public Pattern AtMost(int max, bool greedy = true)
-        {
-            return new QuantifierPattern(this, 0, max, greedy);
-        }
+        public Pattern AtMost(int max, bool greedy = true) => new QuantifierPattern(this, 0, max, greedy);
 
         #endregion
 

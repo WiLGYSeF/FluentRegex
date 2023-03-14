@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Globalization;
 using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
     internal class CharacterLiteralPattern : CharacterPattern
     {
-        private readonly char _character;
-        private readonly string? _string;
-
         public static new CharacterPattern Character(char character) => new CharacterLiteralPattern(CharacterType.Character, character);
 
         public static new CharacterPattern Control(char character)
@@ -56,6 +52,9 @@ namespace Wilgysef.FluentRegex
             return new CharacterLiteralPattern(CharacterType.Unicode, hex);
         }
 
+        private readonly char _character;
+        private readonly string? _string;
+
         private CharacterLiteralPattern(CharacterType type)
         {
             Type = type;
@@ -75,32 +74,14 @@ namespace Wilgysef.FluentRegex
 
         public override bool TryGetChar(out char character)
         {
-            switch (Type)
+            if (Type == CharacterType.Character)
             {
-                case CharacterType.Character:
-                    character = _character;
-                    return true;
-                case CharacterType.Control:
-                    character = _character >= 'a'
-                        ? (char)(_character - 'a')
-                        : (char)(_character - 'A');
-                    return true;
-                case CharacterType.Escape:
-                    character = (char)0x1B;
-                    return true;
-                case CharacterType.Hexadecimal:
-                    character = (char)int.Parse(_string, NumberStyles.AllowHexSpecifier);
-                    return true;
-                case CharacterType.Octal:
-                    character = (char)Convert.ToInt32(_string, 8);
-                    return true;
-                case CharacterType.Unicode:
-                    character = (char)int.Parse(_string, NumberStyles.AllowHexSpecifier);
-                    return true;
-                default:
-                    character = (char)0;
-                    return false;
+                character = _character;
+                return true;
             }
+
+            character = (char)0;
+            return false;
         }
 
         internal override void ToString(StringBuilder builder)
@@ -112,6 +93,9 @@ namespace Wilgysef.FluentRegex
                     {
                         case '.':
                             builder.Append(@"\.");
+                            break;
+                        case '\0':
+                            builder.Append(@"\0");
                             break;
                         case '\\':
                             builder.Append(@"\\");

@@ -2,10 +2,8 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal class BackreferencePattern : Pattern
+    public class BackreferencePattern : Pattern
     {
-        internal override bool IsSinglePattern => true;
-
         public int? GroupNumber { get; private set; }
 
         public string? GroupName { get; private set; }
@@ -13,6 +11,8 @@ namespace Wilgysef.FluentRegex
         public BackreferenceType Type { get; private set; }
 
         public object Group => Type == BackreferenceType.Number ? (object)GroupNumber!.Value : GroupName!;
+
+        internal override bool IsSinglePattern => true;
 
         public BackreferencePattern(int group)
         {
