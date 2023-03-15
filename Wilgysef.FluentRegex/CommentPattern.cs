@@ -4,6 +4,8 @@ namespace Wilgysef.FluentRegex
 {
     internal class CommentPattern : AbstractGroupPattern
     {
+        protected override bool HasContents => true;
+
         public CommentPattern(Pattern? pattern) : base(pattern) { }
 
         public CommentPattern(string value) : base(new LiteralPattern(value)) { }

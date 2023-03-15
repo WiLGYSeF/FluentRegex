@@ -1,16 +1,19 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
     internal class LookaheadPattern : AbstractGroupPattern
     {
-        public static Pattern PositiveLookahead(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookahead);
+        internal static Pattern PositiveLookahead(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookahead);
 
-        public static Pattern NegativeLookahead(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookahead);
+        internal static Pattern NegativeLookahead(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookahead);
 
-        public static Pattern PositiveLookbehind(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookbehind);
+        internal static Pattern PositiveLookbehind(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookbehind);
 
-        public static Pattern NegativeLookbehind(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookbehind);
+        internal static Pattern NegativeLookbehind(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookbehind);
+
+        protected override bool HasContents => true;
 
         private readonly LookaheadType _type;
 
@@ -37,6 +40,8 @@ namespace Wilgysef.FluentRegex
                 case LookaheadType.NegativeLookbehind:
                     builder.Append("<!");
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             _pattern!.ToString(builder);

@@ -13,7 +13,16 @@ namespace Wilgysef.FluentRegex
         {
             foreach (var child in _children)
             {
-                child.ToString(builder);
+                if (child is OrPattern orPattern
+                    && !orPattern.IsSinglePattern
+                    && _children.Count > 1)
+                {
+                    orPattern.Wrap(builder, always: true);
+                }
+                else
+                {
+                    child.ToString(builder);
+                }
             }
         }
     }

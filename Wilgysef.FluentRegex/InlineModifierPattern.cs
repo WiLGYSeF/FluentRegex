@@ -3,38 +3,82 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class InlineModifierPattern : AbstractGroupPattern
+    public class InlineModifierPattern : AbstractGroupPattern
     {
-        private readonly InlineModifier _modifiers;
+        public InlineModifier Modifiers { get; set; }
 
-        public InlineModifierPattern(Pattern? pattern, InlineModifier modifiers) : base(pattern)
+        public InlineModifier DisabledModifiers { get; set; }
+
+        protected override bool HasContents => Modifiers != InlineModifier.None || DisabledModifiers != InlineModifier.None;
+
+        public InlineModifierPattern(
+            Pattern? pattern,
+            InlineModifier modifiers,
+            InlineModifier disabledModifiers = InlineModifier.None)
+            : base(pattern)
         {
-            _modifiers = modifiers;
+            WithModifiers(modifiers, disabledModifiers);
         }
+
+        #region Fluent Methods
+
+        public InlineModifierPattern WithModifiers(InlineModifier modifiers)
+        {
+            Modifiers = modifiers;
+            return this;
+        }
+
+        public InlineModifierPattern WithModifiers(InlineModifier modifiers, InlineModifier disabledModifiers)
+        {
+            Modifiers = modifiers;
+            DisabledModifiers = disabledModifiers;
+            return this;
+        }
+
+        public InlineModifierPattern WithDisabledModifiers(InlineModifier modifiers)
+        {
+            DisabledModifiers = modifiers;
+            return this;
+        }
+
+        public InlineModifierPattern WithIgnoreCase(bool enable = true) => SetModifier(InlineModifier.IgnoreCase, enable);
+
+        public InlineModifierPattern WithMultiline(bool enable = true) => SetModifier(InlineModifier.Multiline, enable);
+
+        public InlineModifierPattern WithExplicitCapture(bool enable = true) => SetModifier(InlineModifier.ExplicitCapture, enable);
+
+        public InlineModifierPattern WithSingleline(bool enable = true) => SetModifier(InlineModifier.Singleline, enable);
+
+        public InlineModifierPattern WithIgnorePatternWhitespace(bool enable = true) => SetModifier(InlineModifier.IgnorePatternWhitespace, enable);
+
+        public InlineModifierPattern WithIgnoreCaseDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.IgnoreCase, enable);
+
+        public InlineModifierPattern WithMultilineDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.Multiline, enable);
+
+        public InlineModifierPattern WithExplicitCaptureDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.ExplicitCapture, enable);
+
+        public InlineModifierPattern WithSinglelineDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.Singleline, enable);
+
+        public InlineModifierPattern WithIgnorePatternWhitespaceDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.IgnorePatternWhitespace, enable);
+
+        #endregion
 
         protected override void GroupContents(StringBuilder builder)
         {
+            var modifiers = Modifiers & ~DisabledModifiers;
+            var disabledModifiers = DisabledModifiers & ~Modifiers;
+
             builder.Append('?');
 
-            if ((_modifiers & InlineModifier.IgnoreCase) != 0)
+            if (modifiers != InlineModifier.None)
             {
-                builder.Append('i');
+                AppendFlags(modifiers);
             }
-            if ((_modifiers & InlineModifier.Multiline) != 0)
+
+            if (disabledModifiers != InlineModifier.None)
             {
-                builder.Append('m');
-            }
-            if ((_modifiers & InlineModifier.ExplicitCapture) != 0)
-            {
-                builder.Append('n');
-            }
-            if ((_modifiers & InlineModifier.Singleline) != 0)
-            {
-                builder.Append('s');
-            }
-            if ((_modifiers & InlineModifier.IgnorePatternWhitespace) != 0)
-            {
-                builder.Append('x');
+                builder.Append('-');
+                AppendFlags(disabledModifiers);
             }
 
             if (_pattern != null)
@@ -42,12 +86,65 @@ namespace Wilgysef.FluentRegex
                 builder.Append(':');
                 _pattern.ToString(builder);
             }
+
+            void AppendFlags(InlineModifier modifiers)
+            {
+                if ((modifiers & InlineModifier.IgnoreCase) != 0)
+                {
+                    builder.Append('i');
+                }
+                if ((modifiers & InlineModifier.Multiline) != 0)
+                {
+                    builder.Append('m');
+                }
+                if ((modifiers & InlineModifier.ExplicitCapture) != 0)
+                {
+                    builder.Append('n');
+                }
+                if ((modifiers & InlineModifier.Singleline) != 0)
+                {
+                    builder.Append('s');
+                }
+                if ((modifiers & InlineModifier.IgnorePatternWhitespace) != 0)
+                {
+                    builder.Append('x');
+                }
+            }
+        }
+
+        private InlineModifierPattern SetModifier(InlineModifier modifier, bool enable)
+        {
+            if (enable)
+            {
+                Modifiers |= modifier;
+            }
+            else
+            {
+                Modifiers &= ~modifier;
+            }
+
+            return this;
+        }
+
+        private InlineModifierPattern SetDisabledModifier(InlineModifier modifier, bool enable)
+        {
+            if (enable)
+            {
+                DisabledModifiers |= modifier;
+            }
+            else
+            {
+                DisabledModifiers &= ~modifier;
+            }
+
+            return this;
         }
     }
 
     [Flags]
     public enum InlineModifier
     {
+        None = 0,
         IgnoreCase = 1,
         Multiline = 2,
         ExplicitCapture = 4,

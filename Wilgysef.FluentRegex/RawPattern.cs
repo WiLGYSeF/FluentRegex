@@ -2,20 +2,26 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal class RawPattern : Pattern
+    public class RawPattern : Pattern
     {
-        internal override bool IsSinglePattern => true;
+        public string Regex { get; set; }
 
-        private readonly string _regex;
+        internal override bool IsSinglePattern => true;
 
         public RawPattern(string regex)
         {
-            _regex = regex;
+            Regex = regex;
+        }
+
+        public RawPattern WithRegex(string regex)
+        {
+            Regex = regex;
+            return this;
         }
 
         internal override void ToString(StringBuilder builder)
         {
-            builder.Append(_regex);
+            builder.Append(Regex);
         }
     }
 }

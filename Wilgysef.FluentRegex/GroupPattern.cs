@@ -49,6 +49,8 @@ namespace Wilgysef.FluentRegex
         }
         private bool _capturing;
 
+        protected override bool HasContents => true;
+
         public GroupPattern(Pattern? pattern, string? name = null, bool capture = true) : base(pattern)
         {
             Name = name;

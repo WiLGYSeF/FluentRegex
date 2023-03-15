@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
@@ -44,6 +45,24 @@ namespace Wilgysef.FluentRegex
 
         internal override void ToString(StringBuilder builder)
         {
+            if (Min < 0 || Max.HasValue && Max.Value < 0)
+            {
+                throw new InvalidOperationException("Range cannot be negative.");
+            }
+
+            if (Max.HasValue)
+            {
+                if (Min > Max.Value)
+                {
+                    throw new InvalidOperationException("Min cannot be greater than max.");
+                }
+
+                if (Min == 0 && Max.Value == 0)
+                {
+                    return;
+                }
+            }
+
             Pattern.Wrap(builder);
 
             if (Min == 0)

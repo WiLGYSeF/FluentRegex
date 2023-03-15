@@ -6,6 +6,8 @@ namespace Wilgysef.FluentRegex
     {
         internal sealed override bool IsSinglePattern => true;
 
+        protected abstract bool HasContents { get; }
+
         protected Pattern? _pattern;
 
         protected AbstractGroupPattern(Pattern? pattern)
@@ -17,6 +19,11 @@ namespace Wilgysef.FluentRegex
 
         internal sealed override void ToString(StringBuilder builder)
         {
+            if (!HasContents)
+            {
+                return;
+            }
+
             builder.Append('(');
             GroupContents(builder);
             builder.Append(')');

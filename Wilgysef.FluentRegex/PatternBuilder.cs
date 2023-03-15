@@ -1,38 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using static Wilgysef.FluentRegex.CharacterSetPattern;
 
 namespace Wilgysef.FluentRegex
 {
-    public class PatternBuilder : Pattern
+    public class PatternBuilder : ContainerPattern
     {
-        private readonly List<Pattern> _patterns;
-        private Pattern? _current;
-
-        internal override bool IsSinglePattern => throw new NotImplementedException();
-
-        public PatternBuilder()
-        {
-            _patterns = new List<Pattern>();
-        }
-
         #region Anchors
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder BeginLine => Add(AnchorPattern.BeginLine);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder EndLine => Add(AnchorPattern.EndLine);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Start => Add(AnchorPattern.Start);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder End => Add(AnchorPattern.End);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder AbsoluteEnd => Add(AnchorPattern.AbsoluteEnd);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder StartOfMatch => Add(AnchorPattern.StartOfMatch);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder WordBoundary => Add(AnchorPattern.WordBoundary);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder NonWordBoundary => Add(AnchorPattern.NonWordBoundary);
 
         #endregion
@@ -47,6 +46,7 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder Control(char character) => Add(CharacterLiteralPattern.Control(character));
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Escape => Add(CharacterLiteralPattern.Escape);
 
         public PatternBuilder Hexadecimal(string hex) => Add(CharacterLiteralPattern.Hexadecimal(hex));
@@ -55,22 +55,29 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder Unicode(string hex) => Add(CharacterLiteralPattern.Unicode(hex));
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Word => Add(CharacterClassPattern.Word);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder NonWord => Add(CharacterClassPattern.NonWord);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Digit => Add(CharacterClassPattern.Digit);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder NonDigit => Add(CharacterClassPattern.NonDigit);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Whitespace => Add(CharacterClassPattern.Whitespace);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder NonWhitespace => Add(CharacterClassPattern.NonWhitespace);
 
         public PatternBuilder Category(string category) => Add(CharacterClassPattern.Category(category));
 
         public PatternBuilder NonCategory(string category) => Add(CharacterClassPattern.NonCategory(category));
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Single => Add(new SingleCharacterPattern());
 
         #endregion
@@ -113,11 +120,21 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder Group(Pattern pattern, string? name = null, bool capture = true) => Add(new GroupPattern(pattern, name, capture));
 
+        public PatternBuilder CaptureGroup(Pattern pattern) => Add(new GroupPattern(pattern, null, true));
+
+        public PatternBuilder CaptureGroup(string name, Pattern pattern) => Add(new GroupPattern(pattern, name, true));
+
+        public PatternBuilder NonCaptureGroup(Pattern pattern) => Add(new GroupPattern(pattern, null, false));
+
         public PatternBuilder BalancingGroup(string name1, string name2, Pattern pattern) => Add(new GroupPattern(pattern, name1, name2));
 
         public PatternBuilder Modifiers(InlineModifier modifiers) => Add(new InlineModifierPattern(null, modifiers));
 
+        public PatternBuilder Modifiers(InlineModifier modifiers, InlineModifier disabledModifiers) => Add(new InlineModifierPattern(null, modifiers, disabledModifiers));
+
         public PatternBuilder Modifiers(Pattern? pattern, InlineModifier modifiers) => Add(new InlineModifierPattern(pattern, modifiers));
+
+        public PatternBuilder Modifiers(Pattern? pattern, InlineModifier modifiers, InlineModifier disabledModifiers) => Add(new InlineModifierPattern(pattern, modifiers, disabledModifiers));
 
         public PatternBuilder PositiveLookahead(Pattern pattern) => Add(LookaheadPattern.PositiveLookahead(pattern));
 
@@ -153,38 +170,35 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder AtMost(int max, bool greedy = true) => AddQuantifier(0, max, greedy);
 
-        private PatternBuilder AddQuantifier(int min, int? max, bool greedy)
-        {
-            if (_current == null)
-            {
-                throw new InvalidOperationException("A pattern is required for quantifiers.");
-            }
-
-            return ReplaceLast(new QuantifierPattern(_current, min, max, greedy));
-        }
+        private PatternBuilder AddQuantifier(int min, int? max, bool greedy) => ReplaceLast(new QuantifierPattern(Current, min, max, greedy));
 
         #endregion
 
+        private Pattern Current => _current ?? throw new InvalidOperationException("A pattern is required for quantifiers.");
+        private Pattern? _current;
+
+        // TODO: get group number
+
         public Pattern Build()
         {
-            return new ConcatPattern(_patterns);
+            return new ConcatPattern(_children);
         }
 
         internal override void ToString(StringBuilder builder)
         {
-            throw new NotImplementedException();
+            Build().ToString(builder);
         }
 
         private PatternBuilder Add(Pattern pattern)
         {
-            _patterns.Add(pattern);
+            _children.Add(pattern);
             _current = pattern;
             return this;
         }
 
         private PatternBuilder ReplaceLast(Pattern pattern)
         {
-            _patterns[^1] = pattern;
+            _children[^1] = pattern;
             _current = pattern;
             return this;
         }

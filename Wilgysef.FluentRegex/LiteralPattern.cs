@@ -6,7 +6,7 @@ namespace Wilgysef.FluentRegex
     {
         public string Value { get; set; }
 
-        internal override bool IsSinglePattern => false;
+        internal override bool IsSinglePattern => true;
 
         public LiteralPattern(string value)
         {

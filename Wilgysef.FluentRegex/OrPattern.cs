@@ -3,9 +3,17 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class OrPattern : ContainerPattern
+    public class OrPattern : ContainerPattern
     {
+        public OrPattern(params Pattern[] patterns) : this((IEnumerable<Pattern>)patterns) { }
+
         public OrPattern(IEnumerable<Pattern> patterns) : base(patterns) { }
+
+        public OrPattern Or(Pattern pattern)
+        {
+            _children.Add(pattern);
+            return this;
+        }
 
         internal override void ToString(StringBuilder builder)
         {
@@ -19,12 +27,12 @@ namespace Wilgysef.FluentRegex
                 return;
             }
 
-            _children[0].Wrap(builder);
+            _children[0].ToString(builder);
 
             for (var i = 1; i < _children.Count; i++)
             {
                 builder.Append('|');
-                _children[i].Wrap(builder);
+                _children[i].ToString(builder);
             }
         }
     }

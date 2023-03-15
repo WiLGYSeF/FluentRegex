@@ -2,28 +2,14 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal abstract class ContainerPattern : Pattern
+    public abstract class ContainerPattern : Pattern
     {
-        internal override bool IsSinglePattern
-        {
-            get
-            {
-                if (_children.Count == 0)
-                {
-                    return true;
-                }
-                else if (_children.Count == 1)
-                {
-                    return _children[0].IsSinglePattern;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
+        internal override bool IsSinglePattern => _children.Count == 0
+            || (_children.Count == 1 && _children[0].IsSinglePattern);
 
         protected readonly List<Pattern> _children = new List<Pattern>();
+
+        protected ContainerPattern() { }
 
         protected ContainerPattern(IEnumerable<Pattern> patterns)
         {

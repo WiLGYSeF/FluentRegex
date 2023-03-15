@@ -1,20 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Wilgysef.FluentRegex.Tests;
+﻿namespace Wilgysef.FluentRegex.Tests;
 
 public class RawPatternTest
 {
     [Fact]
-    public void RawPattern()
+    public void Simple()
     {
+        var pattern = new PatternBuilder().Raw("ab[c").Raw("o]de");
+
+        pattern.ToString().ShouldBe("ab[co]de");
     }
 
     [Fact]
-    public void RawPattern_IsSingle()
+    public void NoWrap()
     {
+        var pattern = new PatternBuilder().Or(
+            new PatternBuilder().Raw("ab[c"),
+            new PatternBuilder().Raw("o]de"));
+
+        pattern.ToString().ShouldBe("ab[c|o]de");
     }
 }

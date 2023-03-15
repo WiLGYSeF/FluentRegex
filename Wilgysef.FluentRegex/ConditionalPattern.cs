@@ -5,6 +5,8 @@ namespace Wilgysef.FluentRegex
 {
     internal class ConditionalPattern : AbstractGroupPattern
     {
+        protected override bool HasContents => true;
+
         private readonly int? _groupNumber;
         private readonly string? _groupName;
         private readonly Pattern? _expression;

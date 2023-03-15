@@ -3,17 +3,17 @@
 public class SingleCharacterPatternTest
 {
     [Fact]
-    public void SingleCharacter()
+    public void Simple()
     {
-        var pattern = new PatternBuilder().Single.Build();
+        var pattern = new PatternBuilder().Single;
 
         pattern.ToString().ShouldBe(".");
     }
 
     [Fact]
-    public void SingleCharacter_IsSingle()
+    public void NoWrap()
     {
-        var pattern = new PatternBuilder().Single.Exactly(3).Build();
+        var pattern = new PatternBuilder().Single.Exactly(3);
 
         pattern.ToString().ShouldBe(".{3}");
     }
