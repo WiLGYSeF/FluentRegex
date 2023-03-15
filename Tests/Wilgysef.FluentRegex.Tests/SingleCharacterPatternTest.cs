@@ -5,7 +5,7 @@ public class SingleCharacterPatternTest
     [Fact]
     public void SingleCharacter()
     {
-        var pattern = Pattern.Single;
+        var pattern = new PatternBuilder().Single.Build();
 
         pattern.ToString().ShouldBe(".");
     }
@@ -13,7 +13,7 @@ public class SingleCharacterPatternTest
     [Fact]
     public void SingleCharacter_IsSingle()
     {
-        var pattern = Pattern.Single.Exactly(3);
+        var pattern = new PatternBuilder().Single.Exactly(3).Build();
 
         pattern.ToString().ShouldBe(".{3}");
     }

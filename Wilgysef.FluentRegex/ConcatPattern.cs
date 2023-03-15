@@ -5,6 +5,8 @@ namespace Wilgysef.FluentRegex
 {
     internal class ConcatPattern : ContainerPattern
     {
+        public ConcatPattern(params Pattern[] patterns) : base(patterns) { }
+
         public ConcatPattern(IEnumerable<Pattern> patterns) : base(patterns) { }
 
         internal override void ToString(StringBuilder builder)

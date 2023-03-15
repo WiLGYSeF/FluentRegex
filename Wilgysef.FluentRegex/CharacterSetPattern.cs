@@ -23,8 +23,6 @@ namespace Wilgysef.FluentRegex
 
         #region Constructors
 
-        public CharacterSetPattern() { }
-
         public CharacterSetPattern(params char[] characters) : this(characters, false) { }
 
         public CharacterSetPattern(IEnumerable<char> characters, bool negated = false)

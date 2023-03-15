@@ -5,34 +5,34 @@ namespace Wilgysef.FluentRegex
 {
     internal class InlineModifierPattern : AbstractGroupPattern
     {
-        private readonly InlineModifier _modifier;
+        private readonly InlineModifier _modifiers;
 
-        public InlineModifierPattern(Pattern? pattern, InlineModifier modifier) : base(pattern)
+        public InlineModifierPattern(Pattern? pattern, InlineModifier modifiers) : base(pattern)
         {
-            _modifier = modifier;
+            _modifiers = modifiers;
         }
 
         protected override void GroupContents(StringBuilder builder)
         {
             builder.Append('?');
 
-            if ((_modifier & InlineModifier.IgnoreCase) != 0)
+            if ((_modifiers & InlineModifier.IgnoreCase) != 0)
             {
                 builder.Append('i');
             }
-            if ((_modifier & InlineModifier.Multiline) != 0)
+            if ((_modifiers & InlineModifier.Multiline) != 0)
             {
                 builder.Append('m');
             }
-            if ((_modifier & InlineModifier.ExplicitCapture) != 0)
+            if ((_modifiers & InlineModifier.ExplicitCapture) != 0)
             {
                 builder.Append('n');
             }
-            if ((_modifier & InlineModifier.Singleline) != 0)
+            if ((_modifiers & InlineModifier.Singleline) != 0)
             {
                 builder.Append('s');
             }
-            if ((_modifier & InlineModifier.IgnorePatternWhitespace) != 0)
+            if ((_modifiers & InlineModifier.IgnorePatternWhitespace) != 0)
             {
                 builder.Append('x');
             }
