@@ -2,13 +2,17 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal class CommentPattern : AbstractGroupPattern
+    public class CommentPattern : AbstractGroupPattern
     {
         protected override bool HasContents => true;
 
-        public CommentPattern(Pattern? pattern) : base(pattern) { }
-
         public CommentPattern(string value) : base(new LiteralPattern(value)) { }
+
+        public CommentPattern WithValue(string value)
+        {
+            _pattern = new LiteralPattern(value);
+            return this;
+        }
 
         protected override void GroupContents(StringBuilder builder)
         {

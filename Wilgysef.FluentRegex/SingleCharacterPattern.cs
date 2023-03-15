@@ -2,7 +2,7 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal class SingleCharacterPattern : Pattern
+    public class SingleCharacterPattern : Pattern
     {
         internal override bool IsSinglePattern => true;
 

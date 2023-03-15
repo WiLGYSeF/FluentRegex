@@ -21,6 +21,14 @@ public class OrPatternTest
     }
 
     [Fact]
+    public void Empty()
+    {
+        var pattern = new PatternBuilder().Or();
+
+        pattern.ToString().ShouldBe("");
+    }
+
+    [Fact]
     public void Nested()
     {
         var pattern = new PatternBuilder().Or(
@@ -51,7 +59,7 @@ public class OrPatternTest
         var pattern = new PatternBuilder().Or(
             new LiteralPattern("abc"),
             new PatternBuilder().Or(
-                new PatternBuilder().Or(new[]
+                new PatternBuilder().Or(new List<LiteralPattern>
                 {
                     new LiteralPattern("123"),
                     new LiteralPattern("456"),

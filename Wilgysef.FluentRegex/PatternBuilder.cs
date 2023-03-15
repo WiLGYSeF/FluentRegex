@@ -8,6 +8,8 @@ namespace Wilgysef.FluentRegex
 {
     public class PatternBuilder : ContainerPattern
     {
+        // TODO: change properties to methods?
+
         #region Anchors
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -42,36 +44,36 @@ namespace Wilgysef.FluentRegex
 
         #region Characters
 
-        public PatternBuilder Character(char character) => Add(CharacterLiteralPattern.Character(character));
+        public PatternBuilder Character(char character) => Add(CharacterPattern.Character(character));
 
-        public PatternBuilder Control(char character) => Add(CharacterLiteralPattern.Control(character));
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public PatternBuilder Escape => Add(CharacterLiteralPattern.Escape);
-
-        public PatternBuilder Hexadecimal(string hex) => Add(CharacterLiteralPattern.Hexadecimal(hex));
-
-        public PatternBuilder Octal(string octal) => Add(CharacterLiteralPattern.Octal(octal));
-
-        public PatternBuilder Unicode(string hex) => Add(CharacterLiteralPattern.Unicode(hex));
+        public PatternBuilder Control(char character) => Add(CharacterPattern.Control(character));
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public PatternBuilder Word => Add(CharacterClassPattern.Word);
+        public PatternBuilder Escape => Add(CharacterPattern.Escape);
+
+        public PatternBuilder Hexadecimal(string hex) => Add(CharacterPattern.Hexadecimal(hex));
+
+        public PatternBuilder Octal(string octal) => Add(CharacterPattern.Octal(octal));
+
+        public PatternBuilder Unicode(string hex) => Add(CharacterPattern.Unicode(hex));
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public PatternBuilder NonWord => Add(CharacterClassPattern.NonWord);
+        public PatternBuilder Word => Add(CharacterPattern.Word);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public PatternBuilder Digit => Add(CharacterClassPattern.Digit);
+        public PatternBuilder NonWord => Add(CharacterPattern.NonWord);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public PatternBuilder NonDigit => Add(CharacterClassPattern.NonDigit);
+        public PatternBuilder Digit => Add(CharacterPattern.Digit);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public PatternBuilder Whitespace => Add(CharacterClassPattern.Whitespace);
+        public PatternBuilder NonDigit => Add(CharacterPattern.NonDigit);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public PatternBuilder NonWhitespace => Add(CharacterClassPattern.NonWhitespace);
+        public PatternBuilder Whitespace => Add(CharacterPattern.Whitespace);
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public PatternBuilder NonWhitespace => Add(CharacterPattern.NonWhitespace);
 
         public PatternBuilder Category(string category) => Add(CharacterClassPattern.Category(category));
 
@@ -107,8 +109,6 @@ namespace Wilgysef.FluentRegex
         #region Groups
 
         public PatternBuilder AtomicGroup(Pattern pattern) => Add(new AtomicGroupPattern(pattern));
-
-        public PatternBuilder Comment(Pattern pattern) => Add(new CommentPattern(pattern));
 
         public PatternBuilder Comment(string value) => Add(new CommentPattern(value));
 

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class ConditionalPattern : AbstractGroupPattern
+    public class ConditionalPattern : AbstractGroupPattern
     {
         protected override bool HasContents => true;
 

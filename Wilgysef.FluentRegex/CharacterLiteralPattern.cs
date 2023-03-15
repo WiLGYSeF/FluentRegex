@@ -5,9 +5,9 @@ namespace Wilgysef.FluentRegex
 {
     internal class CharacterLiteralPattern : CharacterPattern
     {
-        public static new CharacterPattern Character(char character) => new CharacterLiteralPattern(CharacterType.Character, character);
+        internal static new CharacterPattern Character(char character) => new CharacterLiteralPattern(CharacterType.Character, character);
 
-        public static new CharacterPattern Control(char character)
+        internal static new CharacterPattern Control(char character)
         {
             if (!IsControl(character))
             {
@@ -17,9 +17,9 @@ namespace Wilgysef.FluentRegex
             return new CharacterLiteralPattern(CharacterType.Control, character);
         }
 
-        public static new CharacterPattern Escape => new CharacterLiteralPattern(CharacterType.Escape);
+        internal static new CharacterPattern Escape => new CharacterLiteralPattern(CharacterType.Escape);
 
-        public static new CharacterPattern Hexadecimal(string hex)
+        internal static new CharacterPattern Hexadecimal(string hex)
         {
             if (hex.Length != 2 || !IsHex(hex[0]) || !IsHex(hex[1]))
             {
@@ -29,7 +29,7 @@ namespace Wilgysef.FluentRegex
             return new CharacterLiteralPattern(CharacterType.Hexadecimal, hex);
         }
 
-        public static new CharacterPattern Octal(string octal)
+        internal static new CharacterPattern Octal(string octal)
         {
             if ((octal.Length != 2 && octal.Length != 3)
                 || !IsOctal(octal[0])
@@ -42,7 +42,7 @@ namespace Wilgysef.FluentRegex
             return new CharacterLiteralPattern(CharacterType.Octal, octal);
         }
 
-        public static new CharacterPattern Unicode(string hex)
+        internal static new CharacterPattern Unicode(string hex)
         {
             if (hex.Length != 4 || !IsHex(hex[0]) || !IsHex(hex[1]) || !IsHex(hex[2]) || !IsHex(hex[3]))
             {

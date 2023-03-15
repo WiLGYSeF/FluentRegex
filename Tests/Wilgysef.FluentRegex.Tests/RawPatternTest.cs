@@ -11,6 +11,15 @@ public class RawPatternTest
     }
 
     [Fact]
+    public void FluentRegex()
+    {
+        var pattern = new RawPattern("asdf");
+
+        pattern.WithRegex("test");
+        pattern.ToString().ShouldBe("test");
+    }
+
+    [Fact]
     public void NoWrap()
     {
         var pattern = new PatternBuilder().Or(

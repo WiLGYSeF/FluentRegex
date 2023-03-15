@@ -3,11 +3,17 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class ConcatPattern : ContainerPattern
+    public class ConcatPattern : ContainerPattern
     {
         public ConcatPattern(params Pattern[] patterns) : base(patterns) { }
 
         public ConcatPattern(IEnumerable<Pattern> patterns) : base(patterns) { }
+
+        public ConcatPattern Concat(Pattern pattern)
+        {
+            _children.Add(pattern);
+            return this;
+        }
 
         internal override void ToString(StringBuilder builder)
         {
