@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using static Wilgysef.FluentRegex.CharacterSetPattern;
+﻿using static Wilgysef.FluentRegex.CharacterSetPattern;
 
 namespace Wilgysef.FluentRegex.Tests;
 

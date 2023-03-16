@@ -122,15 +122,15 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder Conditional(string group, Pattern yes, Pattern? no) => Add(new ConditionalPattern(group, yes, no));
 
-        public PatternBuilder Group(Pattern pattern, string? name = null, bool capture = true) => Add(new GroupPattern(pattern, name, capture));
+        public PatternBuilder Group(Pattern? pattern, string? name = null, bool capture = true) => Add(new GroupPattern(pattern, name, capture));
 
-        public PatternBuilder CaptureGroup(Pattern pattern) => Add(new GroupPattern(pattern, null, true));
+        public PatternBuilder CaptureGroup(Pattern? pattern) => Add(new GroupPattern(pattern, null, true));
 
-        public PatternBuilder CaptureGroup(string name, Pattern pattern) => Add(new GroupPattern(pattern, name, true));
+        public PatternBuilder CaptureGroup(string name, Pattern? pattern) => Add(new GroupPattern(pattern, name, true));
 
         public PatternBuilder NonCaptureGroup(Pattern pattern) => Add(new GroupPattern(pattern, null, false));
 
-        public PatternBuilder BalancingGroup(string name1, string name2, Pattern pattern) => Add(new GroupPattern(pattern, name1, name2));
+        public PatternBuilder BalancingGroup(string? name1, string name2, Pattern? pattern) => Add(new GroupPattern(pattern, name1, name2));
 
         public PatternBuilder Modifiers(InlineModifier modifiers) => Add(new InlineModifierPattern(null, modifiers));
 

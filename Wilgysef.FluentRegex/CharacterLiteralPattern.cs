@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Text;
 
 namespace Wilgysef.FluentRegex
@@ -115,7 +114,7 @@ namespace Wilgysef.FluentRegex
                             builder.Append(@"\.");
                             break;
                         case '\0':
-                            builder.Append(@"\0");
+                            builder.Append(@"\00");
                             break;
                         case '\\':
                             builder.Append(@"\\");

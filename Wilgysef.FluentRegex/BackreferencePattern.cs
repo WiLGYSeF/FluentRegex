@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
@@ -46,9 +47,13 @@ namespace Wilgysef.FluentRegex
         {
             if (Type == BackreferenceType.Number)
             {
-                builder.Append(@"\g{");
+                if (GroupNumber!.Value > 9)
+                {
+                    throw new InvalidOperationException("Backreference number exceeds limit of 9.");
+                }
+
+                builder.Append('\\');
                 builder.Append(GroupNumber!.Value);
-                builder.Append('}');
             }
             else
             {

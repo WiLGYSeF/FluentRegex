@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
-
-namespace Wilgysef.FluentRegex.Tests;
+﻿namespace Wilgysef.FluentRegex.Tests;
 
 public class LiteralPatternTest
 {

@@ -5,7 +5,7 @@ public class CharacterPatternTest
     [Theory]
     [InlineData('a', "a")]
     [InlineData('.', @"\.")]
-    [InlineData('\0', @"\0")]
+    [InlineData('\0', @"\00")]
     [InlineData('\\', @"\\")]
     [InlineData('\a', @"\a")]
     [InlineData('\b', @"[\b]")]

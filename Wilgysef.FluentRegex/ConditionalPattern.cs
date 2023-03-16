@@ -5,74 +5,111 @@ namespace Wilgysef.FluentRegex
 {
     public class ConditionalPattern : AbstractGroupPattern
     {
-        protected override bool HasContents => true;
+        public int? GroupNumber { get; private set; }
 
-        private readonly int? _groupNumber;
-        private readonly string? _groupName;
-        private readonly Pattern? _expression;
-        private readonly Pattern? _no;
-        private readonly bool _lookahead;
+        public string? GroupName { get; private set; }
+
+        public Pattern? Expression { get; private set; }
+
+        public bool Lookahead { get; private set; }
+
+        public Pattern YesPattern { get => _pattern!; set => _pattern = value; }
+
+        public Pattern? NoPattern { get; set; }
+
+        protected override bool HasContents => true;
 
         public ConditionalPattern(Pattern expression, Pattern yes, Pattern? no, bool lookahead = true)
             : base(yes)
         {
-            _expression = expression;
-            _no = no;
-            _lookahead = lookahead;
+            Expression = expression;
+            NoPattern = no;
+            Lookahead = lookahead;
         }
 
         public ConditionalPattern(int group, Pattern yes, Pattern? no) : base(yes)
         {
-            _groupNumber = group;
-            _no = no;
+            GroupNumber = group;
+            NoPattern = no;
         }
 
         public ConditionalPattern(string group, Pattern yes, Pattern? no) : base(yes)
         {
-            _groupName = group;
-            _no = no;
+            GroupName = group;
+            NoPattern = no;
+        }
+
+        public ConditionalPattern WithGroup(int group)
+        {
+            GroupNumber = group;
+            GroupName = null;
+            Expression = null;
+            return this;
+        }
+
+        public ConditionalPattern WithGroup(string group)
+        {
+            GroupNumber = null;
+            GroupName = group;
+            Expression = null;
+            return this;
+        }
+
+        public ConditionalPattern WithExpression(Pattern expression, bool lookahead = true)
+        {
+            GroupNumber = null;
+            GroupName = null;
+            Expression = expression;
+            Lookahead = lookahead;
+            return this;
+        }
+
+        public ConditionalPattern WithYesPattern(Pattern yes)
+        {
+            YesPattern = yes;
+            return this;
+        }
+
+        public ConditionalPattern WithNoPattern(Pattern? no)
+        {
+            NoPattern = no;
+            return this;
         }
 
         protected override void GroupContents(StringBuilder builder)
         {
-            if (_expression == null && _groupName == null && _groupNumber == null)
-            {
-                throw new InvalidOperationException();
-            }
-
             builder.Append("?(");
 
-            if (_expression != null)
+            if (Expression != null)
             {
-                if (_lookahead)
+                if (Lookahead)
                 {
-                    builder.Append("(?=");
+                    builder.Append("?=");
                 }
                 else
                 {
-                    builder.Append("(?<=");
+                    builder.Append("?<=");
                 }
 
-                _expression.ToString(builder);
-                builder.Append(')');
+                Expression.ToString(builder);
             }
-            else if (_groupName != null)
+            else if (GroupName != null)
             {
-                builder.Append(_groupName);
+                builder.Append(GroupName);
             }
-            else if (_groupNumber != null)
+            else if (GroupNumber != null)
             {
-                builder.Append(_groupNumber);
+                builder.Append(GroupNumber);
             }
 
             builder.Append(')');
 
             _pattern!.Wrap(builder);
 
-            if (_no != null)
+            if (NoPattern != null)
             {
                 builder.Append('|');
-                _no.Wrap(builder);
+                NoPattern.Wrap(builder);
             }
         }
     }
