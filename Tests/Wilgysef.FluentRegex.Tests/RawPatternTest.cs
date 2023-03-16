@@ -3,7 +3,7 @@
 public class RawPatternTest
 {
     [Fact]
-    public void Simple()
+    public void Raw()
     {
         var pattern = new PatternBuilder().Raw("ab[c").Raw("o]de");
 
@@ -22,10 +22,8 @@ public class RawPatternTest
     [Fact]
     public void NoWrap()
     {
-        var pattern = new PatternBuilder().Or(
-            new PatternBuilder().Raw("ab[c"),
-            new PatternBuilder().Raw("o]de"));
+        var pattern = new PatternBuilder().Raw("ab[c").OneOrMore();
 
-        pattern.ToString().ShouldBe("ab[c|o]de");
+        pattern.ToString().ShouldBe("ab[c+");
     }
 }

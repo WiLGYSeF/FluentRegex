@@ -75,9 +75,9 @@ namespace Wilgysef.FluentRegex
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder NonWhitespace => Add(CharacterPattern.NonWhitespace);
 
-        public PatternBuilder Category(string category) => Add(CharacterClassPattern.Category(category));
+        public PatternBuilder Category(string category) => Add(CharacterPattern.Category(category));
 
-        public PatternBuilder NonCategory(string category) => Add(CharacterClassPattern.NonCategory(category));
+        public PatternBuilder NonCategory(string category) => Add(CharacterPattern.NonCategory(category));
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Single => Add(new SingleCharacterPattern());
@@ -174,6 +174,7 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder AtMost(int max, bool greedy = true) => AddQuantifier(0, max, greedy);
 
+        // TODO: cannot quantify anchors
         private PatternBuilder AddQuantifier(int min, int? max, bool greedy) => ReplaceLast(new QuantifierPattern(Current, min, max, greedy));
 
         #endregion

@@ -3,7 +3,7 @@
 public class CommentPatternTest
 {
     [Fact]
-    public void Simple()
+    public void Comment()
     {
         var pattern = new PatternBuilder().Comment("test");
 

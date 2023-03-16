@@ -65,20 +65,46 @@ namespace Wilgysef.FluentRegex
             switch (c)
             {
                 case '$':
+                    escaped = @"\$";
+                    return true;
                 case '(':
+                    escaped = @"\(";
+                    return true;
                 case ')':
+                    escaped = @"\)";
+                    return true;
                 case '*':
+                    escaped = @"\*";
+                    return true;
                 case '+':
+                    escaped = @"\+";
+                    return true;
                 case '.':
+                    escaped = @"\.";
+                    return true;
                 case '?':
+                    escaped = @"\?";
+                    return true;
                 case '[':
+                    escaped = @"\[";
+                    return true;
                 case '\\':
+                    escaped = @"\\";
+                    return true;
                 case ']':
+                    escaped = @"\]";
+                    return true;
                 case '^':
+                    escaped = @"\^";
+                    return true;
                 case '{':
+                    escaped = @"\{";
+                    return true;
                 case '|':
+                    escaped = @"\|";
+                    return true;
                 case '}':
-                    escaped = @"\" + c;
+                    escaped = @"\}";
                     return true;
                 default:
                     escaped = null;

@@ -3,7 +3,7 @@
 public class SingleCharacterPatternTest
 {
     [Fact]
-    public void Simple()
+    public void SingleCharacter()
     {
         var pattern = new PatternBuilder().Single;
 

@@ -3,7 +3,7 @@
 public class OrPatternTest
 {
     [Fact]
-    public void Simple()
+    public void Or()
     {
         var pattern = new PatternBuilder().Or(
             new LiteralPattern("abc"),
@@ -68,5 +68,16 @@ public class OrPatternTest
             new LiteralPattern("ghi"));
 
         pattern.ToString().ShouldBe("abc|123|456|def|ghi");
+    }
+
+    [Fact]
+    public void FluentOr()
+    {
+        var pattern = new OrPattern(
+            new LiteralPattern("abc"),
+            new LiteralPattern("123"));
+
+        pattern.Or(new LiteralPattern("zxc"));
+        pattern.ToString().ShouldBe("abc|123|zxc");
     }
 }

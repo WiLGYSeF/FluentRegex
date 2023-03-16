@@ -1,9 +1,12 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using System.Diagnostics;
+using System.Text;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class LiteralPatternTest
 {
     [Fact]
-    public void Simple()
+    public void Literal()
     {
         var pattern = new PatternBuilder().Literal("test");
 
@@ -25,5 +28,32 @@ public class LiteralPatternTest
 
         pattern.WithValue("test");
         pattern.ToString().ShouldBe("test");
+    }
+
+    [Fact]
+    public void EscapeString()
+    {
+        LiteralPattern.EscapeString(@"test$()*+.?[\]^{|}")
+            .ShouldBe(@"test\$\(\)\*\+\.\?\[\\\]\^\{\|\}");
+    }
+
+    [Fact]
+    public void EscapeChar()
+    {
+        LiteralPattern.EscapeChar('$').ShouldBe(@"\$");
+        LiteralPattern.EscapeChar('(').ShouldBe(@"\(");
+        LiteralPattern.EscapeChar(')').ShouldBe(@"\)");
+        LiteralPattern.EscapeChar('*').ShouldBe(@"\*");
+        LiteralPattern.EscapeChar('+').ShouldBe(@"\+");
+        LiteralPattern.EscapeChar('.').ShouldBe(@"\.");
+        LiteralPattern.EscapeChar('?').ShouldBe(@"\?");
+        LiteralPattern.EscapeChar('[').ShouldBe(@"\[");
+        LiteralPattern.EscapeChar('\\').ShouldBe(@"\\");
+        LiteralPattern.EscapeChar(']').ShouldBe(@"\]");
+        LiteralPattern.EscapeChar('^').ShouldBe(@"\^");
+        LiteralPattern.EscapeChar('{').ShouldBe(@"\{");
+        LiteralPattern.EscapeChar('|').ShouldBe(@"\|");
+        LiteralPattern.EscapeChar('}').ShouldBe(@"\}");
+        LiteralPattern.EscapeChar('a').ShouldBe("a");
     }
 }

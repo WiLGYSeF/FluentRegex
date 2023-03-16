@@ -96,6 +96,9 @@ public class CharacterPatternTest
 
         pattern = CharacterPattern.Hexadecimal("ab");
         pattern.TryGetChar(out _).ShouldBeFalse();
+
+        pattern = CharacterPattern.Word;
+        pattern.TryGetChar(out _).ShouldBeFalse();
     }
 
     [Fact]
@@ -162,6 +165,13 @@ public class CharacterPatternTest
         pattern.ToString().ShouldBe(@"\P{Lu}");
     }
 
+    [Fact]
+    public void NoWrap()
+    {
+        var pattern = new PatternBuilder().Digit.OneOrMore();
+
+        pattern.ToString().ShouldBe(@"\d+");
+    }
 
     // TODO: move?
     private static void ShouldCreatePattern(Func<Pattern> func, string? expected)

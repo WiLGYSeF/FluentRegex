@@ -183,6 +183,22 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void GetValue()
+    {
+        _ = new CharacterRange(CharacterPattern.Control('A'), CharacterPattern.Escape);
+        _ = new CharacterRange(CharacterPattern.Hexadecimal("1e"), CharacterPattern.Octal("40"));
+        _ = new CharacterRange(CharacterPattern.Unicode("1234"), CharacterPattern.Unicode("5678"));
+    }
+
+    [Fact]
+    public void NoWrap()
+    {
+        var pattern = new PatternBuilder().CharacterSet('a', 'b').OneOrMore();
+
+        pattern.ToString().ShouldBe("[ab]+");
+    }
+
+    [Fact]
     public void Fail_SubtractedCharactersOnly()
     {
         var pattern = new PatternBuilder().CharacterSet(
