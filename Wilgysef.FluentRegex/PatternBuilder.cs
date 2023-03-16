@@ -102,6 +102,8 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder CharacterSet(IEnumerable<CharacterRange> characterRanges, IEnumerable<CharacterPattern> characters, IEnumerable<CharacterPattern> subtractedCharacters, bool negated = false) => Add(new CharacterSetPattern(characterRanges, characters, subtractedCharacters, negated));
 
+        public PatternBuilder CharacterSet(IEnumerable<CharacterRange> characterRanges, IEnumerable<CharacterPattern> characters, IEnumerable<CharacterRange> subtractedCharacterRanges, IEnumerable<CharacterPattern> subtractedCharacters, bool negated = false) => Add(new CharacterSetPattern(characterRanges, characters, subtractedCharacterRanges, subtractedCharacters, negated));
+
         #endregion
 
         public PatternBuilder Concat(params Pattern[] patterns) => Add(new ConcatPattern(patterns));

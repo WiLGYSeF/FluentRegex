@@ -13,6 +13,8 @@ namespace Wilgysef.FluentRegex
 
         public ICollection<CharacterPattern> SubtractedCharacters => _subtractedCharacters;
 
+        public ICollection<CharacterRange> SubtractedCharacterRanges => _subtractedCharacterRanges;
+
         public bool Negated { get; set; }
 
         internal override bool IsSinglePattern => true;
@@ -20,6 +22,7 @@ namespace Wilgysef.FluentRegex
         private readonly List<CharacterRange> _characterRanges = new List<CharacterRange>();
         private readonly List<CharacterPattern> _characters = new List<CharacterPattern>();
         private readonly List<CharacterPattern> _subtractedCharacters = new List<CharacterPattern>();
+        private readonly List<CharacterRange> _subtractedCharacterRanges = new List<CharacterRange>();
 
         #region Constructors
 
@@ -75,24 +78,29 @@ namespace Wilgysef.FluentRegex
             Negated = negated;
         }
 
+        public CharacterSetPattern(
+            IEnumerable<CharacterRange> characterRanges,
+            IEnumerable<CharacterPattern> characters,
+            IEnumerable<CharacterRange> subtractedCharacterRanges,
+            IEnumerable<CharacterPattern> subtractedCharacters,
+            bool negated = false)
+        {
+            WithCharacterRanges(characterRanges);
+            WithCharacters(characters);
+            WithSubtractedCharacterRanges(subtractedCharacterRanges);
+            WithSubtractedCharacters(subtractedCharacters);
+            Negated = negated;
+        }
+
         #endregion
 
         #region Fluent Methods
 
-        public CharacterSetPattern WithCharacters(params char[] characters)
-        {
-            return WithCharacters((IEnumerable<char>)characters);
-        }
+        public CharacterSetPattern WithCharacters(params char[] characters) => WithCharacters((IEnumerable<char>)characters);
 
-        public CharacterSetPattern WithCharacters(IEnumerable<char> characters)
-        {
-            return WithCharacters(characters.Select(c => CharacterPattern.Character(c)));
-        }
+        public CharacterSetPattern WithCharacters(IEnumerable<char> characters) => WithCharacters(characters.Select(c => CharacterPattern.Character(c)));
 
-        public CharacterSetPattern WithCharacters(params CharacterPattern[] characters)
-        {
-            return WithCharacters((IEnumerable<CharacterPattern>)characters);
-        }
+        public CharacterSetPattern WithCharacters(params CharacterPattern[] characters) => WithCharacters((IEnumerable<CharacterPattern>)characters);
 
         public CharacterSetPattern WithCharacters(IEnumerable<CharacterPattern> characters)
         {
@@ -100,20 +108,11 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public CharacterSetPattern WithCharacterRange(char start, char end)
-        {
-            return WithCharacterRanges(new CharacterRange(start, end));
-        }
+        public CharacterSetPattern WithCharacterRange(char start, char end) => WithCharacterRanges(new CharacterRange(start, end));
 
-        public CharacterSetPattern WithCharacterRange(CharacterPattern start, CharacterPattern end)
-        {
-            return WithCharacterRanges(new CharacterRange(start, end));
-        }
+        public CharacterSetPattern WithCharacterRange(CharacterPattern start, CharacterPattern end) => WithCharacterRanges(new CharacterRange(start, end));
 
-        public CharacterSetPattern WithCharacterRanges(params CharacterRange[] ranges)
-        {
-            return WithCharacterRanges((IEnumerable<CharacterRange>)ranges);
-        }
+        public CharacterSetPattern WithCharacterRanges(params CharacterRange[] ranges) => WithCharacterRanges((IEnumerable<CharacterRange>)ranges);
 
         public CharacterSetPattern WithCharacterRanges(IEnumerable<CharacterRange> ranges)
         {
@@ -121,24 +120,27 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public CharacterSetPattern WithSubtractedCharacters(params char[] characters)
-        {
-            return WithSubtractedCharacters((IEnumerable<char>)characters);
-        }
+        public CharacterSetPattern WithSubtractedCharacters(params char[] characters) => WithSubtractedCharacters((IEnumerable<char>)characters);
 
-        public CharacterSetPattern WithSubtractedCharacters(IEnumerable<char> characters)
-        {
-            return WithSubtractedCharacters(characters.Select(c => CharacterPattern.Character(c)));
-        }
+        public CharacterSetPattern WithSubtractedCharacters(IEnumerable<char> characters) => WithSubtractedCharacters(characters.Select(c => CharacterPattern.Character(c)));
 
-        public CharacterSetPattern WithSubtractedCharacters(params CharacterPattern[] characters)
-        {
-            return WithSubtractedCharacters((IEnumerable<CharacterPattern>)characters);
-        }
+        public CharacterSetPattern WithSubtractedCharacters(params CharacterPattern[] characters) => WithSubtractedCharacters((IEnumerable<CharacterPattern>)characters);
 
         public CharacterSetPattern WithSubtractedCharacters(IEnumerable<CharacterPattern> characters)
         {
             _subtractedCharacters.AddRange(characters);
+            return this;
+        }
+
+        public CharacterSetPattern WithSubtractedCharacterRange(char start, char end) => WithSubtractedCharacterRanges(new CharacterRange(start, end));
+
+        public CharacterSetPattern WithSubtractedCharacterRange(CharacterPattern start, CharacterPattern end) => WithSubtractedCharacterRanges(new CharacterRange(start, end));
+
+        public CharacterSetPattern WithSubtractedCharacterRanges(params CharacterRange[] ranges) => WithSubtractedCharacterRanges((IEnumerable<CharacterRange>)ranges);
+
+        public CharacterSetPattern WithSubtractedCharacterRanges(IEnumerable<CharacterRange> ranges)
+        {
+            _subtractedCharacterRanges.AddRange(ranges);
             return this;
         }
 
@@ -154,7 +156,7 @@ namespace Wilgysef.FluentRegex
         {
             if (_characters.Count == 0 && _characterRanges.Count == 0)
             {
-                if (_subtractedCharacters.Count > 0)
+                if (_subtractedCharacters.Count > 0 || _subtractedCharacterRanges.Count > 0)
                 {
                     throw new InvalidOperationException("Cannot have subtracted characters without characters.");
                 }
@@ -162,26 +164,24 @@ namespace Wilgysef.FluentRegex
                 return;
             }
 
-            var tmpBuilder = new StringBuilder();
-
-            if (_characters.Count == 1
-                && _characterRanges.Count == 0
-                && _subtractedCharacters.Count == 0
+            if (_subtractedCharacters.Count == 0
+                && _subtractedCharacterRanges.Count == 0
                 && !Negated)
             {
-                _characters[0].ToString(builder);
-                return;
+                if (_characters.Count == 1 && _characterRanges.Count == 0)
+                {
+                    _characters[0].ToString(builder);
+                    return;
+                }
+
+                if (_characters.Count == 0 && _characterRanges.Count == 1 && _characterRanges[0].Single)
+                {
+                    _characterRanges[0].Start.ToString(builder);
+                    return;
+                }
             }
 
-            if (_characters.Count == 0
-                && _characterRanges.Count == 1
-                && _subtractedCharacters.Count == 0
-                && !Negated
-                && _characterRanges[0].Single)
-            {
-                _characterRanges[0].Start.ToString(builder);
-                return;
-            }
+            var tmpBuilder = new StringBuilder();
 
             builder.Append('[');
 
@@ -190,29 +190,20 @@ namespace Wilgysef.FluentRegex
                 builder.Append('^');
             }
 
-            foreach (var range in CharacterRanges)
+            AppendRanges(_characterRanges);
+            foreach (var pattern in _characters)
             {
-                Append(range.Start);
-
-                if (!range.Single)
-                {
-                    builder.Append('-');
-                    Append(range.End);
-                }
+                Append(pattern);
             }
 
-            foreach (var c in Characters)
-            {
-                Append(c);
-            }
-
-            if (SubtractedCharacters.Count > 0)
+            if (_subtractedCharacters.Count > 0 || _subtractedCharacterRanges.Count > 0)
             {
                 builder.Append("-[");
 
-                foreach (var c in SubtractedCharacters)
+                AppendRanges(_subtractedCharacterRanges);
+                foreach (var pattern in _subtractedCharacters)
                 {
-                    Append(c);
+                    Append(pattern);
                 }
 
                 builder.Append(']');
@@ -223,12 +214,12 @@ namespace Wilgysef.FluentRegex
             void Append(CharacterPattern pattern)
             {
                 pattern.ToString(tmpBuilder, fromCharacterSet: true);
-                var character = tmpBuilder.ToString();
+                var patternString = tmpBuilder.ToString();
                 tmpBuilder.Clear();
 
-                if (character.Length == 1)
+                if (patternString.Length == 1)
                 {
-                    switch (character[0])
+                    switch (patternString[0])
                     {
                         case '[':
                         case ']':
@@ -240,7 +231,21 @@ namespace Wilgysef.FluentRegex
                     }
                 }
 
-                builder.Append(character);
+                builder.Append(patternString);
+            }
+
+            void AppendRanges(IEnumerable<CharacterRange> ranges)
+            {
+                foreach (var range in ranges)
+                {
+                    Append(range.Start);
+
+                    if (!range.Single)
+                    {
+                        builder.Append('-');
+                        Append(range.End);
+                    }
+                }
             }
         }
 

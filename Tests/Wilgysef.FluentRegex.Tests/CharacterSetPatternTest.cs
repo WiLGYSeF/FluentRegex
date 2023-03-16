@@ -55,6 +55,19 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void CharacterRanges_Characters_SubtractedCharacterRanges_SubtractedCharacters()
+    {
+        var pattern = new PatternBuilder().CharacterSet(
+            new[] { new CharacterRange('a', 'z') },
+            new[] { CharacterPattern.Character('0'), CharacterPattern.Character('7') },
+            new[] { new CharacterRange('b', 'g') },
+            new[] { CharacterPattern.Character('w'), },
+            negated: true);
+
+        pattern.ToString().ShouldBe("[^a-z07-[b-gw]]");
+    }
+
+    [Fact]
     public void Empty()
     {
         var pattern = new PatternBuilder().CharacterSet(Array.Empty<char>());
@@ -113,6 +126,18 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void SubtractedCharacterRange_Single()
+    {
+        var pattern = new PatternBuilder().CharacterSet(
+            Array.Empty<CharacterRange>(),
+            new[] { CharacterPattern.Character('e') },
+            new[] { new CharacterRange('a', 'a') },
+            Array.Empty<CharacterPattern>());
+
+        pattern.ToString().ShouldBe("[e-[a]]");
+    }
+
+    [Fact]
     public void FluentCharacterRange()
     {
         var pattern = new CharacterSetPattern('a', 'b');
@@ -134,6 +159,18 @@ public class CharacterSetPatternTest
 
         pattern.WithSubtractedCharacters(CharacterPattern.Character('5'));
         pattern.ToString().ShouldBe("[ab-[095]]");
+    }
+
+    [Fact]
+    public void FluentSubtractedCharacterRange()
+    {
+        var pattern = new CharacterSetPattern('a', 'b');
+
+        pattern.WithSubtractedCharacterRange('0', '9');
+        pattern.ToString().ShouldBe("[ab-[0-9]]");
+
+        pattern.WithSubtractedCharacterRange(CharacterPattern.Character('c'), CharacterPattern.Character('e'));
+        pattern.ToString().ShouldBe("[ab-[0-9c-e]]");
     }
 
     [Fact]
