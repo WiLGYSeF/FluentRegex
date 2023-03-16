@@ -90,15 +90,17 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder CharacterSet(IEnumerable<char> characters, bool negated = false) => Add(new CharacterSetPattern(characters, negated));
 
+        public PatternBuilder CharacterSet(params CharacterPattern[] characters) => Add(new CharacterSetPattern(characters));
+
         public PatternBuilder CharacterSet(IEnumerable<CharacterPattern> characters, bool negated = false) => Add(new CharacterSetPattern(characters, negated));
 
         public PatternBuilder CharacterSet(params CharacterRange[] characterRanges) => Add(new CharacterSetPattern(characterRanges));
 
         public PatternBuilder CharacterSet(IEnumerable<CharacterRange> characterRanges, bool negated = false) => Add(new CharacterSetPattern(characterRanges, negated));
 
-        public PatternBuilder CharacterSet(ICollection<CharacterRange> characterRanges, ICollection<CharacterPattern> characters, bool negated = false) => Add(new CharacterSetPattern(characterRanges, characters, negated));
+        public PatternBuilder CharacterSet(IEnumerable<CharacterRange> characterRanges, IEnumerable<CharacterPattern> characters, bool negated = false) => Add(new CharacterSetPattern(characterRanges, characters, negated));
 
-        public PatternBuilder CharacterSet(ICollection<CharacterRange> characterRanges, ICollection<CharacterPattern> characters, ICollection<CharacterPattern> subtractedCharacters, bool negated = false) => Add(new CharacterSetPattern(characterRanges, characters, subtractedCharacters, negated));
+        public PatternBuilder CharacterSet(IEnumerable<CharacterRange> characterRanges, IEnumerable<CharacterPattern> characters, IEnumerable<CharacterPattern> subtractedCharacters, bool negated = false) => Add(new CharacterSetPattern(characterRanges, characters, subtractedCharacters, negated));
 
         #endregion
 

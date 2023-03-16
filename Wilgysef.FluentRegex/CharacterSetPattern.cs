@@ -23,12 +23,20 @@ namespace Wilgysef.FluentRegex
 
         #region Constructors
 
-        public CharacterSetPattern(params char[] characters) : this(characters, false) { }
+        public CharacterSetPattern(params char[] characters)
+        {
+            WithCharacters(characters);
+        }
 
         public CharacterSetPattern(IEnumerable<char> characters, bool negated = false)
         {
             WithCharacters(characters);
             Negated = negated;
+        }
+
+        public CharacterSetPattern(params CharacterPattern[] characters)
+        {
+            WithCharacters(characters);
         }
 
         public CharacterSetPattern(IEnumerable<CharacterPattern> characters, bool negated = false)
@@ -46,8 +54,8 @@ namespace Wilgysef.FluentRegex
         }
 
         public CharacterSetPattern(
-            ICollection<CharacterRange> characterRanges,
-            ICollection<CharacterPattern> characters,
+            IEnumerable<CharacterRange> characterRanges,
+            IEnumerable<CharacterPattern> characters,
             bool negated = false)
         {
             WithCharacterRanges(characterRanges);
@@ -56,9 +64,9 @@ namespace Wilgysef.FluentRegex
         }
 
         public CharacterSetPattern(
-            ICollection<CharacterRange> characterRanges,
-            ICollection<CharacterPattern> characters,
-            ICollection<CharacterPattern> subtractedCharacters,
+            IEnumerable<CharacterRange> characterRanges,
+            IEnumerable<CharacterPattern> characters,
+            IEnumerable<CharacterPattern> subtractedCharacters,
             bool negated = false)
         {
             WithCharacterRanges(characterRanges);
@@ -88,11 +96,7 @@ namespace Wilgysef.FluentRegex
 
         public CharacterSetPattern WithCharacters(IEnumerable<CharacterPattern> characters)
         {
-            foreach (var c in characters)
-            {
-                _characters.Add(c);
-            }
-
+            _characters.AddRange(characters);
             return this;
         }
 
@@ -113,11 +117,7 @@ namespace Wilgysef.FluentRegex
 
         public CharacterSetPattern WithCharacterRanges(IEnumerable<CharacterRange> ranges)
         {
-            foreach (var range in ranges)
-            {
-                _characterRanges.Add(range);
-            }
-
+            _characterRanges.AddRange(ranges);
             return this;
         }
 
@@ -138,11 +138,7 @@ namespace Wilgysef.FluentRegex
 
         public CharacterSetPattern WithSubtractedCharacters(IEnumerable<CharacterPattern> characters)
         {
-            foreach (var c in characters)
-            {
-                _subtractedCharacters.Add(c);
-            }
-
+            _subtractedCharacters.AddRange(characters);
             return this;
         }
 
@@ -154,7 +150,6 @@ namespace Wilgysef.FluentRegex
 
         #endregion
 
-        // TODO: range simplification
         internal override void ToString(StringBuilder builder)
         {
             if (_characters.Count == 0 && _characterRanges.Count == 0)
@@ -167,13 +162,24 @@ namespace Wilgysef.FluentRegex
                 return;
             }
 
+            var tmpBuilder = new StringBuilder();
+
             if (_characters.Count == 1
                 && _characterRanges.Count == 0
                 && _subtractedCharacters.Count == 0
                 && !Negated)
             {
-                // TODO: escape
-                Append(_characters[0]);
+                _characters[0].ToString(builder);
+                return;
+            }
+
+            if (_characters.Count == 0
+                && _characterRanges.Count == 1
+                && _subtractedCharacters.Count == 0
+                && !Negated
+                && _characterRanges[0].Single)
+            {
+                _characterRanges[0].Start.ToString(builder);
                 return;
             }
 
@@ -187,8 +193,12 @@ namespace Wilgysef.FluentRegex
             foreach (var range in CharacterRanges)
             {
                 Append(range.Start);
-                builder.Append('-');
-                Append(range.End);
+
+                if (!range.Single)
+                {
+                    builder.Append('-');
+                    Append(range.End);
+                }
             }
 
             foreach (var c in Characters)
@@ -212,9 +222,13 @@ namespace Wilgysef.FluentRegex
 
             void Append(CharacterPattern pattern)
             {
-                if (pattern.TryGetChar(out var c))
+                pattern.ToString(tmpBuilder, fromCharacterSet: true);
+                var character = tmpBuilder.ToString();
+                tmpBuilder.Clear();
+
+                if (character.Length == 1)
                 {
-                    switch (c)
+                    switch (character[0])
                     {
                         case '[':
                         case ']':
@@ -226,26 +240,45 @@ namespace Wilgysef.FluentRegex
                     }
                 }
 
-                pattern.ToString(builder);
+                builder.Append(character);
             }
         }
 
+        // TODO: make class?
         public struct CharacterRange
         {
             public CharacterPattern Start { get; }
 
             public CharacterPattern End { get; }
 
+            public bool Single { get; }
+
             public CharacterRange(char start, char end)
-            {
-                Start = CharacterPattern.Character(start);
-                End = CharacterPattern.Character(end);
-            }
+                : this(CharacterPattern.Character(start), CharacterPattern.Character(end)) { }
 
             public CharacterRange(CharacterPattern start, CharacterPattern end)
             {
+                if (!(start is CharacterLiteralPattern startLiteral))
+                {
+                    throw new ArgumentException("Start range must be a character literal pattern.", nameof(start));
+                }
+
+                if (!(end is CharacterLiteralPattern endLiteral))
+                {
+                    throw new ArgumentException("End range must be a character literal pattern.", nameof(end));
+                }
+
+                var startValue = startLiteral.GetValue();
+                var endValue = endLiteral.GetValue();
+
+                if (startValue > endValue)
+                {
+                    throw new ArgumentException("Start range cannot be greater than end range.", nameof(start));
+                }
+
                 Start = start;
                 End = end;
+                Single = startValue == endValue;
             }
         }
     }

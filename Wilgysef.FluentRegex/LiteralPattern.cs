@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
@@ -59,7 +60,7 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        public static string EscapeChar(char c)
+        public static bool EscapeChar(char c, [MaybeNullWhen(false)] out string escaped)
         {
             switch (c)
             {
@@ -77,10 +78,17 @@ namespace Wilgysef.FluentRegex
                 case '{':
                 case '|':
                 case '}':
-                    return @"\" + c;
+                    escaped = @"\" + c;
+                    return true;
                 default:
-                    return c.ToString();
+                    escaped = null;
+                    return false;
             }
+        }
+
+        public static string EscapeChar(char c)
+        {
+            return EscapeChar(c, out var escaped) ? escaped : c.ToString();
         }
     }
 }

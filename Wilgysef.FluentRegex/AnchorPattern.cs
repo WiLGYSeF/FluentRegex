@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    internal class AnchorPattern : Pattern
+    public class AnchorPattern : Pattern
     {
         public static AnchorPattern BeginLine => new AnchorPattern(AnchorType.BeginLine);
 

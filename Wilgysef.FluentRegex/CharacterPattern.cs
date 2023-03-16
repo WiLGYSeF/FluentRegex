@@ -1,4 +1,6 @@
-﻿namespace Wilgysef.FluentRegex
+﻿using System.Text;
+
+namespace Wilgysef.FluentRegex
 {
     public abstract class CharacterPattern : Pattern
     {
@@ -35,6 +37,8 @@
         internal override bool IsSinglePattern => true;
 
         public abstract bool TryGetChar(out char character);
+
+        internal abstract void ToString(StringBuilder builder, bool fromCharacterSet);
 
         protected enum CharacterType
         {

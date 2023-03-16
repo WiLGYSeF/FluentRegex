@@ -37,6 +37,11 @@ namespace Wilgysef.FluentRegex
 
         internal override void ToString(StringBuilder builder)
         {
+            ToString(builder, false);
+        }
+
+        internal override void ToString(StringBuilder builder, bool fromCharacterSet)
+        {
             switch (Type)
             {
                 case CharacterType.Word:

@@ -14,6 +14,8 @@ public class CharacterPatternTest
     [InlineData('\r', @"\r")]
     [InlineData('\t', @"\t")]
     [InlineData('\v', @"\v")]
+    [InlineData('^', @"\^")]
+    [InlineData('[', @"\[")]
     public void Character(char character, string expected)
     {
         var pattern = new PatternBuilder().Character(character);

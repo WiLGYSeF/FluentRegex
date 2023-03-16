@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 
 namespace Wilgysef.FluentRegex
@@ -84,7 +85,35 @@ namespace Wilgysef.FluentRegex
             return false;
         }
 
+        internal int GetValue()
+        {
+            switch (Type)
+            {
+                case CharacterType.Character:
+                    return _character;
+                case CharacterType.Control:
+                    return _character >= 'a'
+                        ? _character - 'a'
+                        : _character - 'A';
+                case CharacterType.Escape:
+                    return 0x1B;
+                case CharacterType.Hexadecimal:
+                    return int.Parse(_string, System.Globalization.NumberStyles.AllowHexSpecifier);
+                case CharacterType.Octal:
+                    return Convert.ToInt32(_string, 8);
+                case CharacterType.Unicode:
+                    return int.Parse(_string, System.Globalization.NumberStyles.AllowHexSpecifier);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         internal override void ToString(StringBuilder builder)
+        {
+            ToString(builder, false);
+        }
+
+        internal override void ToString(StringBuilder builder, bool fromCharacterSet)
         {
             switch (Type)
             {
@@ -104,7 +133,7 @@ namespace Wilgysef.FluentRegex
                             builder.Append(@"\a");
                             break;
                         case '\b':
-                            builder.Append(@"[\b]");
+                            builder.Append(fromCharacterSet ? @"\b" : @"[\b]");
                             break;
                         case '\f':
                             builder.Append(@"\f");
@@ -122,7 +151,15 @@ namespace Wilgysef.FluentRegex
                             builder.Append(@"\v");
                             break;
                         default:
-                            builder.Append(_character);
+                            if (fromCharacterSet || !LiteralPattern.EscapeChar(_character, out var escaped))
+                            {
+                                builder.Append(_character);
+                            }
+                            else
+                            {
+                                builder.Append(escaped);
+                            }
+
                             break;
                     }
                     break;
