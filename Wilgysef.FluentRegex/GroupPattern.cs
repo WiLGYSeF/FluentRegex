@@ -5,55 +5,22 @@ namespace Wilgysef.FluentRegex
 {
     public class GroupPattern : AbstractGroupPattern
     {
-        public string? Name
-        {
-            get => _name;
-            set
-            {
-                _name = value;
-                if (_name != null)
-                {
-                    _capturing = true;
-                }
-            }
-        }
-        private string? _name;
+        public string? Name { get; set; }
 
-        public string? SecondName
-        {
-            get => _secondName;
-            set
-            {
-                _secondName = value;
-                if (_secondName != null)
-                {
-                    _capturing = true;
-                }
-            }
-        }
-        private string? _secondName;
+        public string? SecondName { get; set; }
 
-        public bool IsCapturing
-        {
-            get => _capturing;
-            set
-            {
-                _capturing = value;
-                if (!_capturing)
-                {
-                    _name = null;
-                    _secondName = null;
-                }
-            }
-        }
-        private bool _capturing;
+        public bool Capture { get; set; }
+
+        public bool IsCapturing => Name != null || Capture;
+
+        public bool IsNumbered => Capture && Name == null;
 
         protected override bool HasContents => true;
 
         public GroupPattern(Pattern? pattern, string? name = null, bool capture = true) : base(pattern)
         {
             Name = name;
-            IsCapturing = capture;
+            Capture = capture;
         }
 
         public GroupPattern(Pattern? pattern, string? name1, string name2) : base(pattern)
@@ -80,9 +47,9 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public GroupPattern Capture(bool capture = true)
+        public GroupPattern WithCapture(bool capture = true)
         {
-            IsCapturing = capture;
+            Capture = capture;
             return this;
         }
 

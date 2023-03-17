@@ -12,9 +12,6 @@ namespace Wilgysef.FluentRegex
 
         internal abstract void ToString(StringBuilder builder);
 
-        // TODO: unique group name validation
-        // TODO: backreference validation
-
         public Regex Compile()
         {
             return new Regex(ToString(), DefaultOptions);

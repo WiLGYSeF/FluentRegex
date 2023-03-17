@@ -15,8 +15,6 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsSinglePattern => true;
 
-        // TODO: backreference group pattern
-
         public BackreferencePattern(int group)
         {
             WithGroup(group);

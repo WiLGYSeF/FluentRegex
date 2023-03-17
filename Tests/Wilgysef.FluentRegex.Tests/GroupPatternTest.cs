@@ -54,12 +54,14 @@ public class GroupPatternTest
 
         pattern.WithName("a");
         pattern.Name.ShouldBe("a");
+        pattern.IsNumbered.ShouldBeFalse();
 
         pattern.WithSecondName("b");
         pattern.SecondName.ShouldBe("b");
 
-        pattern.Capture(false);
-        pattern.IsCapturing.ShouldBeFalse();
+        pattern.WithCapture(false);
+        pattern.Capture.ShouldBeFalse();
+        pattern.IsCapturing.ShouldBeTrue();
     }
 
     [Fact]
@@ -69,6 +71,8 @@ public class GroupPatternTest
 
         pattern.WithPattern(new LiteralPattern("b"));
         pattern.ToString().ShouldBe("(b)");
+        pattern.IsCapturing.ShouldBeTrue();
+        pattern.IsNumbered.ShouldBeTrue();
     }
 
     [Fact]

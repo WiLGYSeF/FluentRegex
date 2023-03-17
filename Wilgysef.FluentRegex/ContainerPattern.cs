@@ -4,6 +4,8 @@ namespace Wilgysef.FluentRegex
 {
     public abstract class ContainerPattern : Pattern
     {
+        public IReadOnlyList<Pattern> Children => _children;
+
         internal override bool IsSinglePattern => _children.Count == 0
             || (_children.Count == 1 && _children[0].IsSinglePattern);
 

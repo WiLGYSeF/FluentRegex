@@ -194,7 +194,31 @@ namespace Wilgysef.FluentRegex
         private Pattern Current => _current ?? throw new InvalidOperationException("A pattern is required for quantifiers.");
         private Pattern? _current;
 
-        // TODO: get group number
+        public List<GroupPattern> GetNumberedGroups()
+        {
+            var groups = new List<GroupPattern>();
+
+            foreach (var pattern in Traverse(_children))
+            {
+                if (pattern is GroupPattern group && group.IsNumbered)
+                {
+                    groups.Add(group);
+                }
+            }
+
+            return groups;
+        }
+
+        public int? GetGroupNumber(GroupPattern group, IList<GroupPattern>? groups = null)
+        {
+            var index = (groups ?? GetNumberedGroups()).IndexOf(group);
+            if (index == -1)
+            {
+                return null;
+            }
+
+            return index + 1;
+        }
 
         public Pattern Build()
         {
@@ -218,6 +242,38 @@ namespace Wilgysef.FluentRegex
             _children[^1] = pattern;
             _current = pattern;
             return this;
+        }
+
+        private static IEnumerable<Pattern> Traverse(IReadOnlyList<Pattern> patterns)
+        {
+            var stack = new Stack<IEnumerator<Pattern>>();
+            stack.Push(patterns.GetEnumerator());
+
+            while (stack.Count > 0)
+            {
+                var currentPatterns = stack.Peek();
+                var skipPop = false;
+
+                while (currentPatterns.MoveNext())
+                {
+                    yield return currentPatterns.Current;
+
+                    if (currentPatterns.Current is ContainerPattern container)
+                    {
+                        if (container.Children.Count > 0)
+                        {
+                            stack.Push(container.Children.GetEnumerator());
+                            skipPop = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!skipPop)
+                {
+                    stack.Pop();
+                }
+            }
         }
     }
 }
