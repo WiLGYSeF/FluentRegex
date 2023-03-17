@@ -173,7 +173,6 @@ public class CharacterPatternTest
         pattern.ToString().ShouldBe(@"\d+");
     }
 
-    // TODO: move?
     private static void ShouldCreatePattern(Func<Pattern> func, string? expected)
     {
         if (expected != null)

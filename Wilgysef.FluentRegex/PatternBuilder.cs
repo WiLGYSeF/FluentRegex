@@ -174,8 +174,22 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder AtMost(int max, bool greedy = true) => AddQuantifier(0, max, greedy);
 
-        // TODO: cannot quantify anchors
-        private PatternBuilder AddQuantifier(int min, int? max, bool greedy) => ReplaceLast(new QuantifierPattern(Current, min, max, greedy));
+        private PatternBuilder AddQuantifier(int min, int? max, bool greedy)
+        {
+            var current = Current;
+
+            if (current is AnchorPattern)
+            {
+                throw new InvalidOperationException("Cannot quantify an anchor.");
+            }
+
+            if (current is ConcatPattern concat && !concat.IsSinglePattern)
+            {
+                current = new GroupPattern(current, capture: false);
+            }
+
+            return ReplaceLast(new QuantifierPattern(current, min, max, greedy));
+        }
 
         #endregion
 

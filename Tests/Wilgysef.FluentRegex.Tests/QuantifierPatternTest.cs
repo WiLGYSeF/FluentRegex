@@ -36,6 +36,7 @@ public class QuantifierPatternTest
     [InlineData(3, "a{3}")]
     [InlineData(0, "")]
     [InlineData(-1, null)]
+    [InlineData(1, "a")]
     public void Exactly(int count, string? expected)
     {
         ShouldCreatePattern(
@@ -79,6 +80,25 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").AtMost(max, greedy),
             expected);
+    }
+
+    [Fact]
+    public void QuantifyConcat()
+    {
+        ShouldCreatePattern(
+            () => new PatternBuilder().Concat(
+                new LiteralPattern("a"),
+                new CharacterSetPattern('b', 'c'))
+                .Between(1, 3),
+            "(?:a[bc]){1,3}");
+    }
+
+    [Fact]
+    public void QuantifyConcat_Single()
+    {
+        ShouldCreatePattern(
+            () => new PatternBuilder().Concat(new LiteralPattern("a")).Between(1, 3),
+            "a{1,3}");
     }
 
     [Fact]
@@ -186,7 +206,7 @@ public class QuantifierPatternTest
     }
 
     [Fact]
-    public void IsNotSingle()
+    public void Wrap()
     {
         var pattern = new PatternBuilder().Literal("a").Between(1, 3).Between(2, 4);
 
@@ -196,7 +216,13 @@ public class QuantifierPatternTest
     [Fact]
     public void Fail_NoPreviousPattern()
     {
-        Should.Throw<InvalidOperationException>(() => new PatternBuilder().ZeroOrOne());
+        ShouldCreatePattern(() => new PatternBuilder().ZeroOrOne(), null);
+    }
+
+    [Fact]
+    public void Fail_InvalidQuantifier()
+    {
+        ShouldCreatePattern(() => new PatternBuilder().BeginLine.Exactly(3), null);
     }
 
     private static void ShouldCreatePattern(Func<Pattern> func, string? expected)

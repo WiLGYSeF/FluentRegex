@@ -140,12 +140,15 @@ public class CharacterSetPatternTest
     public void FluentCharacterRange()
     {
         var pattern = new CharacterSetPattern('a', 'b');
+        pattern.Characters.Count.ShouldBe(2);
 
         pattern.WithCharacterRange('0', '9');
         pattern.ToString().ShouldBe("[0-9ab]");
+        pattern.CharacterRanges.Count.ShouldBe(1);
 
         pattern.WithCharacterRange(CharacterPattern.Character('c'), CharacterPattern.Character('e'));
         pattern.ToString().ShouldBe("[0-9c-eab]");
+        pattern.CharacterRanges.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -155,9 +158,11 @@ public class CharacterSetPatternTest
 
         pattern.WithSubtractedCharacters('0', '9');
         pattern.ToString().ShouldBe("[ab-[09]]");
+        pattern.SubtractedCharacters.Count.ShouldBe(2);
 
         pattern.WithSubtractedCharacters(CharacterPattern.Character('5'));
         pattern.ToString().ShouldBe("[ab-[095]]");
+        pattern.SubtractedCharacters.Count.ShouldBe(3);
     }
 
     [Fact]
@@ -167,9 +172,11 @@ public class CharacterSetPatternTest
 
         pattern.WithSubtractedCharacterRange('0', '9');
         pattern.ToString().ShouldBe("[ab-[0-9]]");
+        pattern.SubtractedCharacterRanges.Count.ShouldBe(1);
 
         pattern.WithSubtractedCharacterRange(CharacterPattern.Character('c'), CharacterPattern.Character('e'));
         pattern.ToString().ShouldBe("[ab-[0-9c-e]]");
+        pattern.SubtractedCharacterRanges.Count.ShouldBe(2);
     }
 
     [Fact]

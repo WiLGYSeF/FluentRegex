@@ -249,8 +249,7 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        // TODO: make class?
-        public struct CharacterRange
+        public class CharacterRange
         {
             public CharacterPattern Start { get; }
 

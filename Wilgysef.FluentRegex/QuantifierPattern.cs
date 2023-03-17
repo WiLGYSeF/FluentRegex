@@ -65,6 +65,11 @@ namespace Wilgysef.FluentRegex
 
             Pattern.Wrap(builder);
 
+            if (Min == 1 && Max.HasValue && Max.Value == 1)
+            {
+                return;
+            }
+
             if (Min == 0)
             {
                 if (Max.HasValue)
