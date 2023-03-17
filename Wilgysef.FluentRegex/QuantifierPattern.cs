@@ -43,6 +43,12 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        public QuantifierPattern WithPattern(Pattern pattern)
+        {
+            Pattern = pattern;
+            return this;
+        }
+
         internal override void ToString(StringBuilder builder)
         {
             if (Min < 0 || Max.HasValue && Max.Value < 0)

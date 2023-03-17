@@ -33,4 +33,21 @@ public class LookaheadPatternTest
 
         pattern.ToString().ShouldBe("(?<!abc)");
     }
+
+    [Fact]
+    public void FluentPattern()
+    {
+        var pattern = LookaheadPattern.PositiveLookahead(new LiteralPattern("a"));
+
+        pattern.WithPattern(new LiteralPattern("b"));
+        pattern.ToString().ShouldBe("(?=b)");
+    }
+
+    [Fact]
+    public void NoPattern()
+    {
+        var pattern = new PatternBuilder().PositiveLookahead(null);
+
+        pattern.ToString().ShouldBe("(?=)");
+    }
 }

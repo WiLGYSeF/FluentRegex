@@ -2,16 +2,22 @@
 
 namespace Wilgysef.FluentRegex
 {
-    internal class AtomicGroupPattern : AbstractGroupPattern
+    public class AtomicGroupPattern : AbstractGroupPattern
     {
         protected override bool HasContents => true;
 
-        public AtomicGroupPattern(Pattern pattern) : base(pattern) { }
+        public AtomicGroupPattern(Pattern? pattern) : base(pattern) { }
+
+        public AbstractGroupPattern WithPattern(Pattern? pattern)
+        {
+            Pattern = pattern;
+            return this;
+        }
 
         protected override void GroupContents(StringBuilder builder)
         {
             builder.Append("?>");
-            _pattern!.ToString(builder);
+            Pattern?.ToString(builder);
         }
     }
 }

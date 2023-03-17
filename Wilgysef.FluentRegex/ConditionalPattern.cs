@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
@@ -9,15 +8,36 @@ namespace Wilgysef.FluentRegex
 
         public string? GroupName { get; private set; }
 
-        public Pattern? Expression { get; private set; }
+        public Pattern? Expression
+        {
+            get => _expression;
+            set => SetChildPattern(value, ref _expression, ExpressionIndex);
+        }
 
         public bool Lookahead { get; private set; }
 
-        public Pattern YesPattern { get => _pattern!; set => _pattern = value; }
+        public Pattern YesPattern
+        {
+            get => _children[YesIndex];
+            set => _children[YesIndex] = value;
+        }
 
-        public Pattern? NoPattern { get; set; }
+        public Pattern? NoPattern
+        {
+            get => _no;
+            set => SetChildPattern(value, ref _no, NoIndex);
+        }
 
         protected override bool HasContents => true;
+
+        private int ExpressionIndex => 0;
+
+        private int YesIndex => Expression != null ? 1 : 0;
+
+        private int NoIndex => Expression != null ? 2 : 1;
+
+        private Pattern? _expression;
+        private Pattern? _no;
 
         public ConditionalPattern(Pattern expression, Pattern yes, Pattern? no, bool lookahead = true)
             : base(yes)
@@ -104,12 +124,34 @@ namespace Wilgysef.FluentRegex
 
             builder.Append(')');
 
-            _pattern!.Wrap(builder);
+            YesPattern.Wrap(builder);
 
             if (NoPattern != null)
             {
                 builder.Append('|');
                 NoPattern.Wrap(builder);
+            }
+        }
+
+        private void SetChildPattern(Pattern? value, ref Pattern? pattern, int index)
+        {
+            if (value != null)
+            {
+                if (pattern == null)
+                {
+                    pattern = value;
+                    _children.Insert(index, pattern);
+                }
+                else
+                {
+                    pattern = value;
+                    _children[index] = pattern;
+                }
+            }
+            else if (pattern != null)
+            {
+                pattern = value;
+                _children.RemoveAt(index);
             }
         }
     }

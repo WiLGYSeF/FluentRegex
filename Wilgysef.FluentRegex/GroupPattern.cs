@@ -86,6 +86,12 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        public GroupPattern WithPattern(Pattern? pattern)
+        {
+            Pattern = pattern;
+            return this;
+        }
+
         protected override void GroupContents(StringBuilder builder)
         {
             if (Name != null && !IsValidName(Name))
@@ -122,7 +128,7 @@ namespace Wilgysef.FluentRegex
                 builder.Append("?:");
             }
 
-            _pattern?.ToString(builder);
+            Pattern?.ToString(builder);
         }
 
         public static bool IsValidName(string name)

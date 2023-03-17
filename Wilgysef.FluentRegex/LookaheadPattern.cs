@@ -5,21 +5,27 @@ namespace Wilgysef.FluentRegex
 {
     public class LookaheadPattern : AbstractGroupPattern
     {
-        public static Pattern PositiveLookahead(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookahead);
+        public static LookaheadPattern PositiveLookahead(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookahead);
 
-        public static Pattern NegativeLookahead(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookahead);
+        public static LookaheadPattern NegativeLookahead(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookahead);
 
-        public static Pattern PositiveLookbehind(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookbehind);
+        public static LookaheadPattern PositiveLookbehind(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookbehind);
 
-        public static Pattern NegativeLookbehind(Pattern pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookbehind);
+        public static LookaheadPattern NegativeLookbehind(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookbehind);
 
         protected override bool HasContents => true;
 
         private readonly LookaheadType _type;
 
-        private LookaheadPattern(Pattern pattern, LookaheadType type) : base(pattern)
+        private LookaheadPattern(Pattern? pattern, LookaheadType type) : base(pattern)
         {
             _type = type;
+        }
+
+        public LookaheadPattern WithPattern(Pattern? pattern)
+        {
+            Pattern = pattern;
+            return this;
         }
 
         protected override void GroupContents(StringBuilder builder)
@@ -44,7 +50,7 @@ namespace Wilgysef.FluentRegex
                     throw new ArgumentOutOfRangeException();
             }
 
-            _pattern!.ToString(builder);
+            Pattern?.ToString(builder);
         }
 
         private enum LookaheadType

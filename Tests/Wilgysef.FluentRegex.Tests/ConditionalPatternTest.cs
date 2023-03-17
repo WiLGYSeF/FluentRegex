@@ -88,5 +88,8 @@ public class ConditionalPatternTest
 
         pattern.WithNoPattern(new LiteralPattern("2"));
         pattern.ToString().ShouldBe("(?(?=z)1|2)");
+
+        pattern.WithNoPattern(null);
+        pattern.ToString().ShouldBe("(?(?=z)1)");
     }
 }

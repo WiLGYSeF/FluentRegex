@@ -8,16 +8,18 @@ namespace Wilgysef.FluentRegex
 
         public CommentPattern(string value) : base(new LiteralPattern(value)) { }
 
-        public CommentPattern WithValue(string value)
+        public CommentPattern WithValue(string? value)
         {
-            _pattern = new LiteralPattern(value);
+            Pattern = value != null
+                ? new LiteralPattern(value)
+                : null;
             return this;
         }
 
         protected override void GroupContents(StringBuilder builder)
         {
             builder.Append("?#");
-            _pattern?.ToString(builder);
+            Pattern?.ToString(builder);
         }
     }
 }

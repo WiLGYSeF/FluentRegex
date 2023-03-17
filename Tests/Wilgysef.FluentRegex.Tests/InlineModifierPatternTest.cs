@@ -67,6 +67,15 @@ public class InlineModifierPatternTest
         }
     }
 
+    [Fact]
+    public void FluentPattern()
+    {
+        var pattern = new InlineModifierPattern(new LiteralPattern("a"), InlineModifier.IgnoreCase);
+
+        pattern.WithPattern(new LiteralPattern("b"));
+        pattern.ToString().ShouldBe("(?i:b)");
+    }
+
     private static void ShouldHaveModifier(InlineModifier modifiers, InlineModifier flag)
     {
         (modifiers & flag).ShouldBe(flag);

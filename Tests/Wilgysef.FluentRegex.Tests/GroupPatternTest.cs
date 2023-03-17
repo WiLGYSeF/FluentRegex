@@ -63,6 +63,15 @@ public class GroupPatternTest
     }
 
     [Fact]
+    public void FluentPattern()
+    {
+        var pattern = new GroupPattern(new LiteralPattern("a"));
+
+        pattern.WithPattern(new LiteralPattern("b"));
+        pattern.ToString().ShouldBe("(b)");
+    }
+
+    [Fact]
     public void Fail_InvalidName()
     {
         Should.Throw<InvalidOperationException>(() => new PatternBuilder().CaptureGroup("", new LiteralPattern("a")).ToString());

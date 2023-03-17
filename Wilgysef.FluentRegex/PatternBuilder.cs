@@ -8,8 +8,6 @@ namespace Wilgysef.FluentRegex
 {
     public class PatternBuilder : ContainerPattern
     {
-        // TODO: change properties to methods?
-
         #region Anchors
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -112,9 +110,9 @@ namespace Wilgysef.FluentRegex
 
         #region Groups
 
-        public PatternBuilder AtomicGroup(Pattern pattern) => Add(new AtomicGroupPattern(pattern));
+        public PatternBuilder AtomicGroup(Pattern? pattern) => Add(new AtomicGroupPattern(pattern));
 
-        public PatternBuilder Comment(string value) => Add(new CommentPattern(value));
+        public PatternBuilder Comment(string? value) => Add(new CommentPattern(value));
 
         public PatternBuilder Conditional(Pattern expression, Pattern yes, Pattern? no, bool lookahead = true) => Add(new ConditionalPattern(expression, yes, no, lookahead));
 
@@ -128,7 +126,7 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder CaptureGroup(string name, Pattern? pattern) => Add(new GroupPattern(pattern, name, true));
 
-        public PatternBuilder NonCaptureGroup(Pattern pattern) => Add(new GroupPattern(pattern, null, false));
+        public PatternBuilder NonCaptureGroup(Pattern? pattern) => Add(new GroupPattern(pattern, null, false));
 
         public PatternBuilder BalancingGroup(string? name1, string name2, Pattern? pattern) => Add(new GroupPattern(pattern, name1, name2));
 
@@ -140,13 +138,13 @@ namespace Wilgysef.FluentRegex
 
         public PatternBuilder Modifiers(Pattern? pattern, InlineModifier modifiers, InlineModifier disabledModifiers) => Add(new InlineModifierPattern(pattern, modifiers, disabledModifiers));
 
-        public PatternBuilder PositiveLookahead(Pattern pattern) => Add(LookaheadPattern.PositiveLookahead(pattern));
+        public PatternBuilder PositiveLookahead(Pattern? pattern) => Add(LookaheadPattern.PositiveLookahead(pattern));
 
-        public PatternBuilder NegativeLookahead(Pattern pattern) => Add(LookaheadPattern.NegativeLookahead(pattern));
+        public PatternBuilder NegativeLookahead(Pattern? pattern) => Add(LookaheadPattern.NegativeLookahead(pattern));
 
-        public PatternBuilder PositiveLookbehind(Pattern pattern) => Add(LookaheadPattern.PositiveLookbehind(pattern));
+        public PatternBuilder PositiveLookbehind(Pattern? pattern) => Add(LookaheadPattern.PositiveLookbehind(pattern));
 
-        public PatternBuilder NegativeLookbehind(Pattern pattern) => Add(LookaheadPattern.NegativeLookbehind(pattern));
+        public PatternBuilder NegativeLookbehind(Pattern? pattern) => Add(LookaheadPattern.NegativeLookbehind(pattern));
 
         #endregion
 

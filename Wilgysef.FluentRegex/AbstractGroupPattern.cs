@@ -2,17 +2,31 @@
 
 namespace Wilgysef.FluentRegex
 {
-    public abstract class AbstractGroupPattern : Pattern
+    public abstract class AbstractGroupPattern : ContainerPattern
     {
         internal sealed override bool IsSinglePattern => true;
 
         protected abstract bool HasContents { get; }
 
-        protected Pattern? _pattern;
+        protected Pattern? Pattern
+        {
+            get => _children.Count != 0 ? _children[0] : null;
+            set
+            {
+                if (value != null)
+                {
+                    _children.Insert(0, value);
+                }
+                else
+                {
+                    _children.Clear();
+                }
+            }
+        }
 
         protected AbstractGroupPattern(Pattern? pattern)
         {
-            _pattern = pattern;
+            Pattern = pattern;
         }
 
         protected abstract void GroupContents(StringBuilder builder);

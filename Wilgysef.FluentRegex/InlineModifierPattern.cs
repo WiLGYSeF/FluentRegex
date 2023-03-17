@@ -61,6 +61,12 @@ namespace Wilgysef.FluentRegex
 
         public InlineModifierPattern WithIgnorePatternWhitespaceDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.IgnorePatternWhitespace, enable);
 
+        public InlineModifierPattern WithPattern(Pattern? pattern)
+        {
+            Pattern = pattern;
+            return this;
+        }
+
         #endregion
 
         protected override void GroupContents(StringBuilder builder)
@@ -81,10 +87,10 @@ namespace Wilgysef.FluentRegex
                 AppendFlags(disabledModifiers);
             }
 
-            if (_pattern != null)
+            if (Pattern != null)
             {
                 builder.Append(':');
-                _pattern.ToString(builder);
+                Pattern.ToString(builder);
             }
 
             void AppendFlags(InlineModifier modifiers)

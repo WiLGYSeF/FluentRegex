@@ -206,6 +206,15 @@ public class QuantifierPatternTest
     }
 
     [Fact]
+    public void FluentPattern()
+    {
+        var pattern = new QuantifierPattern(new LiteralPattern("a"), 2, 2, true);
+
+        pattern.WithPattern(new LiteralPattern("b"));
+        pattern.ToString().ShouldBe("b{2}");
+    }
+
+    [Fact]
     public void Wrap()
     {
         var pattern = new PatternBuilder().Literal("a").Between(1, 3).Between(2, 4);

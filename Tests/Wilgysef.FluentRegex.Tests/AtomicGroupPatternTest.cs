@@ -9,4 +9,13 @@ public class AtomicGroupPatternTest
 
         pattern.ToString().ShouldBe("(?>asdf)");
     }
+
+    [Fact]
+    public void FluentPattern()
+    {
+        var pattern = new AtomicGroupPattern(new LiteralPattern("a"));
+
+        pattern.WithPattern(new LiteralPattern("b"));
+        pattern.ToString().ShouldBe("(?>b)");
+    }
 }
