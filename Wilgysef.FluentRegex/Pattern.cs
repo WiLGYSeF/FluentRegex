@@ -20,10 +20,10 @@ namespace Wilgysef.FluentRegex
         internal abstract bool IsSinglePattern { get; }
 
         /// <summary>
-        /// Convert pattern to string.
+        /// Build pattern.
         /// </summary>
-        /// <param name="builder">String builder.</param>
-        internal abstract void ToString(StringBuilder builder);
+        /// <param name="state">Pattern build state.</param>
+        internal abstract void Build(PatternBuildState state);
 
         /// <summary>
         /// Compiles the pattern into a regular expression.
@@ -48,9 +48,9 @@ namespace Wilgysef.FluentRegex
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            ToString(builder);
-            return builder.ToString();
+            var state = new PatternBuildState();
+            Build(state);
+            return state.ToString();
         }
 
         /// <summary>
@@ -58,15 +58,15 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="builder">String builder.</param>
         /// <param name="always">Whether wrapping should always be done.</param>
-        internal void Wrap(StringBuilder builder, bool always = false)
+        internal void Wrap(PatternBuildState state, bool always = false)
         {
             if (always || !IsSinglePattern)
             {
-                GroupPattern.NonCaptureGroup(builder, this);
+                GroupPattern.NonCaptureGroup(state, this);
             }
             else
             {
-                ToString(builder);
+                Build(state);
             }
         }
 
@@ -106,10 +106,11 @@ namespace Wilgysef.FluentRegex
                         {
                             if (stack.Any(i => i.Pattern == container))
                             {
-                                throw new InvalidOperationException("Pattern is infinitely recursive.");
+                                var path = GetPatternPath(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), container);
+                                throw new InvalidOperationException($"Pattern is infinitely recursive: {path}");
                             }
 
-                            stack.Push(new TraverseItem(item.Pattern, container.Children.GetEnumerator()));
+                            stack.Push(new TraverseItem(container, container.Children.GetEnumerator()));
                             skipPop = true;
                             break;
                         }
@@ -120,6 +121,36 @@ namespace Wilgysef.FluentRegex
                 {
                     stack.Pop();
                 }
+            }
+        }
+
+        internal static string GetPatternPath(IEnumerable<Pattern> patterns, Pattern? search)
+        {
+            var builder = new StringBuilder();
+
+            using var enumerator = patterns.GetEnumerator();
+
+            if (enumerator.MoveNext())
+            {
+                Append(enumerator.Current);
+            }
+
+            while (enumerator.MoveNext())
+            {
+                builder.Append(" -> ");
+                Append(enumerator.Current);
+            }
+
+            return builder.ToString();
+
+            void Append(Pattern pattern)
+            {
+                if (pattern == search)
+                {
+                    builder.Append('*');
+                }
+
+                builder.Append(pattern.GetType().Name);
             }
         }
 

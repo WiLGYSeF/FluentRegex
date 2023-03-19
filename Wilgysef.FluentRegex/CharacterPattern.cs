@@ -99,7 +99,9 @@ namespace Wilgysef.FluentRegex
         /// <returns><see langword="true"/> if the character pattern has a <see langword="char"/> value, otherwise <see langword="false"/>.</returns>
         public abstract bool TryGetChar(out char character);
 
-        internal abstract void ToString(StringBuilder builder, bool fromCharacterSet);
+        internal abstract void Build(PatternBuildState state, bool fromCharacterSet);
+
+        internal abstract void Build(StringBuilder builder, bool fromCharacterSet);
 
         protected enum CharacterType
         {

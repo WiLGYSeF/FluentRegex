@@ -37,9 +37,14 @@ namespace Wilgysef.FluentRegex
             return new LiteralPattern(Value);
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            EscapeString(builder, Value);
+            state.WithPattern(this, Build);
+
+            void Build(StringBuilder builder)
+            {
+                EscapeString(builder, Value);
+            }
         }
 
         /// <summary>

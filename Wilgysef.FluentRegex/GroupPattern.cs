@@ -124,43 +124,48 @@ namespace Wilgysef.FluentRegex
                 : new GroupPattern(Pattern?.Copy(), Name, Capture);
         }
 
-        protected override void GroupContents(StringBuilder builder)
+        private protected override void GroupContents(PatternBuildState state)
         {
-            if (Name != null && !IsValidName(Name))
-            {
-                throw new InvalidOperationException("Group name is not valid.");
-            }
-            if (SecondName != null && !IsValidName(SecondName))
-            {
-                throw new InvalidOperationException("Group second name is not valid.");
-            }
+            state.WithPattern(this, Build);
 
-            if (IsCapturing)
+            void Build(StringBuilder builder)
             {
-                if (Name != null || SecondName != null)
+                if (Name != null && !IsValidName(Name))
                 {
-                    builder.Append("?<");
-
-                    if (Name != null)
-                    {
-                        builder.Append(Name);
-                    }
-
-                    if (SecondName != null)
-                    {
-                        builder.Append('-');
-                        builder.Append(SecondName);
-                    }
-
-                    builder.Append('>');
+                    throw new InvalidOperationException("Group name is not valid.");
                 }
-            }
-            else
-            {
-                builder.Append("?:");
-            }
+                if (SecondName != null && !IsValidName(SecondName))
+                {
+                    throw new InvalidOperationException("Group second name is not valid.");
+                }
 
-            Pattern?.ToString(builder);
+                if (IsCapturing)
+                {
+                    if (Name != null || SecondName != null)
+                    {
+                        builder.Append("?<");
+
+                        if (Name != null)
+                        {
+                            builder.Append(Name);
+                        }
+
+                        if (SecondName != null)
+                        {
+                            builder.Append('-');
+                            builder.Append(SecondName);
+                        }
+
+                        builder.Append('>');
+                    }
+                }
+                else
+                {
+                    builder.Append("?:");
+                }
+
+                Pattern?.Build(state);
+            }
         }
 
         /// <summary>
@@ -256,11 +261,16 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="builder">String builder.</param>
         /// <param name="pattern">Pattern to wrap.</param>
-        internal static void NonCaptureGroup(StringBuilder builder, Pattern pattern)
+        internal static void NonCaptureGroup(PatternBuildState state, Pattern pattern)
         {
-            builder.Append("(?:");
-            pattern.ToString(builder);
-            builder.Append(')');
+            state.WithBuilder(Build);
+
+            void Build(StringBuilder builder)
+            {
+                builder.Append("(?:");
+                pattern.Build(state);
+                builder.Append(')');
+            }
         }
     }
 }

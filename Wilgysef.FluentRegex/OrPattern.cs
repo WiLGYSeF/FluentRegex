@@ -34,24 +34,29 @@ namespace Wilgysef.FluentRegex
             return new OrPattern(_children.Select(c => c.Copy()));
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            if (_children.Count <= 1)
+            state.WithPattern(this, Build);
+
+            void Build(StringBuilder builder)
             {
-                if (_children.Count == 1)
+                if (_children.Count <= 1)
                 {
-                    _children[0].ToString(builder);
+                    if (_children.Count == 1)
+                    {
+                        _children[0].Build(state);
+                    }
+
+                    return;
                 }
 
-                return;
-            }
+                _children[0].Build(state);
 
-            _children[0].ToString(builder);
-
-            for (var i = 1; i < _children.Count; i++)
-            {
-                builder.Append('|');
-                _children[i].ToString(builder);
+                for (var i = 1; i < _children.Count; i++)
+                {
+                    builder.Append('|');
+                    _children[i].Build(state);
+                }
             }
         }
     }

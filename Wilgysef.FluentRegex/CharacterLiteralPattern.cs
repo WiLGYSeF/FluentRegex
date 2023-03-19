@@ -122,12 +122,22 @@ namespace Wilgysef.FluentRegex
             };
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            ToString(builder, false);
+            Build(state, false);
         }
 
-        internal override void ToString(StringBuilder builder, bool fromCharacterSet)
+        internal override void Build(PatternBuildState state, bool fromCharacterSet)
+        {
+            state.WithPattern(this, Build1);
+
+            void Build1(StringBuilder builder)
+            {
+                Build(builder, fromCharacterSet);
+            }
+        }
+
+        internal override void Build(StringBuilder builder, bool fromCharacterSet)
         {
             switch (Type)
             {

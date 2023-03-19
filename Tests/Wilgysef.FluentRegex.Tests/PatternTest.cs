@@ -81,5 +81,7 @@ public class PatternTest
         var builder = new PatternBuilder().CaptureGroup("z", group);
 
         Should.Throw<InvalidOperationException>(() => builder.Build());
+
+        Should.Throw<InvalidOperationException>(() => group.ToString());
     }
 }

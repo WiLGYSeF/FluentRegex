@@ -136,7 +136,7 @@ namespace Wilgysef.FluentRegex
             return new QuantifierPattern(Pattern.Copy(), Min, Max, Greedy);
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
             if (Min < 0 || Max.HasValue && Max.Value < 0)
             {
@@ -156,58 +156,63 @@ namespace Wilgysef.FluentRegex
                 }
             }
 
-            Pattern.Wrap(builder);
+            state.WithPattern(this, Build);
 
-            if (Min == 1 && Max.HasValue && Max.Value == 1)
+            void Build(StringBuilder builder)
             {
-                return;
-            }
+                Pattern.Wrap(state);
 
-            if (Min == 0)
-            {
-                if (Max.HasValue)
+                if (Min == 1 && Max.HasValue && Max.Value == 1)
                 {
-                    if (Max.Value == 1)
+                    return;
+                }
+
+                if (Min == 0)
+                {
+                    if (Max.HasValue)
                     {
-                        builder.Append('?');
+                        if (Max.Value == 1)
+                        {
+                            builder.Append('?');
+                        }
+                        else
+                        {
+                            builder.Append("{0,");
+                            builder.Append(Max.Value);
+                            builder.Append('}');
+                        }
                     }
                     else
                     {
-                        builder.Append("{0,");
-                        builder.Append(Max.Value);
-                        builder.Append('}');
+                        builder.Append('*');
                     }
+                }
+                else if (Min == 1 && !Max.HasValue)
+                {
+                    builder.Append('+');
                 }
                 else
                 {
-                    builder.Append('*');
-                }
-            }
-            else if (Min == 1 && !Max.HasValue)
-            {
-                builder.Append('+');
-            }
-            else
-            {
-                builder.Append('{');
-                builder.Append(Min);
+                    builder.Append('{');
+                    builder.Append(Min);
 
-                if (!Max.HasValue || Min != Max.Value)
-                {
-                    builder.Append(',');
-
-                    if (Max.HasValue)
+                    if (!Max.HasValue || Min != Max.Value)
                     {
-                        builder.Append(Max.Value);
+                        builder.Append(',');
+
+                        if (Max.HasValue)
+                        {
+                            builder.Append(Max.Value);
+                        }
                     }
+
+                    builder.Append('}');
                 }
 
-                builder.Append('}');
-            }
-
-            if (!Greedy)
-            {
-                builder.Append('?');
+                if (!Greedy)
+                {
+                    builder.Append('?');
+                }
             }
         }
 

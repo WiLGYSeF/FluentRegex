@@ -31,10 +31,15 @@ namespace Wilgysef.FluentRegex
             return new CommentPattern((Pattern as LiteralPattern)?.Value);
         }
 
-        protected override void GroupContents(StringBuilder builder)
+        private protected override void GroupContents(PatternBuildState state)
         {
-            builder.Append("?#");
-            Pattern?.ToString(builder);
+            state.WithPattern(this, Build);
+
+            void Build(StringBuilder builder)
+            {
+                builder.Append("?#");
+                Pattern?.Build(state);
+            }
         }
     }
 }

@@ -63,4 +63,24 @@ public class LiteralPatternTest
         LiteralPattern.EscapeChar('}').ShouldBe(@"\}");
         LiteralPattern.EscapeChar('a').ShouldBe("a");
     }
+
+    [Fact]
+    public void IsSpecialCharacter()
+    {
+        LiteralPattern.IsSpecialCharacter('$').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('(').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter(')').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('*').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('+').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('.').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('?').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('[').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('\\').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter(']').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('^').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('{').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('|').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('}').ShouldBeTrue();
+        LiteralPattern.IsSpecialCharacter('a').ShouldBeFalse();
+    }
 }

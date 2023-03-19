@@ -11,9 +11,14 @@ namespace Wilgysef.FluentRegex
             return new SingleCharacterPattern();
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            builder.Append('.');
+            state.WithPattern(this, Build);
+
+            static void Build(StringBuilder builder)
+            {
+                builder.Append('.');
+            }
         }
     }
 }

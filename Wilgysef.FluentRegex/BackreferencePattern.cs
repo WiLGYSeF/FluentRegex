@@ -88,23 +88,28 @@ namespace Wilgysef.FluentRegex
             };
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            if (Type == BackreferenceType.Number)
-            {
-                if (GroupNumber!.Value > 9)
-                {
-                    throw new InvalidOperationException("Backreference number exceeds limit of 9.");
-                }
+            state.WithPattern(this, Build);
 
-                builder.Append('\\');
-                builder.Append(GroupNumber!.Value);
-            }
-            else
+            void Build(StringBuilder builder)
             {
-                builder.Append(@"\k<");
-                builder.Append(GroupName);
-                builder.Append('>');
+                if (Type == BackreferenceType.Number)
+                {
+                    if (GroupNumber!.Value > 9)
+                    {
+                        throw new InvalidOperationException("Backreference number exceeds limit of 9.");
+                    }
+
+                    builder.Append('\\');
+                    builder.Append(GroupNumber!.Value);
+                }
+                else
+                {
+                    builder.Append(@"\k<");
+                    builder.Append(GroupName);
+                    builder.Append('>');
+                }
             }
         }
 

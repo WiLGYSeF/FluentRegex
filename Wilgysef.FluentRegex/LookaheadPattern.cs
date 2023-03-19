@@ -58,29 +58,34 @@ namespace Wilgysef.FluentRegex
             return new LookaheadPattern(Pattern?.Copy(), _type);
         }
 
-        protected override void GroupContents(StringBuilder builder)
+        private protected override void GroupContents(PatternBuildState state)
         {
-            builder.Append('?');
+            state.WithPattern(this, Build);
 
-            switch (_type)
+            void Build(StringBuilder builder)
             {
-                case LookaheadType.PositiveLookahead:
-                    builder.Append('=');
-                    break;
-                case LookaheadType.NegativeLookahead:
-                    builder.Append('!');
-                    break;
-                case LookaheadType.PositiveLookbehind:
-                    builder.Append("<=");
-                    break;
-                case LookaheadType.NegativeLookbehind:
-                    builder.Append("<!");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                builder.Append('?');
 
-            Pattern?.ToString(builder);
+                switch (_type)
+                {
+                    case LookaheadType.PositiveLookahead:
+                        builder.Append('=');
+                        break;
+                    case LookaheadType.NegativeLookahead:
+                        builder.Append('!');
+                        break;
+                    case LookaheadType.PositiveLookbehind:
+                        builder.Append("<=");
+                        break;
+                    case LookaheadType.NegativeLookbehind:
+                        builder.Append("<!");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                Pattern?.Build(state);
+            }
         }
 
         private enum LookaheadType

@@ -45,19 +45,24 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Writes the group contents to the string builder.
         /// </summary>
-        /// <param name="builder">String builder.</param>
-        protected abstract void GroupContents(StringBuilder builder);
+        /// <param name="state">Pattern build state.</param>
+        private protected abstract void GroupContents(PatternBuildState state);
 
-        internal sealed override void ToString(StringBuilder builder)
+        internal sealed override void Build(PatternBuildState state)
         {
             if (!HasContents)
             {
                 return;
             }
 
-            builder.Append('(');
-            GroupContents(builder);
-            builder.Append(')');
+            state.WithBuilder(Build);
+
+            void Build(StringBuilder builder)
+            {
+                builder.Append('(');
+                GroupContents(state);
+                builder.Append(')');
+            }
         }
     }
 }

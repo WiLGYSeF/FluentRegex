@@ -59,36 +59,41 @@ namespace Wilgysef.FluentRegex
             return new AnchorPattern(_type);
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            switch (_type)
+            state.WithPattern(this, Build);
+
+            void Build(StringBuilder builder)
             {
-                case AnchorType.BeginLine:
-                    builder.Append(@"^");
-                    break;
-                case AnchorType.EndLine:
-                    builder.Append(@"$");
-                    break;
-                case AnchorType.Start:
-                    builder.Append(@"\A");
-                    break;
-                case AnchorType.End:
-                    builder.Append(@"\Z");
-                    break;
-                case AnchorType.AbsoluteEnd:
-                    builder.Append(@"\z");
-                    break;
-                case AnchorType.StartOfMatch:
-                    builder.Append(@"\G");
-                    break;
-                case AnchorType.WordBoundary:
-                    builder.Append(@"\b");
-                    break;
-                case AnchorType.NonWordBoundary:
-                    builder.Append(@"\B");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                switch (_type)
+                {
+                    case AnchorType.BeginLine:
+                        builder.Append(@"^");
+                        break;
+                    case AnchorType.EndLine:
+                        builder.Append(@"$");
+                        break;
+                    case AnchorType.Start:
+                        builder.Append(@"\A");
+                        break;
+                    case AnchorType.End:
+                        builder.Append(@"\Z");
+                        break;
+                    case AnchorType.AbsoluteEnd:
+                        builder.Append(@"\z");
+                        break;
+                    case AnchorType.StartOfMatch:
+                        builder.Append(@"\G");
+                        break;
+                    case AnchorType.WordBoundary:
+                        builder.Append(@"\b");
+                        break;
+                    case AnchorType.NonWordBoundary:
+                        builder.Append(@"\B");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 

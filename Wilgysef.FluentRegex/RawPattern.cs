@@ -36,9 +36,14 @@ namespace Wilgysef.FluentRegex
             return new RawPattern(Regex);
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            builder.Append(Regex);
+            state.WithPattern(this, Build);
+
+            void Build(StringBuilder builder)
+            {
+                builder.Append(Regex);
+            }
         }
     }
 }

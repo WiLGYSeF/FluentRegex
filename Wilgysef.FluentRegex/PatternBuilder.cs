@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using static Wilgysef.FluentRegex.CharacterSetPattern;
 
 namespace Wilgysef.FluentRegex
@@ -286,9 +285,9 @@ namespace Wilgysef.FluentRegex
             return new PatternBuilder(_children.Select(c => c.Copy()));
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            Build().ToString(builder);
+            Build().Build(state);
         }
 
         private PatternBuilder Add(Pattern pattern)

@@ -132,52 +132,57 @@ namespace Wilgysef.FluentRegex
             return new InlineModifierPattern(Pattern?.Copy(), Modifiers, DisabledModifiers);
         }
 
-        protected override void GroupContents(StringBuilder builder)
+        private protected override void GroupContents(PatternBuildState state)
         {
-            // cancel out modifiers both enabled and disabled.
-            var modifiers = Modifiers & ~DisabledModifiers;
-            var disabledModifiers = DisabledModifiers & ~Modifiers;
+            state.WithPattern(this, Build);
 
-            builder.Append('?');
-
-            if (modifiers != InlineModifier.None)
+            void Build(StringBuilder builder)
             {
-                AppendFlags(modifiers);
-            }
+                // cancel out modifiers both enabled and disabled.
+                var modifiers = Modifiers & ~DisabledModifiers;
+                var disabledModifiers = DisabledModifiers & ~Modifiers;
 
-            if (disabledModifiers != InlineModifier.None)
-            {
-                builder.Append('-');
-                AppendFlags(disabledModifiers);
-            }
+                builder.Append('?');
 
-            if (Pattern != null)
-            {
-                builder.Append(':');
-                Pattern.ToString(builder);
-            }
+                if (modifiers != InlineModifier.None)
+                {
+                    AppendFlags(modifiers);
+                }
 
-            void AppendFlags(InlineModifier modifiers)
-            {
-                if ((modifiers & InlineModifier.IgnoreCase) != 0)
+                if (disabledModifiers != InlineModifier.None)
                 {
-                    builder.Append('i');
+                    builder.Append('-');
+                    AppendFlags(disabledModifiers);
                 }
-                if ((modifiers & InlineModifier.Multiline) != 0)
+
+                if (Pattern != null)
                 {
-                    builder.Append('m');
+                    builder.Append(':');
+                    Pattern.Build(state);
                 }
-                if ((modifiers & InlineModifier.ExplicitCapture) != 0)
+
+                void AppendFlags(InlineModifier modifiers)
                 {
-                    builder.Append('n');
-                }
-                if ((modifiers & InlineModifier.Singleline) != 0)
-                {
-                    builder.Append('s');
-                }
-                if ((modifiers & InlineModifier.IgnorePatternWhitespace) != 0)
-                {
-                    builder.Append('x');
+                    if ((modifiers & InlineModifier.IgnoreCase) != 0)
+                    {
+                        builder.Append('i');
+                    }
+                    if ((modifiers & InlineModifier.Multiline) != 0)
+                    {
+                        builder.Append('m');
+                    }
+                    if ((modifiers & InlineModifier.ExplicitCapture) != 0)
+                    {
+                        builder.Append('n');
+                    }
+                    if ((modifiers & InlineModifier.Singleline) != 0)
+                    {
+                        builder.Append('s');
+                    }
+                    if ((modifiers & InlineModifier.IgnorePatternWhitespace) != 0)
+                    {
+                        builder.Append('x');
+                    }
                 }
             }
         }

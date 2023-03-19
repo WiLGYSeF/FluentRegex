@@ -34,19 +34,24 @@ namespace Wilgysef.FluentRegex
             return new ConcatPattern(_children.Select(c => c.Copy()));
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
-            foreach (var child in _children)
+            state.WithPattern(this, Build);
+
+            void Build(StringBuilder builder)
             {
-                if (child is OrPattern orPattern
-                    && !orPattern.IsSinglePattern
-                    && _children.Count > 1)
+                foreach (var child in _children)
                 {
-                    orPattern.Wrap(builder, always: true);
-                }
-                else
-                {
-                    child.ToString(builder);
+                    if (child is OrPattern orPattern
+                        && !orPattern.IsSinglePattern
+                        && _children.Count > 1)
+                    {
+                        orPattern.Wrap(state, always: true);
+                    }
+                    else
+                    {
+                        child.Build(state);
+                    }
                 }
             }
         }

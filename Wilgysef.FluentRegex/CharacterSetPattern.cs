@@ -323,7 +323,7 @@ namespace Wilgysef.FluentRegex
                 Negated);
         }
 
-        internal override void ToString(StringBuilder builder)
+        internal override void Build(PatternBuildState state)
         {
             if (_characters.Count == 0 && _characterRanges.Count == 0)
             {
@@ -335,88 +335,93 @@ namespace Wilgysef.FluentRegex
                 return;
             }
 
-            if (_subtractedCharacters.Count == 0
-                && _subtractedCharacterRanges.Count == 0
-                && !Negated)
+            state.WithPattern(this, Build);
+
+            void Build(StringBuilder builder)
             {
-                if (_characters.Count == 1 && _characterRanges.Count == 0)
+                if (_subtractedCharacters.Count == 0
+                    && _subtractedCharacterRanges.Count == 0
+                    && !Negated)
                 {
-                    _characters[0].ToString(builder);
-                    return;
+                    if (_characters.Count == 1 && _characterRanges.Count == 0)
+                    {
+                        _characters[0].Build(state);
+                        return;
+                    }
+
+                    if (_characters.Count == 0 && _characterRanges.Count == 1 && _characterRanges[0].Single)
+                    {
+                        _characterRanges[0].Start.Build(state);
+                        return;
+                    }
                 }
 
-                if (_characters.Count == 0 && _characterRanges.Count == 1 && _characterRanges[0].Single)
+                // TODO: remove duplicate chars?
+
+                var tmpBuilder = new StringBuilder();
+
+                builder.Append('[');
+
+                if (Negated)
                 {
-                    _characterRanges[0].Start.ToString(builder);
-                    return;
+                    builder.Append('^');
                 }
-            }
 
-            // TODO: remove duplicate chars?
-
-            var tmpBuilder = new StringBuilder();
-
-            builder.Append('[');
-
-            if (Negated)
-            {
-                builder.Append('^');
-            }
-
-            AppendRanges(_characterRanges);
-            foreach (var pattern in _characters)
-            {
-                Append(pattern);
-            }
-
-            if (_subtractedCharacters.Count > 0 || _subtractedCharacterRanges.Count > 0)
-            {
-                builder.Append("-[");
-
-                AppendRanges(_subtractedCharacterRanges);
-                foreach (var pattern in _subtractedCharacters)
+                AppendRanges(_characterRanges);
+                foreach (var pattern in _characters)
                 {
                     Append(pattern);
                 }
 
-                builder.Append(']');
-            }
-
-            builder.Append(']');
-
-            void Append(CharacterPattern pattern)
-            {
-                pattern.ToString(tmpBuilder, fromCharacterSet: true);
-                var patternString = tmpBuilder.ToString();
-                tmpBuilder.Clear();
-
-                if (patternString.Length == 1)
+                if (_subtractedCharacters.Count > 0 || _subtractedCharacterRanges.Count > 0)
                 {
-                    switch (patternString[0])
+                    builder.Append("-[");
+
+                    AppendRanges(_subtractedCharacterRanges);
+                    foreach (var pattern in _subtractedCharacters)
                     {
-                        case '[':
-                        case ']':
-                        case '-':
-                        case '^':
-                        case '\\':
-                            builder.Append('\\');
-                            break;
+                        Append(pattern);
                     }
+
+                    builder.Append(']');
                 }
 
-                builder.Append(patternString);
-            }
+                builder.Append(']');
 
-            void AppendRanges(IEnumerable<CharacterRange> ranges)
-            {
-                foreach (var range in ranges)
+                void Append(CharacterPattern pattern)
                 {
-                    Append(range.Start);
+                    pattern.Build(tmpBuilder, fromCharacterSet: true);
+                    var patternString = tmpBuilder.ToString();
+                    tmpBuilder.Clear();
 
-                    if (!range.Single)
+                    if (patternString.Length == 1)
                     {
-                        builder.Append('-');
-                        Append(range.End);
+                        switch (patternString[0])
+                        {
+                            case '[':
+                            case ']':
+                            case '-':
+                            case '^':
+                            case '\\':
+                                builder.Append('\\');
+                                break;
+                        }
+                    }
+
+                    builder.Append(patternString);
+                }
+
+                void AppendRanges(IEnumerable<CharacterRange> ranges)
+                {
+                    foreach (var range in ranges)
+                    {
+                        Append(range.Start);
+
+                        if (!range.Single)
+                        {
+                            builder.Append('-');
+                            Append(range.End);
+                        }
                     }
                 }
             }

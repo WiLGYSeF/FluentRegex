@@ -175,52 +175,57 @@ namespace Wilgysef.FluentRegex
             return new ConditionalPattern(GroupName!, YesPattern.Copy(), NoPattern?.Copy());
         }
 
-        protected override void GroupContents(StringBuilder builder)
+        private protected override void GroupContents(PatternBuildState state)
         {
-            builder.Append("?(");
+            state.WithPattern(this, Build);
 
-            if (Expression != null)
+            void Build(StringBuilder builder)
             {
-                if (Lookahead)
+                builder.Append("?(");
+
+                if (Expression != null)
                 {
-                    builder.Append("?=");
+                    if (Lookahead)
+                    {
+                        builder.Append("?=");
+                    }
+                    else
+                    {
+                        builder.Append("?<=");
+                    }
+
+                    Expression.Build(state);
                 }
-                else
+                else if (GroupName != null)
                 {
-                    builder.Append("?<=");
+                    builder.Append(GroupName);
+                }
+                else if (GroupNumber != null)
+                {
+                    builder.Append(GroupNumber);
                 }
 
-                Expression.ToString(builder);
-            }
-            else if (GroupName != null)
-            {
-                builder.Append(GroupName);
-            }
-            else if (GroupNumber != null)
-            {
-                builder.Append(GroupNumber);
-            }
+                builder.Append(')');
 
-            builder.Append(')');
+                Wrap(YesPattern);
 
-            Wrap(YesPattern);
-
-            if (NoPattern != null)
-            {
-                builder.Append('|');
-                Wrap(NoPattern);
-            }
-
-            void Wrap(Pattern pattern)
-            {
-                // conditional pattern branches don't need to be wrapped, unless it contains an or pattern.
-                if (Traverse(pattern).Any(p => p is OrPattern))
+                if (NoPattern != null)
                 {
-                    pattern.Wrap(builder);
+                    builder.Append('|');
+                    Wrap(NoPattern);
                 }
-                else
+
+                void Wrap(Pattern pattern)
                 {
-                    pattern.ToString(builder);
+                    // conditional pattern branches don't need to be wrapped, unless it contains an or pattern.
+                    if (Traverse(pattern).Any(p => p is OrPattern))
+                    {
+                        pattern.Wrap(state);
+                    }
+                    else
+                    {
+                        pattern.Build(state);
+                    }
                 }
             }
         }
