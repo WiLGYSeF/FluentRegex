@@ -11,7 +11,12 @@ namespace Wilgysef.FluentRegex
 
         public BackreferenceType Type { get; private set; }
 
-        public object Group => Type == BackreferenceType.Number ? (object)GroupNumber!.Value : GroupName!;
+        public object Group => Type switch
+        {
+            BackreferenceType.Number => GroupNumber!.Value,
+            BackreferenceType.Name => GroupName!,
+            _ => throw new ArgumentOutOfRangeException(),
+        };
 
         internal override bool IsSinglePattern => true;
 
@@ -39,6 +44,16 @@ namespace Wilgysef.FluentRegex
             GroupName = group;
             Type = BackreferenceType.Name;
             return this;
+        }
+
+        public override Pattern Copy()
+        {
+            return Type switch
+            {
+                BackreferenceType.Number => new BackreferencePattern(GroupNumber!.Value),
+                BackreferenceType.Name => new BackreferencePattern(GroupName!),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
         }
 
         internal override void ToString(StringBuilder builder)

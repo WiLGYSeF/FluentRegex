@@ -28,6 +28,11 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        public override Pattern Copy()
+        {
+            return new LookaheadPattern(Pattern?.Copy(), _type);
+        }
+
         protected override void GroupContents(StringBuilder builder)
         {
             builder.Append('?');

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using static Wilgysef.FluentRegex.CharacterSetPattern;
 
@@ -8,6 +9,10 @@ namespace Wilgysef.FluentRegex
 {
     public class PatternBuilder : ContainerPattern
     {
+        public PatternBuilder() { }
+
+        private PatternBuilder(IEnumerable<Pattern> patterns) : base(patterns) { }
+
         #region Anchors
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -223,6 +228,11 @@ namespace Wilgysef.FluentRegex
         public Pattern Build()
         {
             return new ConcatPattern(_children);
+        }
+
+        public override Pattern Copy()
+        {
+            return new PatternBuilder(_children.Select(c => c.Copy()));
         }
 
         internal override void ToString(StringBuilder builder)

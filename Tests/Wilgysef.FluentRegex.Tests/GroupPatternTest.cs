@@ -76,6 +76,33 @@ public class GroupPatternTest
     }
 
     [Fact]
+    public void Copy()
+    {
+        var literal = new LiteralPattern("a");
+
+        var pattern = new GroupPattern(literal, "test");
+        var copy = pattern.Copy();
+        pattern.WithName("z");
+        copy.ToString().ShouldBe("(?<test>a)");
+
+        pattern = new GroupPattern(null);
+        copy = pattern.Copy();
+        pattern.WithPattern(literal);
+        copy.ToString().ShouldBe("()");
+
+        pattern = new GroupPattern(literal, "test", "abc");
+        copy = pattern.Copy();
+        pattern.WithName("z");
+        pattern.WithSecondName("y");
+        copy.ToString().ShouldBe("(?<test-abc>a)");
+
+        pattern = new GroupPattern(null, "test", "abc");
+        copy = pattern.Copy();
+        pattern.WithPattern(literal);
+        copy.ToString().ShouldBe("(?<test-abc>)");
+    }
+
+    [Fact]
     public void Fail_InvalidName()
     {
         Should.Throw<InvalidOperationException>(() => new PatternBuilder().CaptureGroup("", new LiteralPattern("a")).ToString());

@@ -84,6 +84,20 @@ namespace Wilgysef.FluentRegex
             return false;
         }
 
+        public override Pattern Copy()
+        {
+            return Type switch
+            {
+                CharacterType.Character => Character(_character),
+                CharacterType.Control => Control(_character),
+                CharacterType.Escape => Escape,
+                CharacterType.Hexadecimal => Hexadecimal(_string!),
+                CharacterType.Octal => Octal(_string!),
+                CharacterType.Unicode => Unicode(_string!),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
+        }
+
         internal int GetValue()
         {
             return Type switch

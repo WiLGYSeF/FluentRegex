@@ -173,6 +173,32 @@ public class CharacterPatternTest
         pattern.ToString().ShouldBe(@"\d+");
     }
 
+    [Fact]
+    public void Copy()
+    {
+        var pattern = CharacterPattern.Word;
+
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+
+        pattern = CharacterPattern.Character('a');
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+
+        pattern = CharacterPattern.Control('a');
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+
+        pattern = CharacterPattern.Escape;
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+
+        pattern = CharacterPattern.Hexadecimal("a2");
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+
+        pattern = CharacterPattern.Octal("03");
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+
+        pattern = CharacterPattern.Unicode("1234");
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+    }
+
     private static void ShouldCreatePattern(Func<Pattern> func, string? expected)
     {
         if (expected != null)

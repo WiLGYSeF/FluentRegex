@@ -50,4 +50,20 @@ public class LookaheadPatternTest
 
         pattern.ToString().ShouldBe("(?=)");
     }
+
+    [Fact]
+    public void Copy()
+    {
+        var literal = new LiteralPattern("a");
+
+        var pattern = LookaheadPattern.PositiveLookahead(literal);
+        var copy = pattern.Copy();
+        literal.WithValue("b");
+        copy.ToString().ShouldBe("(?=a)");
+
+        pattern = LookaheadPattern.PositiveLookahead(null);
+        copy = pattern.Copy();
+        pattern.WithPattern(literal);
+        copy.ToString().ShouldBe("(?=)");
+    }
 }

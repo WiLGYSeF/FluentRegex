@@ -8,6 +8,8 @@ namespace Wilgysef.FluentRegex
     {
         private static readonly RegexOptions DefaultOptions = RegexOptions.Compiled;
 
+        public abstract Pattern Copy();
+
         internal abstract bool IsSinglePattern { get; }
 
         internal abstract void ToString(StringBuilder builder);

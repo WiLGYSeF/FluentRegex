@@ -28,6 +28,16 @@ public class LiteralPatternTest
     }
 
     [Fact]
+    public void Copy()
+    {
+        var pattern = new LiteralPattern("a");
+
+        var copy = pattern.Copy();
+        pattern.WithValue("b");
+        copy.ToString().ShouldBe("a");
+    }
+
+    [Fact]
     public void EscapeString()
     {
         LiteralPattern.EscapeString(@"test$()*+.?[\]^{|}")

@@ -65,4 +65,20 @@ public class AnchorPatternTest
 
         pattern.ToString().ShouldBe(@"\B");
     }
+
+    [Fact]
+    public void NoWrap()
+    {
+        var pattern = new ConditionalPattern(1, AnchorPattern.BeginLine, null);
+
+        pattern.ToString().ShouldBe("(?(1)^)");
+    }
+
+    [Fact]
+    public void Copy()
+    {
+        var pattern = new PatternBuilder().BeginLine;
+
+        pattern.ToString().ShouldBe(pattern.Copy().ToString());
+    }
 }

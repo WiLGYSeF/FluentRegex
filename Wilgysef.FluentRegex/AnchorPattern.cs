@@ -30,6 +30,11 @@ namespace Wilgysef.FluentRegex
             _type = type;
         }
 
+        public override Pattern Copy()
+        {
+            return new AnchorPattern(_type);
+        }
+
         internal override void ToString(StringBuilder builder)
         {
             switch (_type)

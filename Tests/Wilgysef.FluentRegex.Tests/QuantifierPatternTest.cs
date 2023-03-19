@@ -223,6 +223,18 @@ public class QuantifierPatternTest
     }
 
     [Fact]
+    public void Copy()
+    {
+        var literal = new LiteralPattern("a");
+        var pattern = new QuantifierPattern(literal, 1, 4, true);
+
+        var copy = pattern.Copy();
+        literal.WithValue("b");
+        pattern.WithBetween(2, 5);
+        copy.ToString().ShouldBe("a{1,4}");
+    }
+
+    [Fact]
     public void Fail_NoPreviousPattern()
     {
         ShouldCreatePattern(() => new PatternBuilder().ZeroOrOne(), null);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Wilgysef.FluentRegex
@@ -13,6 +14,11 @@ namespace Wilgysef.FluentRegex
         {
             _children.Add(pattern);
             return this;
+        }
+
+        public override Pattern Copy()
+        {
+            return new OrPattern(_children.Select(c => c.Copy()));
         }
 
         internal override void ToString(StringBuilder builder)

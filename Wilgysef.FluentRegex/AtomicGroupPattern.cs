@@ -8,10 +8,15 @@ namespace Wilgysef.FluentRegex
 
         public AtomicGroupPattern(Pattern? pattern) : base(pattern) { }
 
-        public AbstractGroupPattern WithPattern(Pattern? pattern)
+        public AtomicGroupPattern WithPattern(Pattern? pattern)
         {
             Pattern = pattern;
             return this;
+        }
+
+        public override Pattern Copy()
+        {
+            return new AtomicGroupPattern(Pattern?.Copy());
         }
 
         protected override void GroupContents(StringBuilder builder)

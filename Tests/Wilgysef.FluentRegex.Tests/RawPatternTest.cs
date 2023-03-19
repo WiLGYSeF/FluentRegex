@@ -26,4 +26,14 @@ public class RawPatternTest
 
         pattern.ToString().ShouldBe("ab[c+");
     }
+
+    [Fact]
+    public void Copy()
+    {
+        var pattern = new RawPattern("ab[c");
+
+        var copy = pattern.Copy();
+        pattern.WithRegex("asdf");
+        copy.ToString().ShouldBe("ab[c");
+    }
 }

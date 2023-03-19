@@ -1,4 +1,6 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using System.Diagnostics.Contracts;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class SingleCharacterPatternTest
 {
@@ -16,5 +18,13 @@ public class SingleCharacterPatternTest
         var pattern = new PatternBuilder().Single.Exactly(3);
 
         pattern.ToString().ShouldBe(".{3}");
+    }
+
+    [Fact]
+    public void Copy()
+    {
+        var pattern = new SingleCharacterPattern();
+
+        pattern.Copy().ToString().ShouldBe(".");
     }
 }

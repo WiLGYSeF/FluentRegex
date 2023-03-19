@@ -96,6 +96,21 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        public override Pattern Copy()
+        {
+            if (Expression != null)
+            {
+                return new ConditionalPattern(Expression.Copy(), YesPattern.Copy(), NoPattern?.Copy(), Lookahead);
+            }
+
+            if (GroupNumber.HasValue)
+            {
+                return new ConditionalPattern(GroupNumber.Value, YesPattern.Copy(), NoPattern?.Copy());
+            }
+
+            return new ConditionalPattern(GroupName!, YesPattern.Copy(), NoPattern?.Copy());
+        }
+
         protected override void GroupContents(StringBuilder builder)
         {
             builder.Append("?(");

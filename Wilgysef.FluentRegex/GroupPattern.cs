@@ -15,6 +15,8 @@ namespace Wilgysef.FluentRegex
 
         public bool IsNumbered => Capture && Name == null;
 
+        public bool IsBalancing => SecondName != null;
+
         protected override bool HasContents => true;
 
         public GroupPattern(Pattern? pattern, string? name = null, bool capture = true) : base(pattern)
@@ -57,6 +59,13 @@ namespace Wilgysef.FluentRegex
         {
             Pattern = pattern;
             return this;
+        }
+
+        public override Pattern Copy()
+        {
+            return IsBalancing
+                ? new GroupPattern(Pattern?.Copy(), Name, SecondName!)
+                : new GroupPattern(Pattern?.Copy(), Name, Capture);
         }
 
         protected override void GroupContents(StringBuilder builder)

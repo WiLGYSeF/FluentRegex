@@ -69,6 +69,11 @@ namespace Wilgysef.FluentRegex
 
         #endregion
 
+        public override Pattern Copy()
+        {
+            return new InlineModifierPattern(Pattern?.Copy(), Modifiers, DisabledModifiers);
+        }
+
         protected override void GroupContents(StringBuilder builder)
         {
             var modifiers = Modifiers & ~DisabledModifiers;

@@ -5,21 +5,21 @@ namespace Wilgysef.FluentRegex
 {
     internal class CharacterClassPattern : CharacterPattern
     {
-        public static new CharacterClassPattern Word => new CharacterClassPattern(CharacterType.Word);
+        internal static new CharacterClassPattern Word => new CharacterClassPattern(CharacterType.Word);
 
-        public static new CharacterClassPattern NonWord => new CharacterClassPattern(CharacterType.NonWord);
+        internal static new CharacterClassPattern NonWord => new CharacterClassPattern(CharacterType.NonWord);
 
-        public static new CharacterClassPattern Digit => new CharacterClassPattern(CharacterType.Digit);
+        internal static new CharacterClassPattern Digit => new CharacterClassPattern(CharacterType.Digit);
 
-        public static new CharacterClassPattern NonDigit => new CharacterClassPattern(CharacterType.NonDigit);
+        internal static new CharacterClassPattern NonDigit => new CharacterClassPattern(CharacterType.NonDigit);
 
-        public static new CharacterClassPattern Whitespace => new CharacterClassPattern(CharacterType.Whitespace);
+        internal static new CharacterClassPattern Whitespace => new CharacterClassPattern(CharacterType.Whitespace);
 
-        public static new CharacterClassPattern NonWhitespace => new CharacterClassPattern(CharacterType.NonWhitespace);
+        internal static new CharacterClassPattern NonWhitespace => new CharacterClassPattern(CharacterType.NonWhitespace);
 
-        public static new CharacterClassPattern Category(string category) => new CharacterClassPattern(CharacterType.Category, category);
+        internal static new CharacterClassPattern Category(string category) => new CharacterClassPattern(CharacterType.Category, category);
 
-        public static new CharacterClassPattern NonCategory(string category) => new CharacterClassPattern(CharacterType.NonCategory, category);
+        internal static new CharacterClassPattern NonCategory(string category) => new CharacterClassPattern(CharacterType.NonCategory, category);
 
         private readonly string? _category;
 
@@ -33,6 +33,11 @@ namespace Wilgysef.FluentRegex
         {
             character = (char)0;
             return false;
+        }
+
+        public override Pattern Copy()
+        {
+            return new CharacterClassPattern(Type, _category);
         }
 
         internal override void ToString(StringBuilder builder)

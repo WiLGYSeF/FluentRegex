@@ -1,4 +1,6 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using System.CodeDom;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class ConditionalPatternTest
 {
@@ -91,5 +93,59 @@ public class ConditionalPatternTest
 
         pattern.WithNoPattern(null);
         pattern.ToString().ShouldBe("(?(?=z)1)");
+    }
+
+    [Fact]
+    public void Copy()
+    {
+        ShouldCopy(typeof(int), true);
+        ShouldCopy(typeof(int), false);
+
+        ShouldCopy(typeof(string), true);
+        ShouldCopy(typeof(string), false);
+
+        ShouldCopy(typeof(Pattern), true);
+        ShouldCopy(typeof(Pattern), false);
+
+        static void ShouldCopy(Type conditionalType, bool useNoPattern)
+        {
+            ConditionalPattern pattern;
+            Action changePatternConditional;
+            string expectedConditional;
+
+            var yesPattern = new LiteralPattern("a");
+            var noPattern = new LiteralPattern("b");
+
+            if (conditionalType == typeof(int))
+            {
+                pattern = new ConditionalPattern(1, yesPattern, useNoPattern ? noPattern : null);
+                changePatternConditional = () => pattern.WithGroup(2);
+                expectedConditional = "1";
+            }
+            else if (conditionalType == typeof(string))
+            {
+                pattern = new ConditionalPattern("abc", yesPattern, useNoPattern ? noPattern : null);
+                changePatternConditional = () => pattern.WithGroup("def");
+                expectedConditional = "abc";
+            }
+            else if (conditionalType == typeof(Pattern))
+            {
+                var expressionConditional = new LiteralPattern("test");
+                pattern = new ConditionalPattern(expressionConditional, yesPattern, useNoPattern ? noPattern : null);
+                changePatternConditional = () => expressionConditional.WithValue("asdf");
+                expectedConditional = "?=test";
+            }
+            else
+            {
+                throw new ArgumentException("Invalid type.", nameof(conditionalType));
+            }
+
+            var copy = pattern.Copy();
+            changePatternConditional();
+            yesPattern.WithValue("y");
+            noPattern.WithValue("z");
+
+            copy.ToString().ShouldBe($"(?({expectedConditional})a{(useNoPattern ? "|b" : "")})");
+        }
     }
 }

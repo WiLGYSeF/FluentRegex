@@ -6,7 +6,8 @@ namespace Wilgysef.FluentRegex
     {
         protected override bool HasContents => true;
 
-        public CommentPattern(string value) : base(new LiteralPattern(value)) { }
+        public CommentPattern(string? value)
+            : base(value != null ? new LiteralPattern(value) : null) { }
 
         public CommentPattern WithValue(string? value)
         {
@@ -14,6 +15,11 @@ namespace Wilgysef.FluentRegex
                 ? new LiteralPattern(value)
                 : null;
             return this;
+        }
+
+        public override Pattern Copy()
+        {
+            return new CommentPattern((Pattern as LiteralPattern)?.Value);
         }
 
         protected override void GroupContents(StringBuilder builder)

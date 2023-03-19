@@ -20,6 +20,11 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        public override Pattern Copy()
+        {
+            return new LiteralPattern(Value);
+        }
+
         internal override void ToString(StringBuilder builder)
         {
             EscapeString(builder, Value);

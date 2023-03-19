@@ -49,6 +49,11 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        public override Pattern Copy()
+        {
+            return new QuantifierPattern(Pattern.Copy(), Min, Max, Greedy);
+        }
+
         internal override void ToString(StringBuilder builder)
         {
             if (Min < 0 || Max.HasValue && Max.Value < 0)

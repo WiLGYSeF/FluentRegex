@@ -152,6 +152,16 @@ namespace Wilgysef.FluentRegex
 
         #endregion
 
+        public override Pattern Copy()
+        {
+            return new CharacterSetPattern(
+                _characterRanges.Select(r => r.Copy()),
+                _characters.Select(c => (CharacterPattern)c.Copy()),
+                _subtractedCharacterRanges.Select(r => r.Copy()),
+                _subtractedCharacters.Select(c => (CharacterPattern)c.Copy()),
+                Negated);
+        }
+
         internal override void ToString(StringBuilder builder)
         {
             if (_characters.Count == 0 && _characterRanges.Count == 0)
@@ -283,6 +293,13 @@ namespace Wilgysef.FluentRegex
                 Start = start;
                 End = end;
                 Single = startValue == endValue;
+            }
+
+            public CharacterRange Copy()
+            {
+                return new CharacterRange(
+                    (CharacterPattern)Start.Copy(),
+                    (CharacterPattern)End.Copy());
             }
         }
     }

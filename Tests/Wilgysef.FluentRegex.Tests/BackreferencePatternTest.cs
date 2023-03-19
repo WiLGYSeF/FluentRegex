@@ -44,6 +44,21 @@ public class BackreferencePatternTest
     }
 
     [Fact]
+    public void Copy()
+    {
+        var pattern = new BackreferencePattern("a");
+
+        var copy = pattern.Copy();
+        pattern.WithGroup("b");
+        copy.ToString().ShouldBe(@"\k<a>");
+
+        pattern.WithGroup(2);
+        copy = pattern.Copy();
+        pattern.WithGroup(3);
+        copy.ToString().ShouldBe(@"\2");
+    }
+
+    [Fact]
     public void Fail_InvalidGroupNumber()
     {
         var pattern = new BackreferencePattern(10);

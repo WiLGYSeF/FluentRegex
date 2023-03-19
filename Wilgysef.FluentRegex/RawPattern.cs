@@ -19,6 +19,11 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        public override Pattern Copy()
+        {
+            return new RawPattern(Regex);
+        }
+
         internal override void ToString(StringBuilder builder)
         {
             builder.Append(Regex);

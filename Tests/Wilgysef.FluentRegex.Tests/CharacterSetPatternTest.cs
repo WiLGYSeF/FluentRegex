@@ -205,6 +205,21 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void Copy()
+    {
+        var pattern = new CharacterSetPattern(
+            new[] { new CharacterRange('0', '9') },
+            new[] { CharacterPattern.Character('a') },
+            new[] { new CharacterRange('5', '7') },
+            new[] { CharacterPattern.Character('b') });
+
+        var copy = pattern.Copy();
+        pattern.WithCharacters('d');
+
+        copy.ToString().ShouldBe("[0-9a-[5-7b]]");
+    }
+
+    [Fact]
     public void Fail_SubtractedCharactersOnly()
     {
         var pattern = new PatternBuilder().CharacterSet(

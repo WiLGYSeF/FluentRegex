@@ -80,4 +80,17 @@ public class OrPatternTest
         pattern.Or(new LiteralPattern("zxc"));
         pattern.ToString().ShouldBe("abc|123|zxc");
     }
+
+    [Fact]
+    public void Copy()
+    {
+        var literal = new LiteralPattern("abc");
+        var pattern = new OrPattern(
+            literal,
+            new LiteralPattern("123"));
+
+        var copy = pattern.Copy();
+        literal.WithValue("def");
+        copy.ToString().ShouldBe("abc|123");
+    }
 }

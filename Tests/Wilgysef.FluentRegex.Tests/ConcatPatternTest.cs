@@ -21,4 +21,14 @@ public class ConcatPatternTest
         pattern.Concat(new LiteralPattern("def"));
         pattern.ToString().ShouldBe("abcdef");
     }
+
+    [Fact]
+    public void Copy()
+    {
+        var pattern = new ConcatPattern(new LiteralPattern("abc"));
+
+        var copy = pattern.Copy();
+        pattern.Concat(new LiteralPattern("def"));
+        copy.ToString().ShouldBe("abc");
+    }
 }

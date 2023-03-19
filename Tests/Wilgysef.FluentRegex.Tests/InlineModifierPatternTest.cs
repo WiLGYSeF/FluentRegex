@@ -76,6 +76,18 @@ public class InlineModifierPatternTest
         pattern.ToString().ShouldBe("(?i:b)");
     }
 
+    [Fact]
+    public void Copy()
+    {
+        var literal = new LiteralPattern("a");
+        var pattern = new InlineModifierPattern(literal, InlineModifier.IgnoreCase);
+
+        var copy = pattern.Copy();
+        pattern.WithSingleline();
+        literal.WithValue("b");
+        copy.ToString().ShouldBe("(?i:a)");
+    }
+
     private static void ShouldHaveModifier(InlineModifier modifiers, InlineModifier flag)
     {
         (modifiers & flag).ShouldBe(flag);
