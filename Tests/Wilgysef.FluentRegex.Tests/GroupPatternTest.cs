@@ -76,6 +76,15 @@ public class GroupPatternTest
     }
 
     [Fact]
+    public void IsCapturing_WithoutCapture()
+    {
+        var pattern = new GroupPattern(new LiteralPattern("a"), "abc");
+        pattern.Capture = false;
+        pattern.Capture.ShouldBeFalse();
+        pattern.IsCapturing.ShouldBeTrue();
+    }
+
+    [Fact]
     public void Copy()
     {
         var literal = new LiteralPattern("a");

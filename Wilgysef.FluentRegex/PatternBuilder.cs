@@ -9,40 +9,77 @@ namespace Wilgysef.FluentRegex
 {
     public class PatternBuilder : ContainerPattern
     {
+        /// <summary>
+        /// Creates a new pattern builder.
+        /// </summary>
         public PatternBuilder() { }
 
         private PatternBuilder(IEnumerable<Pattern> patterns) : base(patterns) { }
 
         #region Anchors
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.BeginLine"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder BeginLine => Add(AnchorPattern.BeginLine);
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.EndLine"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder EndLine => Add(AnchorPattern.EndLine);
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.Start"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder Start => Add(AnchorPattern.Start);
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.End"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder End => Add(AnchorPattern.End);
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.AbsoluteEnd"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder AbsoluteEnd => Add(AnchorPattern.AbsoluteEnd);
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.StartOfMatch"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder StartOfMatch => Add(AnchorPattern.StartOfMatch);
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.WordBoundary"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder WordBoundary => Add(AnchorPattern.WordBoundary);
 
+        /// <summary>
+        /// Adds a <see cref="AnchorPattern.NonWordBoundary"/> to the pattern.
+        /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public PatternBuilder NonWordBoundary => Add(AnchorPattern.NonWordBoundary);
 
         #endregion
 
+        /// <summary>
+        /// Adds a <see cref="BackreferencePattern"/> to the pattern.
+        /// </summary>
+        /// <param name="group">Group number.</param>
+        /// <returns>Current pattern builder.</returns>
         public PatternBuilder Backreference(int group) => Add(new BackreferencePattern(group));
 
+        /// <summary>
+        /// Adds a <see cref="BackreferencePattern"/> to the pattern.
+        /// </summary>
+        /// <param name="group">Group name.</param>
+        /// <returns>Current pattern builder.</returns>
         public PatternBuilder Backreference(string group) => Add(new BackreferencePattern(group));
 
         #region Characters
@@ -88,6 +125,8 @@ namespace Wilgysef.FluentRegex
         #endregion
 
         #region Character Sets
+
+        public PatternBuilder CharacterSet(string characters) => Add(new CharacterSetPattern(characters));
 
         public PatternBuilder CharacterSet(params char[] characters) => Add(new CharacterSetPattern(characters));
 
@@ -227,7 +266,19 @@ namespace Wilgysef.FluentRegex
 
         public Pattern Build()
         {
+            // check if the pattern is infinitely recursive, should throw if it is.
+            for (var enumerator = Traverse().GetEnumerator(); enumerator.MoveNext();) ;
+
             return new ConcatPattern(_children);
+        }
+
+        /// <summary>
+        /// Traverses the pattern tree in depth order.
+        /// </summary>
+        /// <returns>Patterns.</returns>
+        public IEnumerable<Pattern> Traverse()
+        {
+            return Traverse(_children);
         }
 
         public override Pattern Copy()
@@ -252,38 +303,6 @@ namespace Wilgysef.FluentRegex
             _children[^1] = pattern;
             _current = pattern;
             return this;
-        }
-
-        private static IEnumerable<Pattern> Traverse(IReadOnlyList<Pattern> patterns)
-        {
-            var stack = new Stack<IEnumerator<Pattern>>();
-            stack.Push(patterns.GetEnumerator());
-
-            while (stack.Count > 0)
-            {
-                var currentPatterns = stack.Peek();
-                var skipPop = false;
-
-                while (currentPatterns.MoveNext())
-                {
-                    yield return currentPatterns.Current;
-
-                    if (currentPatterns.Current is ContainerPattern container)
-                    {
-                        if (container.Children.Count > 0)
-                        {
-                            stack.Push(container.Children.GetEnumerator());
-                            skipPop = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!skipPop)
-                {
-                    stack.Pop();
-                }
-            }
         }
     }
 }

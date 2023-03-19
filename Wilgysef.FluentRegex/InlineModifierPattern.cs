@@ -5,12 +5,34 @@ namespace Wilgysef.FluentRegex
 {
     public class InlineModifierPattern : AbstractGroupPattern
     {
-        public InlineModifier Modifiers { get; set; }
+        /// <summary>
+        /// Inline modifiers to enable.
+        /// </summary>
+        public InlineModifier Modifiers
+        {
+            get => _modifiers;
+            set => _modifiers = value;
+        }
+        private InlineModifier _modifiers;
 
-        public InlineModifier DisabledModifiers { get; set; }
+        /// <summary>
+        /// Inline modifiers to disable.
+        /// </summary>
+        public InlineModifier DisabledModifiers
+        {
+            get => _disabledModifiers;
+            set => _disabledModifiers = value;
+        }
+        private InlineModifier _disabledModifiers;
 
-        protected override bool HasContents => Modifiers != InlineModifier.None || DisabledModifiers != InlineModifier.None;
+        protected override bool HasContents => Modifiers != InlineModifier.None || DisabledModifiers != InlineModifier.None || Pattern != null;
 
+        /// <summary>
+        /// Creates an inline modifier pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="modifiers">Inline modifiers to enable.</param>
+        /// <param name="disabledModifiers">Inline modifiers to disable.</param>
         public InlineModifierPattern(
             Pattern? pattern,
             InlineModifier modifiers,
@@ -22,12 +44,23 @@ namespace Wilgysef.FluentRegex
 
         #region Fluent Methods
 
+        /// <summary>
+        /// Sets the inline modifiers to enable.
+        /// </summary>
+        /// <param name="modifiers">Inline modifiers to enable.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithModifiers(InlineModifier modifiers)
         {
             Modifiers = modifiers;
             return this;
         }
 
+        /// <summary>
+        /// Sets the inline modifiers to enable and disable.
+        /// </summary>
+        /// <param name="modifiers">Inline modifiers to enable.</param>
+        /// <param name="disabledModifiers">Inline modifiers to disable.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithModifiers(InlineModifier modifiers, InlineModifier disabledModifiers)
         {
             Modifiers = modifiers;
@@ -35,32 +68,57 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        /// <summary>
+        /// Sets the inline modifiers to disable.
+        /// </summary>
+        /// <param name="modifiers">Inline modifiers to disable.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithDisabledModifiers(InlineModifier modifiers)
         {
             DisabledModifiers = modifiers;
             return this;
         }
 
-        public InlineModifierPattern WithIgnoreCase(bool enable = true) => SetModifier(InlineModifier.IgnoreCase, enable);
+        /// <summary>
+        /// Sets the <see cref="InlineModifier.IgnoreCase"/> modifier.
+        /// </summary>
+        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
+        public InlineModifierPattern WithIgnoreCase(bool? enable = true) => SetModifier(InlineModifier.IgnoreCase, enable);
 
-        public InlineModifierPattern WithMultiline(bool enable = true) => SetModifier(InlineModifier.Multiline, enable);
+        /// <summary>
+        /// Sets the <see cref="InlineModifier.Multiline"/> modifier.
+        /// </summary>
+        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
+        public InlineModifierPattern WithMultiline(bool? enable = true) => SetModifier(InlineModifier.Multiline, enable);
 
-        public InlineModifierPattern WithExplicitCapture(bool enable = true) => SetModifier(InlineModifier.ExplicitCapture, enable);
+        /// <summary>
+        /// Sets the <see cref="InlineModifier.ExplicitCapture"/> modifier.
+        /// </summary>
+        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
+        public InlineModifierPattern WithExplicitCapture(bool? enable = true) => SetModifier(InlineModifier.ExplicitCapture, enable);
 
-        public InlineModifierPattern WithSingleline(bool enable = true) => SetModifier(InlineModifier.Singleline, enable);
+        /// <summary>
+        /// Sets the <see cref="InlineModifier.Singleline"/> modifier.
+        /// </summary>
+        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
+        public InlineModifierPattern WithSingleline(bool? enable = true) => SetModifier(InlineModifier.Singleline, enable);
 
-        public InlineModifierPattern WithIgnorePatternWhitespace(bool enable = true) => SetModifier(InlineModifier.IgnorePatternWhitespace, enable);
+        /// <summary>
+        /// Sets the <see cref="InlineModifier.IgnorePatternWhitespace"/> modifier.
+        /// </summary>
+        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <returns>Current inline modifiers pattern.</returns>
+        public InlineModifierPattern WithIgnorePatternWhitespace(bool? enable = true) => SetModifier(InlineModifier.IgnorePatternWhitespace, enable);
 
-        public InlineModifierPattern WithIgnoreCaseDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.IgnoreCase, enable);
-
-        public InlineModifierPattern WithMultilineDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.Multiline, enable);
-
-        public InlineModifierPattern WithExplicitCaptureDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.ExplicitCapture, enable);
-
-        public InlineModifierPattern WithSinglelineDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.Singleline, enable);
-
-        public InlineModifierPattern WithIgnorePatternWhitespaceDisabled(bool enable = true) => SetDisabledModifier(InlineModifier.IgnorePatternWhitespace, enable);
-
+        /// <summary>
+        /// Sets the pattern to match.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Current inline modifier pattern.</returns>
         public InlineModifierPattern WithPattern(Pattern? pattern)
         {
             Pattern = pattern;
@@ -76,6 +134,7 @@ namespace Wilgysef.FluentRegex
 
         protected override void GroupContents(StringBuilder builder)
         {
+            // cancel out modifiers both enabled and disabled.
             var modifiers = Modifiers & ~DisabledModifiers;
             var disabledModifiers = DisabledModifiers & ~Modifiers;
 
@@ -123,43 +182,61 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        private InlineModifierPattern SetModifier(InlineModifier modifier, bool enable)
+        private InlineModifierPattern SetModifier(InlineModifier modifier, bool? enable)
         {
-            if (enable)
+            if (enable.HasValue)
             {
-                Modifiers |= modifier;
+                Set(ref _modifiers, enable.Value);
+                Set(ref _disabledModifiers, !enable.Value);
             }
             else
             {
-                Modifiers &= ~modifier;
+                Set(ref _modifiers, false);
+                Set(ref _disabledModifiers, false);
             }
 
             return this;
-        }
 
-        private InlineModifierPattern SetDisabledModifier(InlineModifier modifier, bool enable)
-        {
-            if (enable)
+            void Set(ref InlineModifier modf, bool b)
             {
-                DisabledModifiers |= modifier;
+                if (b)
+                {
+                    modf |= modifier;
+                }
+                else
+                {
+                    modf &= ~modifier;
+                }
             }
-            else
-            {
-                DisabledModifiers &= ~modifier;
-            }
-
-            return this;
         }
     }
 
     [Flags]
     public enum InlineModifier
     {
+        /// <summary>
+        /// No modifiers.
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// Case-insensitive matching.
+        /// </summary>
         IgnoreCase = 1,
+        /// <summary>
+        /// Multi-line. <see cref="AnchorPattern.BeginLine"/> and <see cref="AnchorPattern.EndLine"/> match the beginning and end of lines instead of the entire string.
+        /// </summary>
         Multiline = 2,
+        /// <summary>
+        /// All unnamed capturing groups are treated as non-capturing.
+        /// </summary>
         ExplicitCapture = 4,
+        /// <summary>
+        /// Single-line. The single character pattern matches every character, instead of every character except <c>\n</c>.
+        /// </summary>
         Singleline = 16,
+        /// <summary>
+        /// Ignore unescaped whitespace from the pattern.
+        /// </summary>
         IgnorePatternWhitespace = 32,
     }
 }

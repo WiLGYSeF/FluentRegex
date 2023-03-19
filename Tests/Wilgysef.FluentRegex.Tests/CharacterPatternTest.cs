@@ -49,6 +49,7 @@ public class CharacterPatternTest
     [InlineData("abc", null)]
     [InlineData("ag", null)]
     [InlineData("31", @"\x31")]
+    [InlineData("0x31", @"\x31")]
     public void Hexadecimal(string value, string expected)
     {
         ShouldCreatePattern(
@@ -62,6 +63,7 @@ public class CharacterPatternTest
     [InlineData("01", @"\01")]
     [InlineData("12", @"\12")]
     [InlineData("123", @"\123")]
+    [InlineData("777", @"\777")]
     [InlineData("1234", null)]
     [InlineData("28", null)]
     [InlineData("128", null)]
@@ -78,6 +80,7 @@ public class CharacterPatternTest
     [InlineData("ab", null)]
     [InlineData("abc", null)]
     [InlineData("ab3d", @"\uab3d")]
+    [InlineData("0xAB3D", @"\uAB3D")]
     [InlineData("abcy", null)]
     public void Unicode(string value, string expected)
     {

@@ -5,15 +5,27 @@ namespace Wilgysef.FluentRegex
 {
     public class LiteralPattern : Pattern
     {
+        /// <summary>
+        /// Literal value.
+        /// </summary>
         public string Value { get; set; }
 
-        internal override bool IsSinglePattern => true;
+        internal override bool IsSinglePattern => Value.Length == 1;
 
+        /// <summary>
+        /// Creates a literal pattern.
+        /// </summary>
+        /// <param name="value">Literal value.</param>
         public LiteralPattern(string value)
         {
             Value = value;
         }
 
+        /// <summary>
+        /// Sets the literal value.
+        /// </summary>
+        /// <param name="value">Literal value.</param>
+        /// <returns>Current literal pattern.</returns>
         public LiteralPattern WithValue(string value)
         {
             Value = value;
@@ -30,6 +42,11 @@ namespace Wilgysef.FluentRegex
             EscapeString(builder, Value);
         }
 
+        /// <summary>
+        /// Escapes a pattern string.
+        /// </summary>
+        /// <param name="pattern">Pattern string.</param>
+        /// <returns>Escaped string.</returns>
         public static string EscapeString(string pattern)
         {
             var builder = new StringBuilder(pattern.Length);
@@ -37,6 +54,11 @@ namespace Wilgysef.FluentRegex
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Escapes a pattern string.
+        /// </summary>
+        /// <param name="builder">String builder.</param>
+        /// <param name="pattern">Pattern string.</param>
         public static void EscapeString(StringBuilder builder, string pattern)
         {
             foreach (var c in pattern)
@@ -65,9 +87,15 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        public static bool EscapeChar(char c, [MaybeNullWhen(false)] out string escaped)
+        /// <summary>
+        /// Escapes a pattern character.
+        /// </summary>
+        /// <param name="character">Pattern character.</param>
+        /// <param name="escaped">Escaped character string, or <see langword="null"/> if character does not need to be escaped.</param>
+        /// <returns><see langword="true"/> if the character needs to be escaped, otherwise <see langword="false"/>.</returns>
+        public static bool EscapeChar(char character, [MaybeNullWhen(false)] out string escaped)
         {
-            switch (c)
+            switch (character)
             {
                 case '$':
                     escaped = @"\$";
@@ -117,9 +145,43 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        public static string EscapeChar(char c)
+        /// <summary>
+        /// Escapes a pattern character.
+        /// </summary>
+        /// <param name="character">Character.</param>
+        /// <returns>Escaped pattern character.</returns>
+        public static string EscapeChar(char character)
         {
-            return EscapeChar(c, out var escaped) ? escaped : c.ToString();
+            return EscapeChar(character, out var escaped) ? escaped : character.ToString();
+        }
+
+        /// <summary>
+        /// Checks if a character is special.
+        /// </summary>
+        /// <param name="character">Character.</param>
+        /// <returns><see langword="true"/> if the character is special, otherwise <see langword="false"/>.</returns>
+        public static bool IsSpecialCharacter(char character)
+        {
+            switch (character)
+            {
+                case '$':
+                case '(':
+                case ')':
+                case '*':
+                case '+':
+                case '.':
+                case '?':
+                case '[':
+                case '\\':
+                case ']':
+                case '^':
+                case '{':
+                case '|':
+                case '}':
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

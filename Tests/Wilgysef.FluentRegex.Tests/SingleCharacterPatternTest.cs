@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Wilgysef.FluentRegex.Tests;
+﻿namespace Wilgysef.FluentRegex.Tests;
 
 public class SingleCharacterPatternTest
 {

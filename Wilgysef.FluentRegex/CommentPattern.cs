@@ -6,9 +6,18 @@ namespace Wilgysef.FluentRegex
     {
         protected override bool HasContents => true;
 
+        /// <summary>
+        /// Creates a comment.
+        /// </summary>
+        /// <param name="value">Comment value.</param>
         public CommentPattern(string? value)
             : base(value != null ? new LiteralPattern(value) : null) { }
 
+        /// <summary>
+        /// Sets the comment value.
+        /// </summary>
+        /// <param name="value">Comment value.</param>
+        /// <returns>Current comment pattern.</returns>
         public CommentPattern WithValue(string? value)
         {
             Pattern = value != null

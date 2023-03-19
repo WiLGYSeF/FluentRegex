@@ -6,10 +6,23 @@ namespace Wilgysef.FluentRegex
 {
     public class OrPattern : ContainerPattern
     {
+        /// <summary>
+        /// Creates an or pattern.
+        /// </summary>
+        /// <param name="patterns">Patterns to match.</param>
         public OrPattern(params Pattern[] patterns) : this((IEnumerable<Pattern>)patterns) { }
 
+        /// <summary>
+        /// Creates an or pattern.
+        /// </summary>
+        /// <param name="patterns">Patterns to match.</param>
         public OrPattern(IEnumerable<Pattern> patterns) : base(patterns) { }
 
+        /// <summary>
+        /// Adds a pattern to match.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Current or pattern.</returns>
         public OrPattern Or(Pattern pattern)
         {
             _children.Add(pattern);

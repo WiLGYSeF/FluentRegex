@@ -7,7 +7,10 @@ public class CharacterSetPatternTest
     [Fact]
     public void Characters()
     {
-        var pattern = new PatternBuilder().CharacterSet('a', 'b', '3');
+        var pattern = new PatternBuilder().CharacterSet("ab3");
+        pattern.ToString().ShouldBe("[ab3]");
+
+        pattern = new PatternBuilder().CharacterSet('a', 'b', '3');
         pattern.ToString().ShouldBe("[ab3]");
 
         pattern = new PatternBuilder().CharacterSet(new[] { 'a', 'b', '3' }, negated: true);

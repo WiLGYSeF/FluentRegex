@@ -5,43 +5,89 @@ namespace Wilgysef.FluentRegex
 {
     public class GroupPattern : AbstractGroupPattern
     {
+        /// <summary>
+        /// Group name.
+        /// </summary>
         public string? Name { get; set; }
 
+        /// <summary>
+        /// Second group name, if a balancing group.
+        /// </summary>
         public string? SecondName { get; set; }
 
+        /// <summary>
+        /// Indicates if the group is capturing.
+        /// </summary>
         public bool Capture { get; set; }
 
+        /// <summary>
+        /// Indicates if the group will capture.
+        /// </summary>
         public bool IsCapturing => Name != null || Capture;
 
+        /// <summary>
+        /// Indicates if the group is a numbered capturing group.
+        /// </summary>
         public bool IsNumbered => Capture && Name == null;
 
+        /// <summary>
+        /// Indicates if the group is a balancing group.
+        /// </summary>
         public bool IsBalancing => SecondName != null;
 
         protected override bool HasContents => true;
 
+        /// <summary>
+        /// Creates a group pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="name">Group name.</param>
+        /// <param name="capture">Whether the group is capturing.</param>
         public GroupPattern(Pattern? pattern, string? name = null, bool capture = true) : base(pattern)
         {
             Name = name;
             Capture = capture;
         }
 
+        /// <summary>
+        /// Creates a balancing group pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="name1">First group name.</param>
+        /// <param name="name2">Second group name.</param>
         public GroupPattern(Pattern? pattern, string? name1, string name2) : base(pattern)
         {
             Balancing(name1, name2);
         }
 
+        /// <summary>
+        /// Sets the group name.
+        /// </summary>
+        /// <param name="name">Group name.</param>
+        /// <returns>Current group pattern.</returns>
         public GroupPattern WithName(string? name)
         {
             Name = name;
             return this;
         }
 
+        /// <summary>
+        /// Sets the second group name.
+        /// </summary>
+        /// <param name="name">Group name.</param>
+        /// <returns>Current group pattern.</returns>
         public GroupPattern WithSecondName(string? name)
         {
             SecondName = name;
             return this;
         }
 
+        /// <summary>
+        /// Sets the group as a balancing group.
+        /// </summary>
+        /// <param name="name1">First group name.</param>
+        /// <param name="name2">Second group name.</param>
+        /// <returns>Current group pattern.</returns>
         public GroupPattern Balancing(string? name1, string name2)
         {
             Name = name1;
@@ -49,12 +95,22 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        /// <summary>
+        /// Sets if the group is capturing.
+        /// </summary>
+        /// <param name="capture">Whether the group is capturing.</param>
+        /// <returns>Current group pattern.</returns>
         public GroupPattern WithCapture(bool capture = true)
         {
             Capture = capture;
             return this;
         }
 
+        /// <summary>
+        /// Sets the pattern to match.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Current group pattern.</returns>
         public GroupPattern WithPattern(Pattern? pattern)
         {
             Pattern = pattern;
@@ -107,6 +163,11 @@ namespace Wilgysef.FluentRegex
             Pattern?.ToString(builder);
         }
 
+        /// <summary>
+        /// Checks if the name is a valid group name.
+        /// </summary>
+        /// <param name="name">Group name.</param>
+        /// <returns><see langword="true"/> if the name is a valid group name, otherwise <see langword="false"/>.</returns>
         public static bool IsValidName(string name)
         {
             if (name.Length == 0)
@@ -190,6 +251,11 @@ namespace Wilgysef.FluentRegex
             return true;
         }
 
+        /// <summary>
+        /// Wraps <paramref name="pattern"/> in a non-capturing group.
+        /// </summary>
+        /// <param name="builder">String builder.</param>
+        /// <param name="pattern">Pattern to wrap.</param>
         internal static void NonCaptureGroup(StringBuilder builder, Pattern pattern)
         {
             builder.Append("(?:");

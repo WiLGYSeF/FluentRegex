@@ -21,6 +21,11 @@ namespace Wilgysef.FluentRegex
 
         internal static new CharacterPattern Hexadecimal(string hex)
         {
+            if (hex.Length > 2 && hex[0] == '0' && (hex[1] == 'x' || hex[1] == 'X'))
+            {
+                hex = hex[2..];
+            }
+
             if (hex.Length != 2 || !IsHex(hex[0]) || !IsHex(hex[1]))
             {
                 throw new ArgumentException($"Invalid hexadecimal: {hex}", nameof(hex));
@@ -44,6 +49,11 @@ namespace Wilgysef.FluentRegex
 
         internal static new CharacterPattern Unicode(string hex)
         {
+            if (hex.Length > 2 && hex[0] == '0' && (hex[1] == 'x' || hex[1] == 'X'))
+            {
+                hex = hex[2..];
+            }
+
             if (hex.Length != 4 || !IsHex(hex[0]) || !IsHex(hex[1]) || !IsHex(hex[2]) || !IsHex(hex[3]))
             {
                 throw new ArgumentException($"Invalid unicode hexadecimal: {hex}", nameof(hex));

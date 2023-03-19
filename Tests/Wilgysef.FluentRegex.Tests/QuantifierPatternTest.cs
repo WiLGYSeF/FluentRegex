@@ -102,6 +102,14 @@ public class QuantifierPatternTest
     }
 
     [Fact]
+    public void QuantifyConcat_Literal()
+    {
+        ShouldCreatePattern(
+            () => new PatternBuilder().Concat(new LiteralPattern("abc")).Between(1, 3),
+            "(?:abc){1,3}");
+    }
+
+    [Fact]
     public void FluentZeroOrOne()
     {
         var pattern = new QuantifierPattern(new LiteralPattern("a"), -1, -1, false);

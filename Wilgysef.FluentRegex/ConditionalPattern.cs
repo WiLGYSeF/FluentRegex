@@ -1,27 +1,46 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
     public class ConditionalPattern : AbstractGroupPattern
     {
+        /// <summary>
+        /// Conditional group number.
+        /// </summary>
         public int? GroupNumber { get; private set; }
 
+        /// <summary>
+        /// Conditional group name.
+        /// </summary>
         public string? GroupName { get; private set; }
 
+        /// <summary>
+        /// Conditional expression.
+        /// </summary>
         public Pattern? Expression
         {
             get => _expression;
             set => SetChildPattern(value, ref _expression, ExpressionIndex);
         }
 
+        /// <summary>
+        /// Indicates if the conditional expression is lookahead.
+        /// </summary>
         public bool Lookahead { get; private set; }
 
+        /// <summary>
+        /// Pattern if the conditional matches.
+        /// </summary>
         public Pattern YesPattern
         {
             get => _children[YesIndex];
             set => _children[YesIndex] = value;
         }
 
+        /// <summary>
+        /// Pattern if the conditional does not match.
+        /// </summary>
         public Pattern? NoPattern
         {
             get => _no;
@@ -39,6 +58,13 @@ namespace Wilgysef.FluentRegex
         private Pattern? _expression;
         private Pattern? _no;
 
+        /// <summary>
+        /// Creates a conditional pattern.
+        /// </summary>
+        /// <param name="expression">Conditional expression.</param>
+        /// <param name="yes">Pattern if the conditional matches.</param>
+        /// <param name="no">Pattern if the conditional does not match.</param>
+        /// <param name="lookahead">Whether the expression is lookahead.</param>
         public ConditionalPattern(Pattern expression, Pattern yes, Pattern? no, bool lookahead = true)
             : base(yes)
         {
@@ -47,18 +73,35 @@ namespace Wilgysef.FluentRegex
             Lookahead = lookahead;
         }
 
+        /// <summary>
+        /// Creates a conditional pattern.
+        /// </summary>
+        /// <param name="group">Conditional group number.</param>
+        /// <param name="yes">Pattern if the conditional matches.</param>
+        /// <param name="no">Pattern if the conditional does not match.</param>
         public ConditionalPattern(int group, Pattern yes, Pattern? no) : base(yes)
         {
             GroupNumber = group;
             NoPattern = no;
         }
 
+        /// <summary>
+        /// Creates a conditional pattern.
+        /// </summary>
+        /// <param name="group">Conditional group name.</param>
+        /// <param name="yes">Pattern if the conditional matches.</param>
+        /// <param name="no">Pattern if the conditional does not match.</param>
         public ConditionalPattern(string group, Pattern yes, Pattern? no) : base(yes)
         {
             GroupName = group;
             NoPattern = no;
         }
 
+        /// <summary>
+        /// Sets the conditional group number.
+        /// </summary>
+        /// <param name="group">Group number.</param>
+        /// <returns>Current conditional pattern.</returns>
         public ConditionalPattern WithGroup(int group)
         {
             GroupNumber = group;
@@ -67,6 +110,11 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        /// <summary>
+        /// Sets the conditional group name.
+        /// </summary>
+        /// <param name="group">Group name.</param>
+        /// <returns>Current conditional pattern.</returns>
         public ConditionalPattern WithGroup(string group)
         {
             GroupNumber = null;
@@ -75,6 +123,12 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        /// <summary>
+        /// Sets the conditional expression.
+        /// </summary>
+        /// <param name="expression">Expressino.</param>
+        /// <param name="lookahead">Whether the expression is lookahead.</param>
+        /// <returns>Current conditional pattern.</returns>
         public ConditionalPattern WithExpression(Pattern expression, bool lookahead = true)
         {
             GroupNumber = null;
@@ -84,12 +138,22 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        /// <summary>
+        /// Sets the pattern if the conditional matches.
+        /// </summary>
+        /// <param name="yes">Pattern if the conditional matches.</param>
+        /// <returns>Current conditional pattern.</returns>
         public ConditionalPattern WithYesPattern(Pattern yes)
         {
             YesPattern = yes;
             return this;
         }
 
+        /// <summary>
+        /// Sets the pattern if the conditional does not match.
+        /// </summary>
+        /// <param name="no">Pattern if the conditional does not match.</param>
+        /// <returns>Current conditional pattern.</returns>
         public ConditionalPattern WithNoPattern(Pattern? no)
         {
             NoPattern = no;
@@ -139,15 +203,34 @@ namespace Wilgysef.FluentRegex
 
             builder.Append(')');
 
-            YesPattern.Wrap(builder);
+            Wrap(YesPattern);
 
             if (NoPattern != null)
             {
                 builder.Append('|');
-                NoPattern.Wrap(builder);
+                Wrap(NoPattern);
+            }
+
+            void Wrap(Pattern pattern)
+            {
+                // conditional pattern branches don't need to be wrapped, unless it contains an or pattern.
+                if (Traverse(pattern).Any(p => p is OrPattern))
+                {
+                    pattern.Wrap(builder);
+                }
+                else
+                {
+                    pattern.ToString(builder);
+                }
             }
         }
 
+        /// <summary>
+        /// Sets the child pattern, ensuring that <see cref="Expression"/>, <see cref="YesPattern"/>, <see cref="NoPattern"/> are stored in the correct order.
+        /// </summary>
+        /// <param name="value">Value.</param>
+        /// <param name="pattern">Pattern to change to <paramref name="value"/>.</param>
+        /// <param name="index">Pattern index.</param>
         private void SetChildPattern(Pattern? value, ref Pattern? pattern, int index)
         {
             if (value != null)

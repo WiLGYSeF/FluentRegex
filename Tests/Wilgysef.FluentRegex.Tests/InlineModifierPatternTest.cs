@@ -35,6 +35,14 @@ public class InlineModifierPatternTest
     }
 
     [Fact]
+    public void NoModifiers_Pattern()
+    {
+        var pattern = new PatternBuilder().Modifiers(new LiteralPattern("a"), InlineModifier.None);
+
+        pattern.ToString().ShouldBe("(?:a)");
+    }
+
+    [Fact]
     public void FluentModifiers()
     {
         var pattern = new InlineModifierPattern(null, InlineModifier.None, InlineModifier.None);
@@ -52,17 +60,15 @@ public class InlineModifierPatternTest
         TestFluentSet(pattern.WithSingleline, () => pattern.Modifiers, InlineModifier.Singleline);
         TestFluentSet(pattern.WithIgnorePatternWhitespace, () => pattern.Modifiers, InlineModifier.IgnorePatternWhitespace);
 
-        TestFluentSet(pattern.WithIgnoreCaseDisabled, () => pattern.DisabledModifiers, InlineModifier.IgnoreCase);
-        TestFluentSet(pattern.WithMultilineDisabled, () => pattern.DisabledModifiers, InlineModifier.Multiline);
-        TestFluentSet(pattern.WithExplicitCaptureDisabled, () => pattern.DisabledModifiers, InlineModifier.ExplicitCapture);
-        TestFluentSet(pattern.WithSinglelineDisabled, () => pattern.DisabledModifiers, InlineModifier.Singleline);
-        TestFluentSet(pattern.WithIgnorePatternWhitespaceDisabled, () => pattern.DisabledModifiers, InlineModifier.IgnorePatternWhitespace);
-
-        static void TestFluentSet(Func<bool, InlineModifierPattern> action, Func<InlineModifier> getModifier, InlineModifier modifier)
+        static void TestFluentSet(Func<bool?, InlineModifierPattern> action, Func<InlineModifier> getModifier, InlineModifier modifier)
         {
             action(true);
             ShouldHaveModifier(getModifier(), modifier);
             action(false);
+            ShouldNotHaveModifier(getModifier(), modifier);
+
+            action(true);
+            action(null);
             ShouldNotHaveModifier(getModifier(), modifier);
         }
     }
@@ -80,12 +86,17 @@ public class InlineModifierPatternTest
     public void Copy()
     {
         var literal = new LiteralPattern("a");
-        var pattern = new InlineModifierPattern(literal, InlineModifier.IgnoreCase);
 
+        var pattern = new InlineModifierPattern(literal, InlineModifier.IgnoreCase);
         var copy = pattern.Copy();
         pattern.WithSingleline();
         literal.WithValue("b");
         copy.ToString().ShouldBe("(?i:a)");
+
+        pattern = new InlineModifierPattern(null, InlineModifier.IgnoreCase);
+        copy = pattern.Copy();
+        pattern.WithPattern(literal);
+        copy.ToString().ShouldBe("(?i)");
     }
 
     private static void ShouldHaveModifier(InlineModifier modifiers, InlineModifier flag)

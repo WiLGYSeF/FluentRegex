@@ -6,10 +6,23 @@ namespace Wilgysef.FluentRegex
 {
     public class ConcatPattern : ContainerPattern
     {
+        /// <summary>
+        /// Concatenates patterns.
+        /// </summary>
+        /// <param name="patterns">Patterns.</param>
         public ConcatPattern(params Pattern[] patterns) : base(patterns) { }
 
+        /// <summary>
+        /// Concatenates patterns.
+        /// </summary>
+        /// <param name="patterns">Patterns.</param>
         public ConcatPattern(IEnumerable<Pattern> patterns) : base(patterns) { }
 
+        /// <summary>
+        /// Adds a pattern to concatenate.
+        /// </summary>
+        /// <param name="pattern">Pattern.</param>
+        /// <returns>Current concatenation object.</returns>
         public ConcatPattern Concat(Pattern pattern)
         {
             _children.Add(pattern);

@@ -3,18 +3,51 @@ using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
-    public class QuantifierPattern : Pattern
+    public class QuantifierPattern : ContainerPattern
     {
-        public Pattern Pattern { get; set; }
+        /// <summary>
+        /// Pattern to match.
+        /// </summary>
+        public Pattern Pattern
+        {
+            get => _children[0];
+            set
+            {
+                if (_children.Count == 0)
+                {
+                    _children.Add(value);
+                }
+                else
+                {
+                    _children[0] = value;
+                }
+            }
+        }
 
+        /// <summary>
+        /// Minimum number of occurrences to match.
+        /// </summary>
         public int Min { get; set; }
 
+        /// <summary>
+        /// Maximum number of occurrences to match.
+        /// </summary>
         public int? Max { get; set; }
 
+        /// <summary>
+        /// Indicates if the match is greedy.
+        /// </summary>
         public bool Greedy { get; set; }
 
         internal override bool IsSinglePattern => false;
 
+        /// <summary>
+        /// Creates a quantifier pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
         public QuantifierPattern(Pattern pattern, int min, int? max, bool greedy)
         {
             Pattern = pattern;
@@ -23,26 +56,75 @@ namespace Wilgysef.FluentRegex
             Greedy = greedy;
         }
 
+        /// <summary>
+        /// Sets the quantifier to match zero or one occurrences.
+        /// </summary>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithZeroOrOne(bool greedy = true) => Set(0, 1, greedy);
 
+        /// <summary>
+        /// Sets the quantifier to match zero or more occurrences.
+        /// </summary>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithZeroOrMore(bool greedy = true) => Set(0, null, greedy);
 
+        /// <summary>
+        /// Sets the quantifier to match one or more occurrences.
+        /// </summary>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithOneOrMore(bool greedy = true) => Set(1, null, greedy);
 
+        /// <summary>
+        /// Sets the quantifier to match exactly <paramref name="number"/> occurrences.
+        /// </summary>
+        /// <param name="number">Number of occurrences to match.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithExactly(int number) => Set(number, number, true);
 
+        /// <summary>
+        /// Sets the quantifier to match between <paramref name="min"/> and <paramref name="max"/> occurrences.
+        /// </summary>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithBetween(int min, int max, bool greedy = true) => Set(min, max, greedy);
 
+        /// <summary>
+        /// Sets the quantifier to match at least <paramref name="min"/> occurrences.
+        /// </summary>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithAtLeast(int min, bool greedy = true) => Set(min, null, greedy);
 
+        /// <summary>
+        /// Sets the quantifier to match at most <paramref name="max"/> occurrences.
+        /// </summary>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithAtMost(int max, bool greedy = true) => Set(0, max, greedy);
 
+        /// <summary>
+        /// Sets if the quantifier is greedy.
+        /// </summary>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern GreedyCapture(bool greedy = true)
         {
             Greedy = greedy;
             return this;
         }
 
+        /// <summary>
+        /// Sets the pattern to match.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Current quantifier pattern.</returns>
         public QuantifierPattern WithPattern(Pattern pattern)
         {
             Pattern = pattern;

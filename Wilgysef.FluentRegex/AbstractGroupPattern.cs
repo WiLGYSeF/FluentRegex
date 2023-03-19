@@ -6,8 +6,14 @@ namespace Wilgysef.FluentRegex
     {
         internal sealed override bool IsSinglePattern => true;
 
+        /// <summary>
+        /// Indicates if the group has contents.
+        /// </summary>
         protected abstract bool HasContents { get; }
 
+        /// <summary>
+        /// Group pattern.
+        /// </summary>
         protected Pattern? Pattern
         {
             get => _children.Count != 0 ? _children[0] : null;
@@ -15,7 +21,14 @@ namespace Wilgysef.FluentRegex
             {
                 if (value != null)
                 {
-                    _children.Insert(0, value);
+                    if (_children.Count == 0)
+                    {
+                        _children.Add(value);
+                    }
+                    else
+                    {
+                        _children[0] = value;
+                    }
                 }
                 else
                 {
@@ -29,6 +42,10 @@ namespace Wilgysef.FluentRegex
             Pattern = pattern;
         }
 
+        /// <summary>
+        /// Writes the group contents to the string builder.
+        /// </summary>
+        /// <param name="builder">String builder.</param>
         protected abstract void GroupContents(StringBuilder builder);
 
         internal sealed override void ToString(StringBuilder builder)

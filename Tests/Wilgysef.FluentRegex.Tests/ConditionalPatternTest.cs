@@ -1,6 +1,4 @@
-﻿using System.CodeDom;
-
-namespace Wilgysef.FluentRegex.Tests;
+﻿namespace Wilgysef.FluentRegex.Tests;
 
 public class ConditionalPatternTest
 {

@@ -5,12 +5,32 @@ namespace Wilgysef.FluentRegex
 {
     public class LookaheadPattern : AbstractGroupPattern
     {
+        /// <summary>
+        /// Creates a positive lookahead pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Lookahead pattern.</returns>
         public static LookaheadPattern PositiveLookahead(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookahead);
 
+        /// <summary>
+        /// Creates a negative lookahead pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Lookahead pattern.</returns>
         public static LookaheadPattern NegativeLookahead(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookahead);
 
+        /// <summary>
+        /// Creates a positive lookbehind pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Lookahead pattern.</returns>
         public static LookaheadPattern PositiveLookbehind(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.PositiveLookbehind);
 
+        /// <summary>
+        /// Creates a negative lookbehind pattern.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Lookahead pattern.</returns>
         public static LookaheadPattern NegativeLookbehind(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookbehind);
 
         protected override bool HasContents => true;
@@ -22,6 +42,11 @@ namespace Wilgysef.FluentRegex
             _type = type;
         }
 
+        /// <summary>
+        /// Sets the pattern to match.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <returns>Current lookahead pattern.</returns>
         public LookaheadPattern WithPattern(Pattern? pattern)
         {
             Pattern = pattern;
