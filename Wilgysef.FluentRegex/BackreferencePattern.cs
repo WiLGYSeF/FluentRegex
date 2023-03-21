@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
 {
@@ -98,7 +99,7 @@ namespace Wilgysef.FluentRegex
                 {
                     if (GroupNumber!.Value > 9)
                     {
-                        throw new InvalidOperationException("Backreference number exceeds limit of 9.");
+                        throw new InvalidPatternException(this, "Backreference number exceeds limit of 9.");
                     }
 
                     builder.Append('\\');

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
 {
@@ -13,8 +14,7 @@ namespace Wilgysef.FluentRegex
         {
             if (_buildStack.Contains(pattern))
             {
-                var path = Pattern.GetPatternPath(_buildStack, pattern);
-                throw new InvalidOperationException($"Pattern is infinitely recursive: {path}");
+                throw new PatternRecursionException(_buildStack, pattern);
             }
 
             _buildStack.Push(pattern);

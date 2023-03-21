@@ -50,6 +50,7 @@ public class CharacterPatternTest
     [InlineData("ag", null)]
     [InlineData("31", @"\x31")]
     [InlineData("0x31", @"\x31")]
+    [InlineData("0X31", @"\x31")]
     public void Hexadecimal(string value, string expected)
     {
         ShouldCreatePattern(
@@ -81,6 +82,7 @@ public class CharacterPatternTest
     [InlineData("abc", null)]
     [InlineData("ab3d", @"\uab3d")]
     [InlineData("0xAB3D", @"\uAB3D")]
+    [InlineData("0XAB3D", @"\uAB3D")]
     [InlineData("abcy", null)]
     public void Unicode(string value, string expected)
     {

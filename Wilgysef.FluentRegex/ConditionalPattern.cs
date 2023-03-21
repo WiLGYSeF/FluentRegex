@@ -64,7 +64,7 @@ namespace Wilgysef.FluentRegex
         /// <param name="expression">Conditional expression.</param>
         /// <param name="yes">Pattern if the conditional matches.</param>
         /// <param name="no">Pattern if the conditional does not match.</param>
-        /// <param name="lookahead">Whether the expression is lookahead.</param>
+        /// <param name="lookahead">Indicates if the expression is lookahead.</param>
         public ConditionalPattern(Pattern expression, Pattern yes, Pattern? no, bool lookahead = true)
             : base(yes)
         {
@@ -127,7 +127,7 @@ namespace Wilgysef.FluentRegex
         /// Sets the conditional expression.
         /// </summary>
         /// <param name="expression">Expressino.</param>
-        /// <param name="lookahead">Whether the expression is lookahead.</param>
+        /// <param name="lookahead">Indicates if the expression is lookahead.</param>
         /// <returns>Current conditional pattern.</returns>
         public ConditionalPattern WithExpression(Pattern expression, bool lookahead = true)
         {

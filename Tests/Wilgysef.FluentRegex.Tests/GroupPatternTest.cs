@@ -1,11 +1,13 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using Wilgysef.FluentRegex.Exceptions;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class GroupPatternTest
 {
     [Fact]
     public void Group()
     {
-        var pattern = new PatternBuilder().CaptureGroup(new LiteralPattern("abc"));
+        var pattern = new PatternBuilder().CapturingGroup(new LiteralPattern("abc"));
 
         pattern.ToString().ShouldBe("(abc)");
     }
@@ -16,7 +18,7 @@ public class GroupPatternTest
         var pattern = new PatternBuilder().Group(new LiteralPattern("abc"), capture: false);
         pattern.ToString().ShouldBe("(?:abc)");
 
-        pattern = new PatternBuilder().NonCaptureGroup(new LiteralPattern("abc"));
+        pattern = new PatternBuilder().NonCapturingGroup(new LiteralPattern("abc"));
         pattern.ToString().ShouldBe("(?:abc)");
     }
 
@@ -31,7 +33,7 @@ public class GroupPatternTest
     [Fact]
     public void NamedGroup()
     {
-        var pattern = new PatternBuilder().CaptureGroup("abc", new LiteralPattern("test"));
+        var pattern = new PatternBuilder().CapturingGroup("abc", new LiteralPattern("test"));
 
         pattern.ToString().ShouldBe("(?<abc>test)");
     }
@@ -40,8 +42,8 @@ public class GroupPatternTest
     public void BalancingGroup()
     {
         var pattern = new PatternBuilder()
-            .CaptureGroup("abc", new LiteralPattern("a"))
-            .CaptureGroup("def", new LiteralPattern("b"))
+            .CapturingGroup("abc", new LiteralPattern("a"))
+            .CapturingGroup("def", new LiteralPattern("b"))
             .BalancingGroup("abc", "def", new LiteralPattern("test"));
 
         pattern.ToString().ShouldBe("(?<abc>a)(?<def>b)(?<abc-def>test)");
@@ -79,9 +81,19 @@ public class GroupPatternTest
     public void IsCapturing_WithoutCapture()
     {
         var pattern = new GroupPattern(new LiteralPattern("a"), "abc");
+
         pattern.Capture = false;
         pattern.Capture.ShouldBeFalse();
         pattern.IsCapturing.ShouldBeTrue();
+        pattern.IsNumbered.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void NoWrap()
+    {
+        var pattern = new PatternBuilder().Group(new LiteralPattern("abc")).Exactly(3);
+
+        pattern.ToString().ShouldBe("(abc){3}");
     }
 
     [Fact]
@@ -114,9 +126,9 @@ public class GroupPatternTest
     [Fact]
     public void Fail_InvalidName()
     {
-        Should.Throw<InvalidOperationException>(() => new PatternBuilder().CaptureGroup("", new LiteralPattern("a")).ToString());
-        Should.Throw<InvalidOperationException>(() => new PatternBuilder().CaptureGroup("w-", new LiteralPattern("a")).ToString());
+        Should.Throw<InvalidPatternException>(() => new PatternBuilder().CapturingGroup("", new LiteralPattern("a")).ToString());
+        Should.Throw<InvalidPatternException>(() => new PatternBuilder().CapturingGroup("w-", new LiteralPattern("a")).ToString());
 
-        Should.Throw<InvalidOperationException>(() => new PatternBuilder().BalancingGroup("w", "3-", new LiteralPattern("a")).ToString());
+        Should.Throw<InvalidPatternException>(() => new PatternBuilder().BalancingGroup("w", "3-", new LiteralPattern("a")).ToString());
     }
 }

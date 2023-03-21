@@ -37,7 +37,7 @@ public class PatternBuilderTest
     public void GetGroups_Nested_With_Named()
     {
         var builder = new PatternBuilder()
-            .CaptureGroup("z", new PatternBuilder().Group(new LiteralPattern("a")).Literal("b"))
+            .CapturingGroup("z", new PatternBuilder().Group(new LiteralPattern("a")).Literal("b"))
             .Group(new LiteralPattern("c"))
             .Group(null);
 

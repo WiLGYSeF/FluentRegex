@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex.Tests;
 
@@ -51,7 +52,7 @@ public class PatternTest
     public void Traverse()
     {
         var builder = new PatternBuilder()
-            .CaptureGroup("z", new PatternBuilder().Group(new LiteralPattern("a")).Literal("b"))
+            .CapturingGroup("z", new PatternBuilder().Group(new LiteralPattern("a")).Literal("b"))
             .Group(new LiteralPattern("c"))
             .Literal("asdf")
             .Between(1, 6);
@@ -78,10 +79,21 @@ public class PatternTest
         var group = new GroupPattern(new LiteralPattern("a"));
         group.WithPattern(new ConcatPattern(new LiteralPattern("b"), group));
 
-        var builder = new PatternBuilder().CaptureGroup("z", group);
+        var builder = new PatternBuilder().CapturingGroup("z", group);
 
-        Should.Throw<InvalidOperationException>(() => builder.Build());
+        Should.Throw<PatternRecursionException>(() => builder.Build());
 
-        Should.Throw<InvalidOperationException>(() => group.ToString());
+        var exceptionThrown = false;
+        try
+        {
+            group.ToString();
+        }
+        catch (PatternRecursionException ex)
+        {
+            ex.GetPatternPath().ShouldBe("LiteralPattern -> ConcatPattern -> *GroupPattern");
+            exceptionThrown = true;
+        }
+
+        exceptionThrown.ShouldBeTrue();
     }
 }

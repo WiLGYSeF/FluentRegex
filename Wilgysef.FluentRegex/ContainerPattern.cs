@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
 {
@@ -23,14 +24,17 @@ namespace Wilgysef.FluentRegex
 
         private bool IsSinglePatternInternal()
         {
+            var path = new List<Pattern>();
             var traversed = new HashSet<Pattern>();
             Pattern current = this;
 
             while (true)
             {
+                // just in case the singular child is recursive
+                path.Add(current);
                 if (!traversed.Add(current))
                 {
-                    throw new InvalidOperationException("Pattern is infinitely recursive.");
+                    throw new PatternRecursionException(path, current);
                 }
 
                 if (current is ContainerPattern container)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
 {
@@ -42,7 +43,7 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="pattern">Pattern to match.</param>
         /// <param name="name">Group name.</param>
-        /// <param name="capture">Whether the group is capturing.</param>
+        /// <param name="capture">Indicates if the group is capturing.</param>
         public GroupPattern(Pattern? pattern, string? name = null, bool capture = true) : base(pattern)
         {
             Name = name;
@@ -98,7 +99,7 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Sets if the group is capturing.
         /// </summary>
-        /// <param name="capture">Whether the group is capturing.</param>
+        /// <param name="capture">Indicates if the group is capturing.</param>
         /// <returns>Current group pattern.</returns>
         public GroupPattern WithCapture(bool capture = true)
         {
@@ -132,11 +133,11 @@ namespace Wilgysef.FluentRegex
             {
                 if (Name != null && !IsValidName(Name))
                 {
-                    throw new InvalidOperationException("Group name is not valid.");
+                    throw new InvalidPatternException(this, "Group name is not valid.");
                 }
                 if (SecondName != null && !IsValidName(SecondName))
                 {
-                    throw new InvalidOperationException("Group second name is not valid.");
+                    throw new InvalidPatternException(this, "Group second name is not valid.");
                 }
 
                 if (IsCapturing)
@@ -261,7 +262,7 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="builder">String builder.</param>
         /// <param name="pattern">Pattern to wrap.</param>
-        internal static void NonCaptureGroup(PatternBuildState state, Pattern pattern)
+        internal static void NonCapturingGroup(PatternBuildState state, Pattern pattern)
         {
             state.WithBuilder(Build);
 

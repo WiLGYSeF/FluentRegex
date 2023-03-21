@@ -34,7 +34,7 @@ public class ConditionalPatternTest
     public void GroupName()
     {
         var pattern = new PatternBuilder()
-            .CaptureGroup("a", new LiteralPattern("test"))
+            .CapturingGroup("a", new LiteralPattern("test"))
             .Conditional("a", new LiteralPattern("abc"), new LiteralPattern("asdf"));
 
         pattern.ToString().ShouldBe("(?<a>test)(?(a)abc|asdf)");

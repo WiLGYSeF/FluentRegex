@@ -1,4 +1,6 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using Wilgysef.FluentRegex.Exceptions;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class BackreferencePatternTest
 {
@@ -16,7 +18,7 @@ public class BackreferencePatternTest
     public void Name()
     {
         var pattern = new PatternBuilder()
-            .CaptureGroup("a", new LiteralPattern("z"))
+            .CapturingGroup("a", new LiteralPattern("z"))
             .Backreference("a");
 
         pattern.ToString().ShouldBe(@"(?<a>z)\k<a>");
@@ -36,7 +38,7 @@ public class BackreferencePatternTest
     public void NoWrap()
     {
         var pattern = new PatternBuilder()
-            .CaptureGroup("a", new LiteralPattern("z"))
+            .CapturingGroup("a", new LiteralPattern("z"))
             .Backreference("a")
             .OneOrMore();
 
@@ -63,6 +65,6 @@ public class BackreferencePatternTest
     {
         var pattern = new BackreferencePattern(10);
 
-        Should.Throw<InvalidOperationException>(() => pattern.ToString());
+        Should.Throw<InvalidPatternException>(() => pattern.ToString());
     }
 }

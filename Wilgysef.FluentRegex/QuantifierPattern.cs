@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
 {
@@ -140,14 +141,14 @@ namespace Wilgysef.FluentRegex
         {
             if (Min < 0 || Max.HasValue && Max.Value < 0)
             {
-                throw new InvalidOperationException("Range cannot be negative.");
+                throw new InvalidPatternException(this, "Range cannot be negative.");
             }
 
             if (Max.HasValue)
             {
                 if (Min > Max.Value)
                 {
-                    throw new InvalidOperationException("Min cannot be greater than max.");
+                    throw new InvalidPatternException(this, "Min cannot be greater than max.");
                 }
 
                 if (Min == 0 && Max.Value == 0)

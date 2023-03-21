@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
 {
@@ -56,13 +57,13 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Wraps the pattern if necessary.
         /// </summary>
-        /// <param name="builder">String builder.</param>
-        /// <param name="always">Whether wrapping should always be done.</param>
+        /// <param name="state">Pattern build state.</param>
+        /// <param name="always">Indicates if wrapping should always be done.</param>
         internal void Wrap(PatternBuildState state, bool always = false)
         {
             if (always || !IsSinglePattern)
             {
-                GroupPattern.NonCaptureGroup(state, this);
+                GroupPattern.NonCapturingGroup(state, this);
             }
             else
             {
@@ -73,7 +74,7 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Traverses the pattern in depth order.
         /// </summary>
-        /// <param name="patterns">Pattern.</param>
+        /// <param name="pattern">Pattern.</param>
         /// <returns>Traversed patterns.</returns>
         internal static IEnumerable<Pattern> Traverse(Pattern pattern)
         {
@@ -85,7 +86,7 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="patterns">Patterns.</param>
         /// <returns>Traversed patterns.</returns>
-        /// <exception cref="InvalidOperationException">Pattern is infinitely recursive.</exception>
+        /// <exception cref="PatternRecursionException">Pattern is infinitely recursive.</exception>
         internal static IEnumerable<Pattern> Traverse(IReadOnlyList<Pattern> patterns)
         {
             var stack = new Stack<TraverseItem>();
@@ -106,8 +107,7 @@ namespace Wilgysef.FluentRegex
                         {
                             if (stack.Any(i => i.Pattern == container))
                             {
-                                var path = GetPatternPath(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), container);
-                                throw new InvalidOperationException($"Pattern is infinitely recursive: {path}");
+                                throw new PatternRecursionException(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), container);
                             }
 
                             stack.Push(new TraverseItem(container, container.Children.GetEnumerator()));
@@ -121,36 +121,6 @@ namespace Wilgysef.FluentRegex
                 {
                     stack.Pop();
                 }
-            }
-        }
-
-        internal static string GetPatternPath(IEnumerable<Pattern> patterns, Pattern? search)
-        {
-            var builder = new StringBuilder();
-
-            using var enumerator = patterns.GetEnumerator();
-
-            if (enumerator.MoveNext())
-            {
-                Append(enumerator.Current);
-            }
-
-            while (enumerator.MoveNext())
-            {
-                builder.Append(" -> ");
-                Append(enumerator.Current);
-            }
-
-            return builder.ToString();
-
-            void Append(Pattern pattern)
-            {
-                if (pattern == search)
-                {
-                    builder.Append('*');
-                }
-
-                builder.Append(pattern.GetType().Name);
             }
         }
 

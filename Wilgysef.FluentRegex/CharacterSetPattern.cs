@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
 {
@@ -303,7 +304,7 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Sets if the character set is negated.
         /// </summary>
-        /// <param name="negated">Whether the character set is negated.</param>
+        /// <param name="negated">Indicates if the character set is negated.</param>
         /// <returns>Current character set pattern.</returns>
         public CharacterSetPattern Negate(bool negated = true)
         {
@@ -329,7 +330,7 @@ namespace Wilgysef.FluentRegex
             {
                 if (_subtractedCharacters.Count > 0 || _subtractedCharacterRanges.Count > 0)
                 {
-                    throw new InvalidOperationException("Cannot have subtracted characters without characters.");
+                    throw new InvalidPatternException(this, "Cannot have subtracted characters without characters.");
                 }
 
                 return;

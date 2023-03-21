@@ -82,35 +82,35 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Sets the <see cref="InlineModifier.IgnoreCase"/> modifier.
         /// </summary>
-        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <param name="enable">Indicates if the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
         /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithIgnoreCase(bool? enable = true) => SetModifier(InlineModifier.IgnoreCase, enable);
 
         /// <summary>
         /// Sets the <see cref="InlineModifier.Multiline"/> modifier.
         /// </summary>
-        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <param name="enable">Indicates if the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
         /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithMultiline(bool? enable = true) => SetModifier(InlineModifier.Multiline, enable);
 
         /// <summary>
         /// Sets the <see cref="InlineModifier.ExplicitCapture"/> modifier.
         /// </summary>
-        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <param name="enable">Indicates if the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
         /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithExplicitCapture(bool? enable = true) => SetModifier(InlineModifier.ExplicitCapture, enable);
 
         /// <summary>
         /// Sets the <see cref="InlineModifier.Singleline"/> modifier.
         /// </summary>
-        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <param name="enable">Indicates if the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
         /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithSingleline(bool? enable = true) => SetModifier(InlineModifier.Singleline, enable);
 
         /// <summary>
         /// Sets the <see cref="InlineModifier.IgnorePatternWhitespace"/> modifier.
         /// </summary>
-        /// <param name="enable">Whether the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
+        /// <param name="enable">Indicates if the modifier is enabled, or <see langword="null"/> if neither enabled nor disabled.</param>
         /// <returns>Current inline modifiers pattern.</returns>
         public InlineModifierPattern WithIgnorePatternWhitespace(bool? enable = true) => SetModifier(InlineModifier.IgnorePatternWhitespace, enable);
 

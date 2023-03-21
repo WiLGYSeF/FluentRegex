@@ -1,4 +1,6 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using Wilgysef.FluentRegex.Exceptions;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class QuantifierPatternTest
 {
@@ -260,9 +262,10 @@ public class QuantifierPatternTest
         {
             var pattern = func();
             pattern.ToString().ShouldBe(expected);
-        }else
+        }
+        else
         {
-            Should.Throw<InvalidOperationException>(() => func().ToString());
+            Should.Throw<InvalidPatternException>(() => func().ToString());
         }
     }
 }

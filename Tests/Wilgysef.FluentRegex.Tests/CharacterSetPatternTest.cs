@@ -1,4 +1,5 @@
-﻿using static Wilgysef.FluentRegex.CharacterSetPattern;
+﻿using Wilgysef.FluentRegex.Exceptions;
+using static Wilgysef.FluentRegex.CharacterSetPattern;
 
 namespace Wilgysef.FluentRegex.Tests;
 
@@ -21,6 +22,9 @@ public class CharacterSetPatternTest
 
         pattern = new PatternBuilder().CharacterSet(new[] { CharacterPattern.Digit }, negated: true);
         pattern.ToString().ShouldBe(@"[^\d]");
+        
+        pattern = new PatternBuilder().CharacterSet(new[] { CharacterPattern.Character('\b'), CharacterPattern.Digit });
+        pattern.ToString().ShouldBe(@"[\b\d]");
     }
 
     [Fact]
@@ -99,6 +103,7 @@ public class CharacterSetPatternTest
             (CharacterPattern.Digit, @"\d"),
             (CharacterPattern.Character('['), @"\["),
             (CharacterPattern.Character('.'), @"\."),
+            (CharacterPattern.Character('\b'), @"[\b]"),
         };
 
         foreach (var (character, expected) in entries)
@@ -195,6 +200,7 @@ public class CharacterSetPatternTest
     public void GetValue()
     {
         _ = new CharacterRange(CharacterPattern.Control('A'), CharacterPattern.Escape);
+        _ = new CharacterRange(CharacterPattern.Control('a'), CharacterPattern.Escape);
         _ = new CharacterRange(CharacterPattern.Hexadecimal("1e"), CharacterPattern.Octal("40"));
         _ = new CharacterRange(CharacterPattern.Unicode("1234"), CharacterPattern.Unicode("5678"));
     }
@@ -230,7 +236,7 @@ public class CharacterSetPatternTest
             Array.Empty<CharacterPattern>(),
             new[] { CharacterPattern.Character('a') });
 
-        Should.Throw<InvalidOperationException>(() => pattern.ToString());
+        Should.Throw<InvalidPatternException>(() => pattern.ToString());
     }
 
     [Fact]
