@@ -97,6 +97,11 @@ namespace Wilgysef.FluentRegex
             }
         }
 
+        internal override Pattern Unwrap()
+        {
+            return this;
+        }
+
         private enum AnchorType
         {
             BeginLine,

@@ -426,6 +426,11 @@ namespace Wilgysef.FluentRegex
             }
         }
 
+        internal override Pattern Unwrap()
+        {
+            return this;
+        }
+
         public class CharacterRange
         {
             public CharacterPattern Start { get; }

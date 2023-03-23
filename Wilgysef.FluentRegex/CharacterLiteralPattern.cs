@@ -209,6 +209,11 @@ namespace Wilgysef.FluentRegex
             }
         }
 
+        internal override Pattern Unwrap()
+        {
+            return this;
+        }
+
         private static bool IsControl(char c)
         {
             switch (c)

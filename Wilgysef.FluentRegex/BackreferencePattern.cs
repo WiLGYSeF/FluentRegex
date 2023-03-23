@@ -114,6 +114,11 @@ namespace Wilgysef.FluentRegex
             }
         }
 
+        internal override Pattern Unwrap()
+        {
+            return this;
+        }
+
         public enum BackreferenceType
         {
             Number,

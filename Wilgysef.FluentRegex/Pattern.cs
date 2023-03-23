@@ -26,6 +26,12 @@ namespace Wilgysef.FluentRegex
         internal abstract void Build(PatternBuildState state);
 
         /// <summary>
+        /// Unwraps the pattern, if possible.
+        /// </summary>
+        /// <returns>Pattern.</returns>
+        internal abstract Pattern Unwrap();
+
+        /// <summary>
         /// Compiles the pattern into a regular expression.
         /// </summary>
         /// <param name="options">Regex options.</param>

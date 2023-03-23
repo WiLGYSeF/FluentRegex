@@ -54,5 +54,12 @@ namespace Wilgysef.FluentRegex
                 }
             }
         }
+
+        internal override Pattern Unwrap()
+        {
+            return _children.Count == 1
+                ? _children[0].Unwrap()
+                : this;
+        }
     }
 }

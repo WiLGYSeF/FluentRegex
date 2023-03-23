@@ -706,6 +706,11 @@ namespace Wilgysef.FluentRegex
             Build().Build(state);
         }
 
+        internal override Pattern Unwrap()
+        {
+            return this;
+        }
+
         /// <summary>
         /// Adds pattern to builder.
         /// </summary>

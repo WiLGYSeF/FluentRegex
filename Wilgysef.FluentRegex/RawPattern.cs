@@ -45,5 +45,10 @@ namespace Wilgysef.FluentRegex
                 builder.Append(Regex);
             }
         }
+
+        internal override Pattern Unwrap()
+        {
+            return this;
+        }
     }
 }

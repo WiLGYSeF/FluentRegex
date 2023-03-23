@@ -47,6 +47,11 @@ namespace Wilgysef.FluentRegex
             }
         }
 
+        internal override Pattern Unwrap()
+        {
+            return this;
+        }
+
         /// <summary>
         /// Escapes a pattern string.
         /// </summary>

@@ -46,6 +46,8 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsSinglePattern => false;
 
+        private bool IsExactlyOne => Min == 1 && Max.HasValue && Max.Value == 1;
+
         /// <summary>
         /// Creates a quantifier pattern.
         /// </summary>
@@ -169,14 +171,14 @@ namespace Wilgysef.FluentRegex
 
                 Pattern.Wrap(state);
 
+                if (IsExactlyOne)
+                {
+                    return;
+                }
+
                 if (builder.Length == startLength)
                 {
                     throw new InvalidPatternException(this, "Quantified pattern cannot be empty.");
-                }
-
-                if (Min == 1 && Max.HasValue && Max.Value == 1)
-                {
-                    return;
                 }
 
                 if (Min == 0)
@@ -226,6 +228,13 @@ namespace Wilgysef.FluentRegex
                     builder.Append('?');
                 }
             }
+        }
+
+        internal override Pattern Unwrap()
+        {
+            return IsExactlyOne
+                ? Pattern
+                : this;
         }
 
         private QuantifierPattern Set(int min, int? max, bool greedy)
