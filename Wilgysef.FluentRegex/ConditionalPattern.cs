@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Wilgysef.FluentRegex
 {
@@ -217,8 +216,7 @@ namespace Wilgysef.FluentRegex
 
                 void Wrap(Pattern pattern)
                 {
-                    // conditional pattern branches don't need to be wrapped, unless it contains an or pattern.
-                    if (Traverse(pattern).Any(p => p is OrPattern))
+                    if (ContainsUnwrappedOrPattern(pattern))
                     {
                         pattern.Wrap(state);
                     }

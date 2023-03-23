@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using Wilgysef.FluentRegex.Exceptions;
 
@@ -71,14 +70,23 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        /// <summary>
-        /// Traverses the pattern in depth order.
-        /// </summary>
-        /// <param name="pattern">Pattern.</param>
-        /// <returns>Traversed patterns.</returns>
-        internal static IEnumerable<Pattern> Traverse(Pattern pattern)
+        internal static bool ContainsUnwrappedOrPattern(Pattern pattern)
         {
-            return Traverse(new[] { pattern });
+            foreach (var current in Traverse(new[] { pattern }))
+            {
+                if (current is AbstractGroupPattern
+                    || current is ConcatPattern
+                    || current is QuantifierPattern)
+                {
+                    return false;
+                }
+                else if (current is OrPattern)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -87,7 +95,8 @@ namespace Wilgysef.FluentRegex
         /// <param name="patterns">Patterns.</param>
         /// <returns>Traversed patterns.</returns>
         /// <exception cref="PatternRecursionException">Pattern is infinitely recursive.</exception>
-        internal static IEnumerable<Pattern> Traverse(IReadOnlyList<Pattern> patterns)
+        internal static IEnumerable<Pattern> Traverse(
+            IReadOnlyList<Pattern> patterns)
         {
             var stack = new Stack<TraverseItem>();
             stack.Push(new TraverseItem(null, patterns.GetEnumerator()));
@@ -101,19 +110,17 @@ namespace Wilgysef.FluentRegex
                 {
                     yield return item.Enumerator.Current;
 
-                    if (item.Enumerator.Current is ContainerPattern container)
+                    if (item.Enumerator.Current is ContainerPattern container
+                        && container.Children.Count > 0)
                     {
-                        if (container.Children.Count > 0)
+                        if (stack.Any(i => i.Pattern == container))
                         {
-                            if (stack.Any(i => i.Pattern == container))
-                            {
-                                throw new PatternRecursionException(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), container);
-                            }
-
-                            stack.Push(new TraverseItem(container, container.Children.GetEnumerator()));
-                            skipPop = true;
-                            break;
+                            throw new PatternRecursionException(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), container);
                         }
+
+                        stack.Push(new TraverseItem(container, container.Children.GetEnumerator()));
+                        skipPop = true;
+                        break;
                     }
                 }
 

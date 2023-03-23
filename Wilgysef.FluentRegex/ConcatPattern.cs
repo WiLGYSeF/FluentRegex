@@ -42,11 +42,10 @@ namespace Wilgysef.FluentRegex
             {
                 foreach (var child in _children)
                 {
-                    if (child is OrPattern orPattern
-                        && !orPattern.IsSinglePattern
+                    if (ContainsUnwrappedOrPattern(child)
                         && _children.Count > 1)
                     {
-                        orPattern.Wrap(state, always: true);
+                        child.Wrap(state, always: true);
                     }
                     else
                     {

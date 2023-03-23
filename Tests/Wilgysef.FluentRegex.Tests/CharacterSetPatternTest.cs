@@ -35,6 +35,15 @@ public class CharacterSetPatternTest
 
         pattern = new PatternBuilder().CharacterSet(new[] { new CharacterRange('a', 'z') }, negated: true);
         pattern.ToString().ShouldBe("[^a-z]");
+
+        pattern = new PatternBuilder().CharacterSet(new[] { CharacterRange.Hexadecimal("00", "FF") }, negated: true);
+        pattern.ToString().ShouldBe(@"[^\x00-\xFF]");
+
+        pattern = new PatternBuilder().CharacterSet(new[] { CharacterRange.Octal("00", "12") }, negated: true);
+        pattern.ToString().ShouldBe(@"[^\00-\12]");
+
+        pattern = new PatternBuilder().CharacterSet(new[] { CharacterRange.Unicode("0000", "FFFF") }, negated: true);
+        pattern.ToString().ShouldBe(@"[^\u0000-\uFFFF]");
     }
 
     [Fact]

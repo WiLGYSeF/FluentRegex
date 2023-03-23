@@ -357,8 +357,6 @@ namespace Wilgysef.FluentRegex
                     }
                 }
 
-                // TODO: remove duplicate chars?
-
                 var tmpBuilder = new StringBuilder();
 
                 builder.Append('[');
@@ -435,6 +433,27 @@ namespace Wilgysef.FluentRegex
             public CharacterPattern End { get; }
 
             public bool Single { get; }
+
+            public static CharacterRange Hexadecimal(string start, string end)
+            {
+                return new CharacterRange(
+                    CharacterPattern.Hexadecimal(start),
+                    CharacterPattern.Hexadecimal(end));
+            }
+
+            public static CharacterRange Octal(string start, string end)
+            {
+                return new CharacterRange(
+                    CharacterPattern.Octal(start),
+                    CharacterPattern.Octal(end));
+            }
+
+            public static CharacterRange Unicode(string start, string end)
+            {
+                return new CharacterRange(
+                    CharacterPattern.Unicode(start),
+                    CharacterPattern.Unicode(end));
+            }
 
             public CharacterRange(char start, char end)
                 : this(CharacterPattern.Character(start), CharacterPattern.Character(end)) { }

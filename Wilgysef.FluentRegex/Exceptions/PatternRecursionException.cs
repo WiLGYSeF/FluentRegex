@@ -1,21 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Wilgysef.FluentRegex.Exceptions
 {
     public class PatternRecursionException : Exception
     {
-        public IEnumerable<Pattern> Path { get; }
+        public IList<Pattern> Path { get; }
 
         public Pattern RecursivePattern { get; }
 
-        public PatternRecursionException(IEnumerable<Pattern> path, Pattern recursivePattern)
+        public int RecursivePatternIndex { get; }
+
+        public PatternRecursionException(IList<Pattern> path, Pattern recursivePattern)
             : base("Pattern is infinitely recursive")
         {
             Path = path;
             RecursivePattern = recursivePattern;
+            RecursivePatternIndex = path.IndexOf(recursivePattern);
         }
+
+        public PatternRecursionException(IEnumerable<Pattern> path, Pattern recursivePattern)
+            : this(path.ToList(), recursivePattern) { }
 
         /// <summary>
         /// Gets the pattern path string where the recursion occurred.

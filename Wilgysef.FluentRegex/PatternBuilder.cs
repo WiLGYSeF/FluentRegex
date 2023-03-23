@@ -13,6 +13,33 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public PatternBuilder() { }
 
+        /// <summary>
+        /// Creates a new pattern builder.
+        /// </summary>
+        /// <param name="character">Starting character.</param>
+        public PatternBuilder(char character)
+        {
+            Character(character);
+        }
+
+        /// <summary>
+        /// Creates a new pattern builder.
+        /// </summary>
+        /// <param name="literal">Starting literal string.</param>
+        public PatternBuilder(string literal)
+        {
+            Literal(literal);
+        }
+
+        /// <summary>
+        /// Creates a new pattern builder.
+        /// </summary>
+        /// <param name="pattern">Starting pattern.</param>
+        public PatternBuilder(Pattern pattern)
+        {
+            Add(pattern);
+        }
+
         private PatternBuilder(IEnumerable<Pattern> patterns) : base(patterns) { }
 
         #region Anchors
@@ -269,18 +296,34 @@ namespace Wilgysef.FluentRegex
         #endregion
 
         /// <summary>
-        /// Concatenates patterns to the pattern.
+        /// Concatenates patterns as a concatenation unit to the pattern.
         /// </summary>
-        /// <param name="patterns">Patterns.</param>
+        /// <param name="patterns">Patterns to add.</param>
         /// <returns>Current pattern builder.</returns>
-        public PatternBuilder Concat(params Pattern[] patterns) => Add(new ConcatPattern(patterns));
+        public PatternBuilder Concat(params Pattern[] patterns) => Concat((IEnumerable<Pattern>)patterns);
 
         /// <summary>
-        /// Concatenates patterns to the pattern.
+        /// Concatenates patterns as a concatenation unit to the pattern.
         /// </summary>
-        /// <param name="patterns">Patterns.</param>
+        /// <param name="patterns">Patterns to add.</param>
         /// <returns>Current pattern builder.</returns>
-        public PatternBuilder Concat(IEnumerable<Pattern> patterns) => Add(new ConcatPattern(patterns));
+        public PatternBuilder Concat(IEnumerable<Pattern> patterns)
+        {
+            if (HasAtLeast(patterns, 2))
+            {
+                Add(new ConcatPattern(patterns));
+            }
+            else
+            {
+                var first = patterns.FirstOrDefault();
+                if (first != null)
+                {
+                    Add(first);
+                }
+            }
+
+            return this;
+        }
 
         #region Groups
 
@@ -461,6 +504,66 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Matches the last pattern added zero or one times.
         /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder ZeroOrOne(Pattern pattern, bool greedy = true) => AddQuantifier(pattern, 0, 1, greedy);
+
+        /// <summary>
+        /// Matches the last pattern added zero or more times.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder ZeroOrMore(Pattern pattern, bool greedy = true) => AddQuantifier(pattern, 0, null, greedy);
+
+        /// <summary>
+        /// Matches the last pattern added one or more times.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder OneOrMore(Pattern pattern, bool greedy = true) => AddQuantifier(pattern, 1, null, greedy);
+
+        /// <summary>
+        /// Matches the last pattern added exactly <paramref name="number"/> times.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="number">Number of occurrences to match.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder Exactly(Pattern pattern, int number) => AddQuantifier(pattern, number, number, true);
+
+        /// <summary>
+        /// Matches the last pattern added between <paramref name="min"/> and <paramref name="max"/> times.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder Between(Pattern pattern, int min, int max, bool greedy = true) => AddQuantifier(pattern, min, max, greedy);
+
+        /// <summary>
+        /// Matches the last pattern added at least <paramref name="min"/> times.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder AtLeast(Pattern pattern, int min, bool greedy = true) => AddQuantifier(pattern, min, null, greedy);
+
+        /// <summary>
+        /// Matches the last pattern added at most <paramref name="max"/> times.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder AtMost(Pattern pattern, int max, bool greedy = true) => AddQuantifier(pattern, 0, max, greedy);
+
+        /// <summary>
+        /// Matches the last pattern added zero or one times.
+        /// </summary>
         /// <param name="greedy">Indicates if the match is greedy.</param>
         /// <returns>Current pattern builder.</returns>
         public PatternBuilder ZeroOrOne(bool greedy = true) => AddQuantifier(0, 1, greedy);
@@ -514,22 +617,23 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Adds a quantifier to the pattern.
         /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current pattern builder.</returns>
+        /// <exception cref="InvalidPatternException">Cannot quantify pattern.</exception>
+        private PatternBuilder AddQuantifier(Pattern pattern, int min, int? max, bool greedy) => Add(new QuantifierPattern(pattern, min, max, greedy));
+
+        /// <summary>
+        /// Adds a quantifier to the pattern, replacing the last pattern added with a quantifier.
+        /// </summary>
         /// <param name="min">Minimum number of occurrences to match.</param>
         /// <param name="max">Maximum number of occurrences to match.</param>
         /// <param name="greedy">Indicates if the match is greedy.</param>
         /// <returns>Current pattern builder.</returns>
         /// <exception cref="InvalidPatternException">Cannot quantify last pattern.</exception>
-        private PatternBuilder AddQuantifier(int min, int? max, bool greedy)
-        {
-            var current = Current;
-
-            if (current is AnchorPattern)
-            {
-                throw new InvalidPatternException(current, "Cannot quantify an anchor.");
-            }
-
-            return ReplaceLast(new QuantifierPattern(current, min, max, greedy));
-        }
+        private PatternBuilder AddQuantifier(int min, int? max, bool greedy) => ReplaceLast(new QuantifierPattern(Current, min, max, greedy));
 
         #endregion
 
@@ -624,6 +728,28 @@ namespace Wilgysef.FluentRegex
             _children[^1] = pattern;
             _current = pattern;
             return this;
+        }
+
+        /// <summary>
+        /// Checks that the sequence has as least <paramref name="minimum"/> values.
+        /// </summary>
+        /// <typeparam name="T">Type.</typeparam>
+        /// <param name="values">Values.</param>
+        /// <param name="minimum">Minimum values required in the sequence.</param>
+        /// <returns><see langword="true"/> if the sequence has at least <paramref name="minimum"/> values, otherwise <see langword="false"/>.</returns>
+        private static bool HasAtLeast<T>(IEnumerable<T> values, int minimum)
+        {
+            using var enumerator = values.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                if (--minimum <= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

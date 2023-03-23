@@ -3,6 +3,32 @@
 public class PatternBuilderTest
 {
     [Fact]
+    public void Constructor_Char()
+    {
+        var builder = new PatternBuilder('a').ZeroOrMore();
+
+        builder.ToString().ShouldBe("a*");
+    }
+
+    [Fact]
+    public void Constructor_String()
+    {
+        var builder = new PatternBuilder("abc").ZeroOrMore();
+
+        builder.ToString().ShouldBe("(?:abc)*");
+    }
+
+    [Fact]
+    public void Constructor_Pattern()
+    {
+        var literal = new LiteralPattern("abc");
+
+        var builder = new PatternBuilder(literal).ZeroOrMore();
+
+        builder.ToString().ShouldBe("(?:abc)*");
+    }
+
+    [Fact]
     public void GetGroups_Simple()
     {
         var builder = new PatternBuilder()

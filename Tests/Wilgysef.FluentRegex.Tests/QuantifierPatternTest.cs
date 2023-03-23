@@ -12,6 +12,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").ZeroOrOne(greedy),
             expected);
+
+        ShouldCreatePattern(
+            () => new PatternBuilder().ZeroOrOne(new LiteralPattern("a"), greedy),
+            expected);
     }
 
     [Theory]
@@ -22,6 +26,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").ZeroOrMore(greedy),
             expected);
+
+        ShouldCreatePattern(
+            () => new PatternBuilder().ZeroOrMore(new LiteralPattern("a"), greedy),
+            expected);
     }
 
     [Theory]
@@ -31,6 +39,10 @@ public class QuantifierPatternTest
     {
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").OneOrMore(greedy),
+            expected);
+
+        ShouldCreatePattern(
+            () => new PatternBuilder().OneOrMore(new LiteralPattern("a"), greedy),
             expected);
     }
 
@@ -44,6 +56,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").Exactly(count),
             expected);
+
+        ShouldCreatePattern(
+            () => new PatternBuilder().Exactly(new LiteralPattern("a"), count),
+            expected);
     }
 
     [Theory]
@@ -55,6 +71,10 @@ public class QuantifierPatternTest
     {
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").Between(min, max, greedy),
+            expected);
+
+        ShouldCreatePattern(
+            () => new PatternBuilder().Between(new LiteralPattern("a"), min, max, greedy),
             expected);
     }
 
@@ -69,6 +89,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").AtLeast(min, greedy),
             expected);
+
+        ShouldCreatePattern(
+            () => new PatternBuilder().AtLeast(new LiteralPattern("a"), min, greedy),
+            expected);
     }
 
     [Theory]
@@ -81,6 +105,10 @@ public class QuantifierPatternTest
     {
         ShouldCreatePattern(
             () => new PatternBuilder().Literal("a").AtMost(max, greedy),
+            expected);
+
+        ShouldCreatePattern(
+            () => new PatternBuilder().AtMost(new LiteralPattern("a"), max, greedy),
             expected);
     }
 
@@ -108,6 +136,31 @@ public class QuantifierPatternTest
     {
         ShouldCreatePattern(
             () => new PatternBuilder().Concat(new LiteralPattern("abc")).Between(1, 3),
+            "(?:abc){1,3}");
+    }
+
+    [Fact]
+    public void QuantifyConcat_Nested()
+    {
+        ShouldCreatePattern(
+            () => new PatternBuilder().Concat(
+                new ConcatPattern(
+                    new ConcatPattern(
+                        new LiteralPattern("a"),
+                        new CharacterSetPattern('b', 'c'))))
+                .Between(1, 3),
+            "(?:a[bc]){1,3}");
+    }
+
+    [Fact]
+    public void QuantifyConcat_Nested_Single()
+    {
+        ShouldCreatePattern(
+            () => new PatternBuilder().Concat(
+                new ConcatPattern(
+                    new ConcatPattern(
+                        new LiteralPattern("abc"))))
+                .Between(1, 3),
             "(?:abc){1,3}");
     }
 
@@ -254,6 +307,14 @@ public class QuantifierPatternTest
     public void Fail_InvalidQuantifier()
     {
         ShouldCreatePattern(() => new PatternBuilder().BeginLine.Exactly(3), null);
+    }
+
+    [Fact]
+    public void Fail_Empty()
+    {
+        ShouldCreatePattern(
+            () => new PatternBuilder().Concat(new ConcatPattern()).Between(1, 3),
+            null);
     }
 
     private static void ShouldCreatePattern(Func<Pattern> func, string? expected)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
@@ -14,6 +13,11 @@ namespace Wilgysef.FluentRegex
             get => _children[0];
             set
             {
+                if (value is AnchorPattern)
+                {
+                    throw new InvalidPatternException(value, "Cannot quantify an anchor.");
+                }
+
                 if (_children.Count == 0)
                 {
                     _children.Add(value);
@@ -161,7 +165,14 @@ namespace Wilgysef.FluentRegex
 
             void Build(StringBuilder builder)
             {
+                var startLength = builder.Length;
+
                 Pattern.Wrap(state);
+
+                if (builder.Length == startLength)
+                {
+                    throw new InvalidPatternException(this, "Quantified pattern cannot be empty.");
+                }
 
                 if (Min == 1 && Max.HasValue && Max.Value == 1)
                 {

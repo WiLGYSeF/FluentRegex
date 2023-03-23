@@ -19,6 +19,7 @@ namespace Wilgysef.FluentRegex
 
             _buildStack.Push(pattern);
             action(_stringBuilder);
+            _buildStack.Pop();
         }
 
         public void WithBuilder(Action<StringBuilder> action)
