@@ -21,7 +21,7 @@ namespace Wilgysef.FluentRegex
             _children.AddRange(patterns);
         }
 
-        private bool IsSinglePatternInternal()
+        protected bool IsSinglePatternInternal()
         {
             var path = new List<Pattern>();
             var traversed = new HashSet<Pattern>();

@@ -86,9 +86,9 @@ namespace Wilgysef.FluentRegex
                 {
                     return false;
                 }
-                else if (current is OrPattern)
+                else if (current is OrPattern orPattern)
                 {
-                    return true;
+                    return !orPattern.IsSinglePattern;
                 }
             }
 

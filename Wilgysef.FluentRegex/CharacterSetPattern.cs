@@ -324,6 +324,23 @@ namespace Wilgysef.FluentRegex
                 Negated);
         }
 
+        internal static CharacterSetPattern Combine(IEnumerable<CharacterSetPattern> patterns)
+        {
+            var negated = patterns.FirstOrDefault()?.Negated ?? false;
+
+            if (!patterns.All(p => p.Negated == negated))
+            {
+                throw new ArgumentException("Not all patterns have same negation.");
+            }
+
+            return new CharacterSetPattern(
+                patterns.SelectMany(p => p.CharacterRanges),
+                patterns.SelectMany(p => p.Characters),
+                patterns.SelectMany(p => p.SubtractedCharacterRanges),
+                patterns.SelectMany(p => p.SubtractedCharacters),
+                negated);
+        }
+
         internal override void Build(PatternBuildState state)
         {
             if (_characters.Count == 0 && _characterRanges.Count == 0)
