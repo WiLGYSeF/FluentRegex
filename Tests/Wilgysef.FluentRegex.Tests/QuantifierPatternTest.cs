@@ -286,6 +286,37 @@ public class QuantifierPatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new OrPattern(
+            new QuantifierPattern(new LiteralPattern("b"), 1, 2, true),
+            new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe("b{1,2}|a");
+    }
+
+    [Fact]
+    public void Unwrap_ExactlyOne()
+    {
+        var pattern = new OrPattern(
+            new QuantifierPattern(new LiteralPattern("b"), 1, 1, true),
+            new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe("[ba]");
+    }
+
+    [Fact]
+    public void Unwrap_Recursive()
+    {
+        var quantifier = new QuantifierPattern(new LiteralPattern("b"), 1, 1, true);
+        quantifier.WithPattern(quantifier);
+
+        var pattern = new OrPattern(quantifier, new LiteralPattern("a"));
+
+        Should.Throw<PatternRecursionException>(() => pattern.ToString());
+    }
+
+    [Fact]
     public void Copy()
     {
         var literal = new LiteralPattern("a");
@@ -298,19 +329,19 @@ public class QuantifierPatternTest
     }
 
     [Fact]
-    public void Fail_NoPreviousPattern()
+    public void NoPreviousPattern()
     {
         ShouldCreatePattern(() => new PatternBuilder().ZeroOrOne(), null);
     }
 
     [Fact]
-    public void Fail_InvalidQuantifier()
+    public void InvalidQuantifier()
     {
         ShouldCreatePattern(() => new PatternBuilder().BeginLine.Exactly(3), null);
     }
 
     [Fact]
-    public void Fail_Empty()
+    public void Empty()
     {
         ShouldCreatePattern(
             () => new PatternBuilder().Concat(new ConcatPattern()).Between(1, 3),

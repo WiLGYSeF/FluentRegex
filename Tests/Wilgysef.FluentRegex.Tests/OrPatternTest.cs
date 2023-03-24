@@ -96,6 +96,16 @@ public class OrPatternTest
         copy.ToString().ShouldBe("abc|123");
     }
 
+    [Fact]
+    public void Unwrap_Concat()
+    {
+        var pattern = new OrPattern(
+            new ConcatPattern(new LiteralPattern("abc")),
+            new LiteralPattern("123"));
+
+        pattern.ToString().ShouldBe("abc|123");
+    }
+
     #region CharacterSetPattern combinations
 
     [Fact]

@@ -223,6 +223,14 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new OrPattern(new CharacterSetPattern('b'), new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe("[ba]");
+    }
+
+    [Fact]
     public void Copy()
     {
         var pattern = new CharacterSetPattern(
@@ -238,7 +246,7 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
-    public void Fail_SubtractedCharactersOnly()
+    public void SubtractedCharactersOnly()
     {
         var pattern = new PatternBuilder().CharacterSet(
             Array.Empty<CharacterRange>(),
@@ -249,14 +257,14 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
-    public void Fail_CharacterRange_NotLiteral()
+    public void CharacterRange_NotLiteral()
     {
         Should.Throw<ArgumentException>(() => new CharacterRange(CharacterPattern.Digit, CharacterPattern.Character('a')));
         Should.Throw<ArgumentException>(() => new CharacterRange(CharacterPattern.Character('a'), CharacterPattern.Digit));
     }
 
     [Fact]
-    public void Fail_CharacterRange_OutOfOrder()
+    public void CharacterRange_OutOfOrder()
     {
         Should.Throw<ArgumentException>(() => new CharacterRange('z', 'a'));
     }

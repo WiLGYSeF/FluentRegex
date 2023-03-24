@@ -97,6 +97,14 @@ public class GroupPatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new OrPattern(new GroupPattern(new LiteralPattern("b")), new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe(@"(b)|a");
+    }
+
+    [Fact]
     public void Copy()
     {
         var literal = new LiteralPattern("a");
@@ -124,7 +132,7 @@ public class GroupPatternTest
     }
 
     [Fact]
-    public void Fail_InvalidName()
+    public void InvalidName()
     {
         Should.Throw<InvalidPatternException>(() => new PatternBuilder().CapturingGroup("", new LiteralPattern("a")).ToString());
         Should.Throw<InvalidPatternException>(() => new PatternBuilder().CapturingGroup("w-", new LiteralPattern("a")).ToString());

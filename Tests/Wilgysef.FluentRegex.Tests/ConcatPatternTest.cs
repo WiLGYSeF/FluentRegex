@@ -1,4 +1,6 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using Wilgysef.FluentRegex.Exceptions;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class ConcatPatternTest
 {
@@ -30,5 +32,27 @@ public class ConcatPatternTest
         var copy = pattern.Copy();
         pattern.Concat(new LiteralPattern("def"));
         copy.ToString().ShouldBe("abc");
+    }
+
+    [Fact]
+    public void Wrap()
+    {
+        var pattern = new ConcatPattern();
+        pattern.Concat(pattern);
+
+        var quantifierPattern = new QuantifierPattern(pattern, 0, 1, true);
+
+        Should.Throw<PatternRecursionException>(() => quantifierPattern.ToString());
+    }
+
+    [Fact]
+    public void Unwrap()
+    {
+        var pattern = new ConcatPattern();
+        pattern.Concat(pattern);
+
+        var orPattern = new OrPattern(pattern, new LiteralPattern("a"));
+
+        Should.Throw<PatternRecursionException>(() => orPattern.ToString());
     }
 }

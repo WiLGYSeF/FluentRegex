@@ -19,6 +19,14 @@ public class SingleCharacterPatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new OrPattern(new SingleCharacterPattern(), new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe(".|a");
+    }
+
+    [Fact]
     public void Copy()
     {
         var pattern = new SingleCharacterPattern();

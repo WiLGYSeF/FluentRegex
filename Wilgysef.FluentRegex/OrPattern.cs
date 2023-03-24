@@ -115,13 +115,6 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        internal override Pattern Unwrap()
-        {
-            return _children.Count == 1
-                ? _children[0].Unwrap()
-                : this;
-        }
-
         private CategorizedPatterns CategorizePatterns()
         {
             var uncategorized = new List<Pattern>();

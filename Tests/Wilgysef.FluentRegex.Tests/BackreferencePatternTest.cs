@@ -46,6 +46,14 @@ public class BackreferencePatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new OrPattern(new BackreferencePattern(1), new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe(@"\1|a");
+    }
+
+    [Fact]
     public void Copy()
     {
         var pattern = new BackreferencePattern("a");
@@ -61,7 +69,7 @@ public class BackreferencePatternTest
     }
 
     [Fact]
-    public void Fail_InvalidGroupNumber()
+    public void InvalidGroupNumber()
     {
         var pattern = new BackreferencePattern(10);
 

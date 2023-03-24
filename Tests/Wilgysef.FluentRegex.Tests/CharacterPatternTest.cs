@@ -179,6 +179,16 @@ public class CharacterPatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new OrPattern(CharacterPattern.Character('b'), new LiteralPattern("a"));
+        pattern.ToString().ShouldBe("[ba]");
+
+        pattern = new OrPattern(CharacterPattern.Word, new LiteralPattern("a"));
+        pattern.ToString().ShouldBe(@"[\wa]");
+    }
+
+    [Fact]
     public void Copy()
     {
         var pattern = CharacterPattern.Word;

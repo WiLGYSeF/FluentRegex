@@ -28,6 +28,14 @@ public class RawPatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new OrPattern(new RawPattern("be"), new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe("be|a");
+    }
+
+    [Fact]
     public void Copy()
     {
         var pattern = new RawPattern("ab[c");

@@ -21,6 +21,11 @@ namespace Wilgysef.FluentRegex
             _children.AddRange(patterns);
         }
 
+        internal override Pattern Unwrap()
+        {
+            return UnwrapInternal();
+        }
+
         protected bool IsSinglePatternInternal()
         {
             var path = new List<Pattern>();
@@ -53,6 +58,36 @@ namespace Wilgysef.FluentRegex
                 else
                 {
                     return current.IsSinglePattern;
+                }
+            }
+        }
+
+        protected Pattern UnwrapInternal()
+        {
+            var path = new List<Pattern>();
+            var traversed = new HashSet<Pattern>();
+            Pattern current = this;
+
+            while (true)
+            {
+                path.Add(current);
+                if (!traversed.Add(current))
+                {
+                    throw new PatternRecursionException(path, current);
+                }
+
+                if (current is ContainerPattern container)
+                {
+                    if (container._children.Count != 1)
+                    {
+                        return current;
+                    }
+
+                    current = container._children[0];
+                }
+                else
+                {
+                    return current.Unwrap();
                 }
             }
         }

@@ -233,7 +233,7 @@ namespace Wilgysef.FluentRegex
         internal override Pattern Unwrap()
         {
             return IsExactlyOne
-                ? Pattern
+                ? UnwrapInternal()
                 : this;
         }
 
