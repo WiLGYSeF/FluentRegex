@@ -8,14 +8,12 @@ namespace Wilgysef.FluentRegex.PatternBuilders
 
         private readonly List<IPatternStringBuilder> _builders;
 
-        public PatternStringBuilderReplicator(params IPatternStringBuilder[] builders)
+        public PatternStringBuilderReplicator(IPatternStringBuilder builder)
         {
-            _builders = new List<IPatternStringBuilder>(builders);
-        }
-
-        public PatternStringBuilderReplicator(IEnumerable<IPatternStringBuilder> builders)
-        {
-            _builders = new List<IPatternStringBuilder>(builders);
+            _builders = new List<IPatternStringBuilder>
+            {
+                builder
+            };
         }
 
         public void Add(IPatternStringBuilder builder)

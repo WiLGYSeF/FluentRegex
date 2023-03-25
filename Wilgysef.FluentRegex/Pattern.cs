@@ -101,9 +101,7 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="patterns">Patterns.</param>
         /// <returns>Traversed patterns.</returns>
-        /// <exception cref="PatternRecursionException">Pattern is infinitely recursive.</exception>
-        internal static IEnumerable<Pattern> Traverse(
-            IReadOnlyList<Pattern> patterns)
+        internal static IEnumerable<Pattern> Traverse(IReadOnlyList<Pattern> patterns)
         {
             var stack = new Stack<TraverseItem>();
             var traversed = new HashSet<Pattern>();

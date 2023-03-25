@@ -355,7 +355,7 @@ public class PatternTest
                 }),
             obsCtext);
 
-        var ccontent = new OrPattern(ctext, quotedPair); // OR comment, skipped because of recursion
+        var ccontent = new OrPattern(ctext, quotedPair); // OR comment, omitted because of recursion
 
         var comment = new PatternBuilder().Character('(')
             .ZeroOrMore(new PatternBuilder().ZeroOrOne(fws).Concat(ccontent))
