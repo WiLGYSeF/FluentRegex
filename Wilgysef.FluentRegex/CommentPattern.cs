@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -35,7 +36,7 @@ namespace Wilgysef.FluentRegex
         {
             state.WithPattern(this, Build);
 
-            void Build(StringBuilder builder)
+            void Build(IPatternStringBuilder builder)
             {
                 builder.Append("?#");
                 Pattern?.Build(state);

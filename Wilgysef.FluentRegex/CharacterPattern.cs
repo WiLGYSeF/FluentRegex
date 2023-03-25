@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -101,7 +102,7 @@ namespace Wilgysef.FluentRegex
 
         internal abstract void Build(PatternBuildState state, bool fromCharacterSet);
 
-        internal abstract void Build(StringBuilder builder, bool fromCharacterSet);
+        internal abstract void Build(IPatternStringBuilder builder, bool fromCharacterSet);
 
         protected enum CharacterType
         {

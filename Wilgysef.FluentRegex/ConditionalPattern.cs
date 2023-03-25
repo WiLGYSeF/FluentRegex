@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -178,7 +179,7 @@ namespace Wilgysef.FluentRegex
         {
             state.WithPattern(this, Build);
 
-            void Build(StringBuilder builder)
+            void Build(IPatternStringBuilder builder)
             {
                 builder.Append("?(");
 
@@ -201,7 +202,7 @@ namespace Wilgysef.FluentRegex
                 }
                 else if (GroupNumber != null)
                 {
-                    builder.Append(GroupNumber);
+                    builder.Append(GroupNumber.Value);
                 }
 
                 builder.Append(')');

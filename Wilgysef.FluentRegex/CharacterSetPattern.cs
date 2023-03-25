@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Wilgysef.FluentRegex.Exceptions;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -355,7 +356,7 @@ namespace Wilgysef.FluentRegex
 
             state.WithPattern(this, Build);
 
-            void Build(StringBuilder builder)
+            void Build(IPatternStringBuilder builder)
             {
                 if (_subtractedCharacters.Count == 0
                     && _subtractedCharacterRanges.Count == 0
@@ -374,7 +375,7 @@ namespace Wilgysef.FluentRegex
                     }
                 }
 
-                var tmpBuilder = new StringBuilder();
+                var tmpBuilder = new PatternStringBuilder();
 
                 builder.Append('[');
 

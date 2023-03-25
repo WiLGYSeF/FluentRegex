@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -49,13 +50,13 @@ namespace Wilgysef.FluentRegex
         {
             state.WithPattern(this, Build1);
 
-            void Build1(StringBuilder builder)
+            void Build1(IPatternStringBuilder builder)
             {
                 Build(builder, fromCharacterSet);
             }
         }
 
-        internal override void Build(StringBuilder builder, bool fromCharacterSet)
+        internal override void Build(IPatternStringBuilder builder, bool fromCharacterSet)
         {
             switch (Type)
             {
@@ -79,12 +80,12 @@ namespace Wilgysef.FluentRegex
                     break;
                 case CharacterType.Category:
                     builder.Append(@"\p{");
-                    builder.Append(_category);
+                    builder.Append(_category!);
                     builder.Append('}');
                     break;
                 case CharacterType.NonCategory:
                     builder.Append(@"\P{");
-                    builder.Append(_category);
+                    builder.Append(_category!);
                     builder.Append('}');
                     break;
                 default:

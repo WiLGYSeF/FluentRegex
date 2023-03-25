@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -41,7 +42,7 @@ namespace Wilgysef.FluentRegex
         {
             state.WithPattern(this, Build);
 
-            void Build(StringBuilder builder)
+            void Build(IPatternStringBuilder builder)
             {
                 EscapeString(builder, Value);
             }
@@ -70,6 +71,39 @@ namespace Wilgysef.FluentRegex
         /// <param name="builder">String builder.</param>
         /// <param name="pattern">Pattern string.</param>
         public static void EscapeString(StringBuilder builder, string pattern)
+        {
+            foreach (var c in pattern)
+            {
+                switch (c)
+                {
+                    case '$':
+                    case '(':
+                    case ')':
+                    case '*':
+                    case '+':
+                    case '.':
+                    case '?':
+                    case '[':
+                    case '\\':
+                    case ']':
+                    case '^':
+                    case '{':
+                    case '|':
+                    case '}':
+                        builder.Append('\\');
+                        break;
+                }
+
+                builder.Append(c);
+            }
+        }
+
+        /// <summary>
+        /// Escapes a pattern string.
+        /// </summary>
+        /// <param name="builder">String builder.</param>
+        /// <param name="pattern">Pattern string.</param>
+        internal static void EscapeString(IPatternStringBuilder builder, string pattern)
         {
             foreach (var c in pattern)
             {

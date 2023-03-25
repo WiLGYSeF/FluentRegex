@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -136,7 +137,7 @@ namespace Wilgysef.FluentRegex
         {
             state.WithPattern(this, Build);
 
-            void Build(StringBuilder builder)
+            void Build(IPatternStringBuilder builder)
             {
                 // cancel out modifiers both enabled and disabled.
                 var modifiers = Modifiers & ~DisabledModifiers;

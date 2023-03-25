@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
@@ -131,13 +132,13 @@ namespace Wilgysef.FluentRegex
         {
             state.WithPattern(this, Build1);
 
-            void Build1(StringBuilder builder)
+            void Build1(IPatternStringBuilder builder)
             {
                 Build(builder, fromCharacterSet);
             }
         }
 
-        internal override void Build(StringBuilder builder, bool fromCharacterSet)
+        internal override void Build(IPatternStringBuilder builder, bool fromCharacterSet)
         {
             switch (Type)
             {
@@ -196,15 +197,15 @@ namespace Wilgysef.FluentRegex
                     break;
                 case CharacterType.Hexadecimal:
                     builder.Append(@"\x");
-                    builder.Append(_string);
+                    builder.Append(_string!);
                     break;
                 case CharacterType.Octal:
                     builder.Append('\\');
-                    builder.Append(_string);
+                    builder.Append(_string!);
                     break;
                 case CharacterType.Unicode:
                     builder.Append(@"\u");
-                    builder.Append(_string);
+                    builder.Append(_string!);
                     break;
             }
         }
