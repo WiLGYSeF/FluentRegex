@@ -42,8 +42,8 @@ namespace Wilgysef.FluentRegex
             {
                 foreach (var child in _children)
                 {
-                    if (ContainsUnwrappedOrPattern(child)
-                        && _children.Count > 1)
+                    if (_children.Count > 1
+                        && ContainsUnwrappedOrPattern(child))
                     {
                         child.Wrap(state, always: true);
                     }

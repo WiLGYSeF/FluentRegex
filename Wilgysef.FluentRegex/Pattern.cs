@@ -105,23 +105,25 @@ namespace Wilgysef.FluentRegex
             IReadOnlyList<Pattern> patterns)
         {
             var stack = new Stack<TraverseItem>();
+            var traversed = new HashSet<Pattern>();
+
             stack.Push(new TraverseItem(null, patterns.GetEnumerator()));
 
             while (stack.Count > 0)
             {
-                var item = stack.Peek();
+                var current = stack.Peek();
                 var skipPop = false;
 
-                while (item.Enumerator.MoveNext())
+                while (current.Enumerator.MoveNext())
                 {
-                    yield return item.Enumerator.Current;
+                    yield return current.Enumerator.Current;
 
-                    if (item.Enumerator.Current is ContainerPattern container
+                    if (current.Enumerator.Current is ContainerPattern container
                         && container.Children.Count > 0)
                     {
-                        if (stack.Any(i => i.Pattern == container))
+                        if (!traversed.Add(container))
                         {
-                            throw new PatternRecursionException(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), container);
+                            throw new PatternRecursionException(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), current.Pattern);
                         }
 
                         stack.Push(new TraverseItem(container, container.Children.GetEnumerator()));
@@ -133,11 +135,16 @@ namespace Wilgysef.FluentRegex
                 if (!skipPop)
                 {
                     stack.Pop();
+
+                    if (current.Pattern != null)
+                    {
+                        traversed.Remove(current.Pattern);
+                    }
                 }
             }
         }
 
-        private struct TraverseItem
+        private class TraverseItem
         {
             public Pattern? Pattern { get; }
 
