@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Wilgysef.FluentRegex.Composites;
 using Wilgysef.FluentRegex.Exceptions;
 using Wilgysef.FluentRegex.PatternBuilders;
 
@@ -59,6 +60,8 @@ namespace Wilgysef.FluentRegex
             Build(state);
             return state.ToString();
         }
+
+        public static Pattern NumericRange(int min, int max) => NumericRangePattern.NumericRange(min, max);
 
         /// <summary>
         /// Wraps the pattern if necessary.
