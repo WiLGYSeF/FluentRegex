@@ -16,9 +16,9 @@ namespace Wilgysef.FluentRegex.Composites
                 throw new ArgumentException("Minimum cannot be greater than maximum.", nameof(max));
             }
 
-            return NumericRange(min.ToString(), max.ToString(), false);
+            return NumericRange(min.ToString(), max.ToString());
 
-            static Pattern NumericRange(string minStr, string maxStr, bool isSubstring)
+            static Pattern NumericRange(ReadOnlySpan<char> minStr, ReadOnlySpan<char> maxStr)
             {
                 var orPattern = new OrPattern();
 
@@ -30,13 +30,13 @@ namespace Wilgysef.FluentRegex.Composites
 
                     while (mid.Length < maxStr.Length)
                     {
-                        orPattern.Or(NumericRange(last, mid.ToString(), isSubstring));
+                        orPattern.Or(NumericRange(last, mid.ToString()));
                         mid.Append('9');
                         lastOneZeros.Append('0');
                         last = lastOneZeros.ToString();
                     }
 
-                    orPattern.Or(NumericRange(last, maxStr, isSubstring));
+                    orPattern.Or(NumericRange(last, maxStr));
                 }
                 else
                 {
@@ -52,12 +52,12 @@ namespace Wilgysef.FluentRegex.Composites
                     {
                         if (prefix == minStr.Length)
                         {
-                            return new LiteralPattern(minStr);
+                            return new LiteralPattern(minStr.ToString());
                         }
 
                         return new ConcatPattern(
-                            new LiteralPattern(minStr[..prefix]),
-                            NumericRange(minStr[prefix..], maxStr[prefix..], true));
+                            new LiteralPattern(minStr[..prefix].ToString()),
+                            NumericRange(minStr[prefix..], maxStr[prefix..]));
                     }
 
                     var digits = new QuantifierPattern(CharacterPattern.Digit, 0, 0, true);
@@ -83,7 +83,7 @@ namespace Wilgysef.FluentRegex.Composites
                         else
                         {
                             orPattern.Or(new ConcatPattern(
-                                new LiteralPattern(minStr[..^1]),
+                                new LiteralPattern(minStr[..^1].ToString()),
                                 new CharacterSetPattern(new CharacterRange(minStr[^1], '9'))));
                             start--;
                         }
@@ -94,7 +94,7 @@ namespace Wilgysef.FluentRegex.Composites
                             if (digit <= '9')
                             {
                                 orPattern.Or(new ConcatPattern(
-                                    new LiteralPattern(minStr[..i]),
+                                    new LiteralPattern(minStr[..i].ToString()),
                                     new CharacterSetPattern(new CharacterRange(digit, '9')),
                                     digits.WithExactly(minStr.Length - i - 1).Copy()));
                             }
@@ -122,14 +122,14 @@ namespace Wilgysef.FluentRegex.Composites
                             if (digit >= '0')
                             {
                                 orPattern.Or(new ConcatPattern(
-                                    new LiteralPattern(maxStr[..i]),
+                                    new LiteralPattern(maxStr[..i].ToString()),
                                     new CharacterSetPattern(new CharacterRange('0', digit)),
                                     digits.WithExactly(maxStr.Length - i - 1).Copy()));
                             }
                         }
 
                         orPattern.Or(new ConcatPattern(
-                            new LiteralPattern(maxStr[..^1]),
+                            new LiteralPattern(maxStr[..^1].ToString()),
                             new CharacterSetPattern(new CharacterRange('0', maxStr[^1]))));
                     }
                 }
