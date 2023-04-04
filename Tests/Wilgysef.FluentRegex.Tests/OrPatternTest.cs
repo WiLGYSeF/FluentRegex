@@ -1,6 +1,4 @@
-﻿using static Wilgysef.FluentRegex.CharacterSetPattern;
-
-namespace Wilgysef.FluentRegex.Tests;
+﻿namespace Wilgysef.FluentRegex.Tests;
 
 public class OrPatternTest
 {

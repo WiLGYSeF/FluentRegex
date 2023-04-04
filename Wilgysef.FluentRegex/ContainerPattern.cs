@@ -34,7 +34,6 @@ namespace Wilgysef.FluentRegex
 
             while (true)
             {
-                // just in case the singular child is recursive
                 path.Add(current);
                 if (!traversed.Add(current))
                 {

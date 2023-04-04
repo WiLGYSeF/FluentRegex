@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using Wilgysef.FluentRegex.Exceptions;
 using Wilgysef.FluentRegex.PatternBuilders;
-using static Wilgysef.FluentRegex.CharacterSetPattern;
 
 namespace Wilgysef.FluentRegex
 {

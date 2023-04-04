@@ -1,5 +1,4 @@
 ﻿using Wilgysef.FluentRegex.Exceptions;
-using static Wilgysef.FluentRegex.CharacterSetPattern;
 
 namespace Wilgysef.FluentRegex.Tests;
 

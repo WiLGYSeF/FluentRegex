@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Wilgysef.FluentRegex.PatternBuilders;
+﻿using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {

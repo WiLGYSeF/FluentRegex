@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Wilgysef.FluentRegex.Exceptions;
 using Wilgysef.FluentRegex.PatternBuilders;
 
@@ -109,7 +108,7 @@ namespace Wilgysef.FluentRegex
                 else
                 {
                     builder.Append(@"\k<");
-                    builder.Append(GroupName);
+                    builder.Append(GroupName!);
                     builder.Append('>');
                 }
             }
