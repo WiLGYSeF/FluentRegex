@@ -17,6 +17,7 @@ public class NumericRangePatternTest
     [InlineData(13, 6215, @"1[3-9]|[2-9]\d|[1-9]\d{2}|[1-5]\d{3}|6[0-1]\d{2}|620\d|621[0-5]")]
     [InlineData(51, 501, @"5[1-9]|[6-9]\d|[1-4]\d{2}|50[0-1]")]
     [InlineData(99, 100, @"99|100")]
+    [InlineData(0, 100, @"\d|[1-9]\d|100")]
     [InlineData(7, 1234, @"[7-9]|[1-9]\d|[1-9]\d{2}|1(?:[0-1]\d{2}|2[0-2]\d|23[0-4])")]
     [InlineData(321, 12345, @"32[1-9]|3[3-9]\d|[4-9]\d{2}|[1-9]\d{3}|1(?:[0-1]\d{3}|2[0-2]\d{2}|23[0-3]\d|234[0-5])")]
 
@@ -37,7 +38,7 @@ public class NumericRangePatternTest
         }
 
         var pattern = Pattern.NumericRange(min, max);
-        var regex = BuildPattern(pattern);
+        var regex = CompilePattern(pattern);
 
         var start = Math.Pow(10, Math.Max(0, min.ToString().Length - 2));
         var end = Math.Pow(10, max.ToString().Length);
@@ -56,7 +57,7 @@ public class NumericRangePatternTest
     public void LeadingZeros_Required(int min, int max, string expected)
     {
         var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Required);
-        var regex = BuildPattern(pattern);
+        var regex = CompilePattern(pattern);
 
         var start = Math.Pow(10, Math.Max(0, min.ToString().Length - 2));
         var end = Math.Pow(10, max.ToString().Length) - 1;
@@ -79,7 +80,7 @@ public class NumericRangePatternTest
     public void LeadingZeros_Optional(int min, int max, string expected)
     {
         var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Optional);
-        var regex = BuildPattern(pattern);
+        var regex = CompilePattern(pattern);
 
         var start = Math.Pow(10, Math.Max(0, min.ToString().Length - 2));
         var end = Math.Pow(10, max.ToString().Length) - 1;
@@ -99,7 +100,115 @@ public class NumericRangePatternTest
         pattern.ToString().ShouldBe(expected);
     }
 
-    private static Regex BuildPattern(Pattern pattern)
+    [Theory]
+    [InlineData(-271, -32, @"-(?:3[2-9]|[4-9]\d|1\d{2}|2[0-6]\d|27[0-1])")]
+    [InlineData(-271, -3, @"-(?:[3-9]|[1-9]\d|1\d{2}|2[0-6]\d|27[0-1])")]
+    [InlineData(-27, -3, @"-(?:[3-9]|1\d|2[0-7])")]
+    [InlineData(-7, -3, "-[3-7]")]
+    [InlineData(-53, 0, @"-(?:[1-9]|[1-4]\d|5[0-3])|0")]
+    [InlineData(-15, 2, @"-(?:[1-9]|1[0-5])|[0-2]")]
+    [InlineData(-15, 27, @"-(?:[1-9]|1[0-5])|\d|1\d|2[0-7]")]
+    [InlineData(-15, 273, @"-(?:[1-9]|1[0-5])|\d|[1-9]\d|1\d{2}|2[0-6]\d|27[0-3]")]
+    [InlineData(-125, -123, @"-12[3-5]")]
+    public void NegativeRange(int min, int max, string expected)
+    {
+        var pattern = Pattern.NumericRange(min, max);
+        var regex = CompilePattern(pattern);
+
+        var start = -Math.Pow(10, min.ToString().Length - 1);
+        var end = max >= 0
+            ? Math.Pow(10, max.ToString().Length)
+            : -Math.Pow(10, Math.Max(0, max.ToString().Length - 3));
+
+        for (var cur = start; cur <= end; cur++)
+        {
+            ShouldRegexMatch(regex, cur.ToString(), cur >= min && cur <= max);
+        }
+
+        pattern.ToString().ShouldBe(expected);
+    }
+
+    [Theory]
+    [InlineData(-271, -3, @"-(?:00[3-9]|0(?:[1-9]\d)|1\d{2}|2[0-6]\d|27[0-1])")]
+    [InlineData(-53, 0, @"-(?:0[1-9]|[1-4]\d|5[0-3])|00")]
+    [InlineData(-15, 27, @"-(?:0[1-9]|1[0-5])|0\d|1\d|2[0-7]")]
+    [InlineData(-15, 418, @"-(?:00[1-9]|01[0-5])|00\d|0(?:[1-9]\d)|[1-3]\d{2}|40\d|41[0-8]")]
+    public void NegativeRange_LeadingZeros_Required(int min, int max, string expected)
+    {
+        var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Required);
+        var regex = CompilePattern(pattern);
+
+        var start = -Math.Pow(10, min.ToString().Length - 1) + 1;
+        var end = max >= 0
+            ? Math.Pow(10, max.ToString().Length) - 1
+            : -Math.Pow(10, Math.Max(0, max.ToString().Length - 3)) + 1;
+
+        var maxStrLength = Math.Max(Math.Abs(min).ToString().Length, Math.Abs(max).ToString().Length);
+
+        for (var cur = start; cur <= end; cur++)
+        {
+            string curStr;
+
+            if (cur < 0)
+            {
+                curStr = (-cur).ToString();
+                curStr = $"-{new string('0', maxStrLength - curStr.Length)}{curStr}";
+            }
+            else
+            {
+                curStr = cur.ToString();
+                curStr = new string('0', maxStrLength - curStr.Length) + curStr;
+            }
+            
+            ShouldRegexMatch(regex, curStr, cur >= min && cur <= max);
+        }
+
+        pattern.ToString().ShouldBe(expected);
+    }
+
+    [Theory]
+    [InlineData(-271, -3, @"-(?:(?:00)?[3-9]|0?(?:[1-9]\d)|1\d{2}|2[0-6]\d|27[0-1])")]
+    [InlineData(-53, 0, @"-(?:0?[1-9]|[1-4]\d|5[0-3])|0?0")]
+    [InlineData(-15, 27, @"-(?:0?[1-9]|1[0-5])|0?\d|1\d|2[0-7]")]
+    [InlineData(-15, 418, @"-(?:(?:00)?[1-9]|0?1[0-5])|(?:00)?\d|0?(?:[1-9]\d)|[1-3]\d{2}|40\d|41[0-8]")]
+    public void NegativeRange_LeadingZeros_Optional(int min, int max, string expected)
+    {
+        var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Optional);
+        var regex = CompilePattern(pattern);
+
+        var start = -Math.Pow(10, min.ToString().Length - 1) + 1;
+        var end = max >= 0
+            ? Math.Pow(10, max.ToString().Length) - 1
+            : -Math.Pow(10, Math.Max(0, max.ToString().Length - 3)) + 1;
+
+        var maxStrLength = Math.Max(Math.Abs(min).ToString().Length, Math.Abs(max).ToString().Length);
+
+        for (var cur = start; cur <= end; cur++)
+        {
+            var shouldMatch = cur >= min && cur <= max;
+            string curStr;
+            string paddedCurStr;
+
+            if (cur < 0)
+            {
+                curStr = (-cur).ToString();
+                paddedCurStr = $"-{new string('0', maxStrLength - curStr.Length)}{curStr}";
+                curStr = cur.ToString();
+            }
+            else
+            {
+                curStr = cur.ToString();
+                paddedCurStr = new string('0', maxStrLength - curStr.Length) + curStr;
+            }
+
+            ShouldRegexMatch(regex, curStr, shouldMatch);
+            ShouldRegexMatch(regex, paddedCurStr, shouldMatch);
+        }
+
+        pattern.ToString().ShouldBe(expected);
+    }
+
+    private static Regex CompilePattern(Pattern pattern)
     {
         return new PatternBuilder().BeginLine.Concat(pattern).EndLine.Compile();
     }

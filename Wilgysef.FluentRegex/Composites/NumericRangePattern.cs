@@ -7,16 +7,44 @@ namespace Wilgysef.FluentRegex.Composites
     {
         public static Pattern NumericRange(int min, int max, LeadingZeros leadingZeros = LeadingZeros.None)
         {
-            // TODO: negatives
+            return NumericRange(min, max, leadingZeros, null);
+        }
 
+        private static Pattern NumericRange(int min, int max, LeadingZeros leadingZeros, int? maxDigitsLength)
+        {
             if (min > max)
             {
                 throw new ArgumentException("Minimum cannot be greater than maximum.", nameof(max));
             }
 
-            return NumericRange(min.ToString(), max.ToString());
+            if (min < 0)
+            {
+                var minAbsStr = (-min).ToString();
 
-            Pattern NumericRange(ReadOnlySpan<char> minStr, ReadOnlySpan<char> maxStr)
+                if (max < 0)
+                {
+                    var maxAbsStr = (-max).ToString();
+
+                    maxDigitsLength ??= Math.Max(minAbsStr.Length, maxAbsStr.Length);
+                    return new ConcatPattern(
+                        CharacterPattern.Character('-'),
+                        NumericRange(maxAbsStr, minAbsStr, 0));
+                }
+
+                maxDigitsLength ??= Math.Max(minAbsStr.Length, max.ToString().Length);
+                return new OrPattern(
+                    NumericRangePattern.NumericRange(min, -1, leadingZeros, maxDigitsLength),
+                    NumericRangePattern.NumericRange(0, max, leadingZeros, maxDigitsLength));
+            }
+
+            {
+                // block-scope maxAsString
+                var maxAsString = max.ToString();
+                maxDigitsLength ??= maxAsString.Length;
+                return NumericRange(min.ToString(), maxAsString, 0);
+            }
+
+            Pattern NumericRange(ReadOnlySpan<char> minStr, ReadOnlySpan<char> maxStr, int depth)
             {
                 var orPattern = new OrPattern();
 
@@ -28,35 +56,25 @@ namespace Wilgysef.FluentRegex.Composites
 
                     while (mid.Length < maxStr.Length)
                     {
-                        Pattern pattern;
-                        if (leadingZeros != LeadingZeros.None)
-                        {
-                            Pattern leadingZerosPattern = new LiteralPattern(new string('0', maxStr.Length - mid.Length));
-                            if (leadingZeros == LeadingZeros.Optional)
-                            {
-                                leadingZerosPattern = new QuantifierPattern(leadingZerosPattern, 0, 1, true);
-                            }
-
-                            pattern = new ConcatPattern(leadingZerosPattern, NumericRange(last, mid.ToString()));
-                        }
-                        else
-                        {
-                            pattern = NumericRange(last, mid.ToString());
-                        }
-
-                        orPattern.Or(pattern);
+                        orPattern.Or(PadZero(NumericRange(last, mid.ToString(), depth + 1), maxDigitsLength.Value - mid.Length));
                         mid.Append('9');
                         lastOneZeros.Append('0');
                         last = lastOneZeros.ToString();
                     }
 
-                    orPattern.Or(NumericRange(last, maxStr));
+                    orPattern.Or(PadZero(NumericRange(last, maxStr, depth + 1), maxDigitsLength.Value - maxStr.Length));
                     return orPattern;
                 }
 
                 if (minStr.Length == 1)
                 {
-                    return DigitRange(minStr[0], maxStr[0]);
+                    var pattern = DigitRange(minStr[0], maxStr[0]);
+                    if (depth == 0)
+                    {
+                        pattern = PadZero(pattern, maxDigitsLength.Value - 1);
+                    }
+
+                    return pattern;
                 }
 
                 var prefix = 0;
@@ -71,7 +89,7 @@ namespace Wilgysef.FluentRegex.Composites
 
                     return new ConcatPattern(
                         new LiteralPattern(minStr[..prefix].ToString()),
-                        NumericRange(minStr[prefix..], maxStr[prefix..]));
+                        NumericRange(minStr[prefix..], maxStr[prefix..], depth + 1));
                 }
 
                 // min and max are the same length of at least 2 and do not share a prefix
@@ -170,6 +188,22 @@ namespace Wilgysef.FluentRegex.Composites
                     }
 
                     return concatPattern;
+                }
+
+                Pattern PadZero(Pattern pattern, int zeros)
+                {
+                    if (leadingZeros == LeadingZeros.None || zeros == 0)
+                    {
+                        return pattern;
+                    }
+
+                    Pattern leadingZerosPattern = new LiteralPattern(new string('0', zeros));
+                    if (leadingZeros == LeadingZeros.Optional)
+                    {
+                        leadingZerosPattern = new QuantifierPattern(leadingZerosPattern, 0, 1, true);
+                    }
+
+                    return new ConcatPattern(leadingZerosPattern, pattern);
                 }
             }
         }
