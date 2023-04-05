@@ -9,7 +9,6 @@ namespace Wilgysef.FluentRegex.Composites
         {
             // TODO: negatives
             // TODO: leading zeroes
-            // TODO: \d vs [0-9]?
 
             if (min > max)
             {
@@ -42,7 +41,7 @@ namespace Wilgysef.FluentRegex.Composites
 
                 if (minStr.Length == 1)
                 {
-                    return new CharacterSetPattern(new CharacterRange(minStr[0], maxStr[0]));
+                    return DigitRange(minStr[0], maxStr[0]);
                 }
 
                 var prefix = 0;
@@ -55,88 +54,108 @@ namespace Wilgysef.FluentRegex.Composites
                         return new LiteralPattern(minStr.ToString());
                     }
 
-                    var subpattern = NumericRange(minStr[prefix..], maxStr[prefix..]);
-                    //if (!(subpattern is ContainerPattern container)
-                    //    || container.Children.Count * prefix > 4)
+                    return new ConcatPattern(
+                        new LiteralPattern(minStr[..prefix].ToString()),
+                        NumericRange(minStr[prefix..], maxStr[prefix..]));
+                }
+
+                // min and max are the same length of at least 2 and do not share a prefix
+
+                var minStart = minStr.Length - 1;
+                var minAllZerosAfterFirst = false;
+                if (minStr[^1] == '0')
+                {
+                    for (; minStart > 0 && minStr[minStart] == '0'; minStart--) ;
+                    minAllZerosAfterFirst = minStart == 0;
+                }
+                else
+                {
+                    orPattern.Or(DigitPattern(minStr[..^1], minStr[^1], '9', 0));
+                    minStart--;
+                }
+
+                var maxEnd = maxStr.Length - 1;
+                var maxAllNinesAfterFirst = false;
+                for (; maxEnd > 0 && maxStr[maxEnd] == '9'; maxEnd--) ;
+
+                if (maxEnd != maxStr.Length - 1)
+                {
+                    maxAllNinesAfterFirst = maxEnd == 0;
+                    maxEnd++;
+                }
+
+                for (var i = minStart; i > 0; i--)
+                {
+                    var digit = (char)(minStr[i] + 1);
+                    if (digit <= '9')
                     {
-                        // TODO: only use prefix if it is a shorter pattern
-                        return new ConcatPattern(
-                            new LiteralPattern(minStr[..prefix].ToString()),
-                            subpattern);
+                        orPattern.Or(DigitPattern(minStr[..i], digit, '9', minStr.Length - i - 1));
                     }
                 }
 
-                var digits = new QuantifierPattern(CharacterPattern.Digit, 0, 0, true);
-
-                var maxAllNines = true;
-                for (var i = 0; i < maxStr.Length; i++)
+                if (minAllZerosAfterFirst || maxAllNinesAfterFirst || minStr[0] + 1 <= maxStr[0] - 1)
                 {
-                    if (maxStr[i] != '9')
+                    orPattern.Or(DigitPattern(
+                        "",
+                        minAllZerosAfterFirst ? minStr[0] : (char)(minStr[0] + 1),
+                        maxAllNinesAfterFirst ? maxStr[0] : (char)(maxStr[0] - 1),
+                        minStr.Length - 1));
+
+                    if (maxAllNinesAfterFirst)
                     {
-                        maxAllNines = false;
-                        break;
+                        return orPattern;
                     }
                 }
 
-                if (minStr[0] < maxStr[0])
+                for (var i = 1; i < maxEnd; i++)
                 {
-                    var start = minStr.Length - 1;
-
-                    if (minStr[^1] == '0')
+                    var digit = (char)(maxStr[i] - 1);
+                    if (digit >= '0')
                     {
-                        for (; start > 0 && minStr[start] == '0'; start--) ;
+                        orPattern.Or(DigitPattern(maxStr[..i], '0', digit, maxStr.Length - i - 1));
+                    }
+                }
+
+                orPattern.Or(DigitPattern(
+                    maxStr[..maxEnd],
+                    '0',
+                    maxStr[maxEnd],
+                    maxStr.Length - maxEnd - 1));
+
+                return orPattern;
+
+                static Pattern DigitRange(char min, char max)
+                {
+                    return min == '0' && max == '9'
+                        ? (Pattern)CharacterPattern.Digit
+                        : new CharacterSetPattern(new CharacterRange(min, max));
+                }
+
+                static ConcatPattern DigitPattern(ReadOnlySpan<char> prefix, char min, char max, int digits)
+                {
+                    var concatPattern = new ConcatPattern();
+
+                    if (prefix.Length > 0)
+                    {
+                        concatPattern.Concat(new LiteralPattern(prefix.ToString()));
+                    }
+
+                    if (min == '0' && max == '9')
+                    {
+                        digits++;
                     }
                     else
                     {
-                        orPattern.Or(new ConcatPattern(
-                            new LiteralPattern(minStr[..^1].ToString()),
-                            new CharacterSetPattern(new CharacterRange(minStr[^1], '9'))));
-                        start--;
+                        concatPattern.Concat(new CharacterSetPattern(new CharacterRange(min, max)));
                     }
 
-                    for (var i = start; i > 0; i--)
+                    if (digits > 0)
                     {
-                        var digit = (char)(minStr[i] + 1);
-                        if (digit <= '9')
-                        {
-                            orPattern.Or(new ConcatPattern(
-                                new LiteralPattern(minStr[..i].ToString()),
-                                new CharacterSetPattern(new CharacterRange(digit, '9')),
-                                digits.WithExactly(minStr.Length - i - 1).Copy()));
-                        }
+                        concatPattern.Concat(new QuantifierPattern(CharacterPattern.Digit, digits, digits, true));
                     }
 
-                    var minZeros = start == 0 && minStr[1] == '0';
-                    if (minZeros || minStr[0] + 1 <= maxStr[0] - 1)
-                    {
-                        orPattern.Or(new ConcatPattern(
-                            new CharacterSetPattern(new CharacterRange(
-                                minZeros ? minStr[0] : (char)(minStr[0] + 1),
-                                maxAllNines ? '9' : (char)(maxStr[0] - 1))),
-                            digits.WithExactly(minStr.Length - 1).Copy()));
-                    }
+                    return concatPattern;
                 }
-
-                if (!maxAllNines)
-                {
-                    for (var i = 1; i < maxStr.Length - 1; i++)
-                    {
-                        var digit = (char)(maxStr[i] - 1);
-                        if (digit >= '0')
-                        {
-                            orPattern.Or(new ConcatPattern(
-                                new LiteralPattern(maxStr[..i].ToString()),
-                                new CharacterSetPattern(new CharacterRange('0', digit)),
-                                digits.WithExactly(maxStr.Length - i - 1).Copy()));
-                        }
-                    }
-
-                    orPattern.Or(new ConcatPattern(
-                        new LiteralPattern(maxStr[..^1].ToString()),
-                        new CharacterSetPattern(new CharacterRange('0', maxStr[^1]))));
-                }
-
-                return orPattern;
             }
         }
     }
