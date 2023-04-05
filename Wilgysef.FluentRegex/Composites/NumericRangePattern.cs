@@ -5,10 +5,9 @@ namespace Wilgysef.FluentRegex.Composites
 {
     internal static class NumericRangePattern
     {
-        public static Pattern NumericRange(int min, int max)
+        public static Pattern NumericRange(int min, int max, LeadingZeros leadingZeros = LeadingZeros.None)
         {
             // TODO: negatives
-            // TODO: leading zeroes
 
             if (min > max)
             {
@@ -17,19 +16,35 @@ namespace Wilgysef.FluentRegex.Composites
 
             return NumericRange(min.ToString(), max.ToString());
 
-            static Pattern NumericRange(ReadOnlySpan<char> minStr, ReadOnlySpan<char> maxStr)
+            Pattern NumericRange(ReadOnlySpan<char> minStr, ReadOnlySpan<char> maxStr)
             {
                 var orPattern = new OrPattern();
 
                 if (minStr.Length < maxStr.Length)
                 {
                     var last = minStr;
-                    var lastOneZeros = new StringBuilder("10", maxStr.Length - minStr.Length + 2);
+                    var lastOneZeros = new StringBuilder("1" + new string('0', minStr.Length - 1), maxStr.Length);
                     var mid = new StringBuilder(new string('9', minStr.Length), maxStr.Length);
 
                     while (mid.Length < maxStr.Length)
                     {
-                        orPattern.Or(NumericRange(last, mid.ToString()));
+                        Pattern pattern;
+                        if (leadingZeros != LeadingZeros.None)
+                        {
+                            Pattern leadingZerosPattern = new LiteralPattern(new string('0', maxStr.Length - mid.Length));
+                            if (leadingZeros == LeadingZeros.Optional)
+                            {
+                                leadingZerosPattern = new QuantifierPattern(leadingZerosPattern, 0, 1, true);
+                            }
+
+                            pattern = new ConcatPattern(leadingZerosPattern, NumericRange(last, mid.ToString()));
+                        }
+                        else
+                        {
+                            pattern = NumericRange(last, mid.ToString());
+                        }
+
+                        orPattern.Or(pattern);
                         mid.Append('9');
                         lastOneZeros.Append('0');
                         last = lastOneZeros.ToString();
@@ -158,5 +173,23 @@ namespace Wilgysef.FluentRegex.Composites
                 }
             }
         }
+    }
+
+    public enum LeadingZeros
+    {
+        /// <summary>
+        /// Do not match leading zeros.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Optionally match leading zeros.
+        /// </summary>
+        Optional,
+
+        /// <summary>
+        /// Must match with leading zeros.
+        /// </summary>
+        Required,
     }
 }
