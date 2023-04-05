@@ -10,7 +10,12 @@ namespace Wilgysef.FluentRegex.Composites
             return NumericRange(min, max, leadingZeros, null);
         }
 
-        private static Pattern NumericRange(int min, int max, LeadingZeros leadingZeros, int? maxDigitsLength)
+        public static Pattern NumericRange(long min, long max, LeadingZeros leadingZeros = LeadingZeros.None)
+        {
+            return NumericRange(min, max, leadingZeros, null);
+        }
+
+        private static Pattern NumericRange(long min, long max, LeadingZeros leadingZeros, int? maxDigitsLength)
         {
             if (min > max)
             {

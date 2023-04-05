@@ -72,6 +72,16 @@ namespace Wilgysef.FluentRegex
             => NumericRangePattern.NumericRange(min, max, leadingZeros);
 
         /// <summary>
+        /// Creates a pattern that matches numbers in the range between <paramref name="min"/> and <paramref name="max"/>.
+        /// </summary>
+        /// <param name="min">Minimum number to match, inclusive.</param>
+        /// <param name="max">Maximum number to match, inclusive.</param>
+        /// <param name="leadingZeros">Whether to match leading zeros.</param>
+        /// <returns>Pattern that matches numeric range.</returns>
+        public static Pattern NumericRange(long min, long max, LeadingZeros leadingZeros = LeadingZeros.None)
+            => NumericRangePattern.NumericRange(min, max, leadingZeros);
+
+        /// <summary>
         /// Wraps the pattern if necessary.
         /// </summary>
         /// <param name="state">Pattern build state.</param>

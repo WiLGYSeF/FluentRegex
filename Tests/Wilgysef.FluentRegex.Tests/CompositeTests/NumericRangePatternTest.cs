@@ -53,6 +53,13 @@ public class NumericRangePatternTest
     }
 
     [Fact]
+    public void NumericRange_Long()
+    {
+        Pattern.NumericRange(12379L, 12989L).ToString()
+            .ShouldBe(@"12(?:379|3[8-9]\d|[4-8]\d{2}|9[0-7]\d|98\d)");
+    }
+
+    [Fact]
     public void InvalidRange()
     {
         Should.Throw<ArgumentException>(() => Pattern.NumericRange(5, 0));
