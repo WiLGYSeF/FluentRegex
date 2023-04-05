@@ -28,79 +28,6 @@ public class NumericRangePatternTest
     [InlineData(12379, 12989, @"12(?:379|3[8-9]\d|[4-8]\d{2}|9[0-7]\d|98\d)")]
     [InlineData(9927, 9931, @"99(?:2[7-9]|3[0-1])")]
 
-    [InlineData(5, 0, null)]
-    public void NumericRange(int min, int max, string? expected)
-    {
-        if (expected == null)
-        {
-            Should.Throw<Exception>(() => Pattern.NumericRange(min, max));
-            return;
-        }
-
-        var pattern = Pattern.NumericRange(min, max);
-        var regex = CompilePattern(pattern);
-
-        var start = Math.Pow(10, Math.Max(0, min.ToString().Length - 2));
-        var end = Math.Pow(10, max.ToString().Length);
-
-        for (var cur = start; cur <= end; cur++)
-        {
-            ShouldRegexMatch(regex, cur.ToString(), cur >= min && cur <= max);
-        }
-
-        pattern.ToString().ShouldBe(expected);
-    }
-
-    [Theory]
-    [InlineData(152, 361, @"15[2-9]|1[6-9]\d|2\d{2}|3[0-5]\d|36[0-1]")]
-    [InlineData(2, 1023, @"000[2-9]|00(?:[1-9]\d)|0(?:[1-9]\d{2})|10(?:[0-1]\d|2[0-3])")]
-    public void LeadingZeros_Required(int min, int max, string expected)
-    {
-        var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Required);
-        var regex = CompilePattern(pattern);
-
-        var start = Math.Pow(10, Math.Max(0, min.ToString().Length - 2));
-        var end = Math.Pow(10, max.ToString().Length) - 1;
-
-        var maxStr = max.ToString();
-
-        for (var cur = start; cur <= end; cur++)
-        {
-            var curStr = cur.ToString();
-            curStr = new string('0', maxStr.Length - curStr.Length) + curStr;
-            ShouldRegexMatch(regex, curStr, cur >= min && cur <= max);
-        }
-
-        pattern.ToString().ShouldBe(expected);
-    }
-
-    [Theory]
-    [InlineData(152, 361, @"15[2-9]|1[6-9]\d|2\d{2}|3[0-5]\d|36[0-1]")]
-    [InlineData(2, 1023, @"(?:000)?[2-9]|(?:00)?(?:[1-9]\d)|0?(?:[1-9]\d{2})|10(?:[0-1]\d|2[0-3])")]
-    public void LeadingZeros_Optional(int min, int max, string expected)
-    {
-        var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Optional);
-        var regex = CompilePattern(pattern);
-
-        var start = Math.Pow(10, Math.Max(0, min.ToString().Length - 2));
-        var end = Math.Pow(10, max.ToString().Length) - 1;
-
-        var maxStr = max.ToString();
-
-        for (var cur = start; cur <= end; cur++)
-        {
-            var shouldMatch = cur >= min && cur <= max;
-            var curStr = cur.ToString();
-            var paddedCurStr = new string('0', maxStr.Length - curStr.Length) + curStr;
-
-            ShouldRegexMatch(regex, curStr, shouldMatch);
-            ShouldRegexMatch(regex, paddedCurStr, shouldMatch);
-        }
-
-        pattern.ToString().ShouldBe(expected);
-    }
-
-    [Theory]
     [InlineData(-271, -32, @"-(?:3[2-9]|[4-9]\d|1\d{2}|2[0-6]\d|27[0-1])")]
     [InlineData(-271, -3, @"-(?:[3-9]|[1-9]\d|1\d{2}|2[0-6]\d|27[0-1])")]
     [InlineData(-27, -3, @"-(?:[3-9]|1\d|2[0-7])")]
@@ -110,15 +37,12 @@ public class NumericRangePatternTest
     [InlineData(-15, 27, @"-(?:[1-9]|1[0-5])|\d|1\d|2[0-7]")]
     [InlineData(-15, 273, @"-(?:[1-9]|1[0-5])|\d|[1-9]\d|1\d{2}|2[0-6]\d|27[0-3]")]
     [InlineData(-125, -123, @"-12[3-5]")]
-    public void NegativeRange(int min, int max, string expected)
+    public void NumericRange(int min, int max, string expected)
     {
         var pattern = Pattern.NumericRange(min, max);
         var regex = CompilePattern(pattern);
 
-        var start = -Math.Pow(10, min.ToString().Length - 1);
-        var end = max >= 0
-            ? Math.Pow(10, max.ToString().Length)
-            : -Math.Pow(10, Math.Max(0, max.ToString().Length - 3));
+        GetTestRange(min, max, out var start, out var end);
 
         for (var cur = start; cur <= end; cur++)
         {
@@ -128,20 +52,26 @@ public class NumericRangePatternTest
         pattern.ToString().ShouldBe(expected);
     }
 
+    [Fact]
+    public void InvalidRange()
+    {
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(5, 0));
+    }
+
     [Theory]
+    [InlineData(152, 361, @"15[2-9]|1[6-9]\d|2\d{2}|3[0-5]\d|36[0-1]")]
+    [InlineData(2, 1023, @"000[2-9]|00(?:[1-9]\d)|0(?:[1-9]\d{2})|10(?:[0-1]\d|2[0-3])")]
+
     [InlineData(-271, -3, @"-(?:00[3-9]|0(?:[1-9]\d)|1\d{2}|2[0-6]\d|27[0-1])")]
     [InlineData(-53, 0, @"-(?:0[1-9]|[1-4]\d|5[0-3])|00")]
     [InlineData(-15, 27, @"-(?:0[1-9]|1[0-5])|0\d|1\d|2[0-7]")]
     [InlineData(-15, 418, @"-(?:00[1-9]|01[0-5])|00\d|0(?:[1-9]\d)|[1-3]\d{2}|40\d|41[0-8]")]
-    public void NegativeRange_LeadingZeros_Required(int min, int max, string expected)
+    public void LeadingZeros_Required(int min, int max, string expected)
     {
         var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Required);
         var regex = CompilePattern(pattern);
 
-        var start = -Math.Pow(10, min.ToString().Length - 1) + 1;
-        var end = max >= 0
-            ? Math.Pow(10, max.ToString().Length) - 1
-            : -Math.Pow(10, Math.Max(0, max.ToString().Length - 3)) + 1;
+        GetLeadingZeroTestRange(min, max, out var start, out var end);
 
         var maxStrLength = Math.Max(Math.Abs(min).ToString().Length, Math.Abs(max).ToString().Length);
 
@@ -167,19 +97,19 @@ public class NumericRangePatternTest
     }
 
     [Theory]
+    [InlineData(152, 361, @"15[2-9]|1[6-9]\d|2\d{2}|3[0-5]\d|36[0-1]")]
+    [InlineData(2, 1023, @"(?:000)?[2-9]|(?:00)?(?:[1-9]\d)|0?(?:[1-9]\d{2})|10(?:[0-1]\d|2[0-3])")]
+
     [InlineData(-271, -3, @"-(?:(?:00)?[3-9]|0?(?:[1-9]\d)|1\d{2}|2[0-6]\d|27[0-1])")]
     [InlineData(-53, 0, @"-(?:0?[1-9]|[1-4]\d|5[0-3])|0?0")]
     [InlineData(-15, 27, @"-(?:0?[1-9]|1[0-5])|0?\d|1\d|2[0-7]")]
     [InlineData(-15, 418, @"-(?:(?:00)?[1-9]|0?1[0-5])|(?:00)?\d|0?(?:[1-9]\d)|[1-3]\d{2}|40\d|41[0-8]")]
-    public void NegativeRange_LeadingZeros_Optional(int min, int max, string expected)
+    public void LeadingZeros_Optional(int min, int max, string expected)
     {
         var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Optional);
         var regex = CompilePattern(pattern);
 
-        var start = -Math.Pow(10, min.ToString().Length - 1) + 1;
-        var end = max >= 0
-            ? Math.Pow(10, max.ToString().Length) - 1
-            : -Math.Pow(10, Math.Max(0, max.ToString().Length - 3)) + 1;
+        GetLeadingZeroTestRange(min, max, out var start, out var end);
 
         var maxStrLength = Math.Max(Math.Abs(min).ToString().Length, Math.Abs(max).ToString().Length);
 
@@ -216,5 +146,25 @@ public class NumericRangePatternTest
     private static void ShouldRegexMatch(Regex regex, string match, bool shouldMatch)
     {
         regex.IsMatch(match).ShouldBe(shouldMatch, $"{match} {(shouldMatch ? "should" : "should not")} match");
+    }
+
+    private static void GetTestRange(int min, int max, out int start, out int end)
+    {
+        start = min >= 0
+            ? (int)Math.Pow(10, Math.Max(0, min.ToString().Length - 2))
+            : (int)-Math.Pow(10, min.ToString().Length - 1);
+        end = max >= 0
+            ? (int)Math.Pow(10, max.ToString().Length)
+            : (int)-Math.Pow(10, Math.Max(0, max.ToString().Length - 3));
+    }
+
+    private static void GetLeadingZeroTestRange(int min, int max, out int start, out int end)
+    {
+        start = min >= 0
+            ? (int)Math.Pow(10, Math.Max(0, min.ToString().Length - 2))
+            : (int)-Math.Pow(10, min.ToString().Length - 1) + 1;
+        end = max >= 0
+            ? (int)Math.Pow(10, max.ToString().Length) - 1
+            : (int)-Math.Pow(10, Math.Max(0, max.ToString().Length - 3)) + 1;
     }
 }
