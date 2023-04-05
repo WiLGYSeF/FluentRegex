@@ -435,7 +435,11 @@ namespace Wilgysef.FluentRegex
 
                         if (!range.Single)
                         {
-                            builder.Append('-');
+                            if (!range.Adjacent)
+                            {
+                                builder.Append('-');
+                            }
+
                             Append(range.End);
                         }
                     }

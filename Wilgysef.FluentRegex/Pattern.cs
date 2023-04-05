@@ -11,7 +11,7 @@ namespace Wilgysef.FluentRegex
     public abstract class Pattern
     {
         /// <summary>
-        /// Copies the pattern object.
+        /// Creates a copy of the pattern object.
         /// </summary>
         /// <returns>Copied pattern.</returns>
         public abstract Pattern Copy();
