@@ -67,12 +67,12 @@ public class NumericRangePatternTest
 
     [Theory]
     [InlineData(152, 361, @"15[2-9]|1[6-9]\d|2\d{2}|3[0-5]\d|36[0-1]")]
-    [InlineData(2, 1023, @"000[2-9]|00(?:[1-9]\d)|0(?:[1-9]\d{2})|10(?:[0-1]\d|2[0-3])")]
+    [InlineData(2, 1023, @"000[2-9]|00[1-9]\d|0[1-9]\d{2}|10(?:[0-1]\d|2[0-3])")]
 
-    [InlineData(-271, -3, @"-(?:00[3-9]|0(?:[1-9]\d)|1\d{2}|2[0-6]\d|27[0-1])")]
+    [InlineData(-271, -3, @"-(?:00[3-9]|0[1-9]\d|1\d{2}|2[0-6]\d|27[0-1])")]
     [InlineData(-53, 0, @"-(?:0[1-9]|[1-4]\d|5[0-3])|00")]
     [InlineData(-15, 27, @"-(?:0[1-9]|1[0-5])|0\d|1\d|2[0-7]")]
-    [InlineData(-15, 418, @"-(?:00[1-9]|01[0-5])|00\d|0(?:[1-9]\d)|[1-3]\d{2}|40\d|41[0-8]")]
+    [InlineData(-15, 418, @"-(?:00[1-9]|01[0-5])|00\d|0[1-9]\d|[1-3]\d{2}|40\d|41[0-8]")]
     public void LeadingZeros_Required(int min, int max, string expected)
     {
         var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Required);
@@ -105,12 +105,12 @@ public class NumericRangePatternTest
 
     [Theory]
     [InlineData(152, 361, @"15[2-9]|1[6-9]\d|2\d{2}|3[0-5]\d|36[0-1]")]
-    [InlineData(2, 1023, @"(?:000)?[2-9]|(?:00)?(?:[1-9]\d)|0?(?:[1-9]\d{2})|10(?:[0-1]\d|2[0-3])")]
+    [InlineData(2, 1023, @"(?:000)?[2-9]|(?:00)?[1-9]\d|0?[1-9]\d{2}|10(?:[0-1]\d|2[0-3])")]
 
-    [InlineData(-271, -3, @"-(?:(?:00)?[3-9]|0?(?:[1-9]\d)|1\d{2}|2[0-6]\d|27[0-1])")]
+    [InlineData(-271, -3, @"-(?:(?:00)?[3-9]|0?[1-9]\d|1\d{2}|2[0-6]\d|27[0-1])")]
     [InlineData(-53, 0, @"-(?:0?[1-9]|[1-4]\d|5[0-3])|0?0")]
     [InlineData(-15, 27, @"-(?:0?[1-9]|1[0-5])|0?\d|1\d|2[0-7]")]
-    [InlineData(-15, 418, @"-(?:(?:00)?[1-9]|0?1[0-5])|(?:00)?\d|0?(?:[1-9]\d)|[1-3]\d{2}|40\d|41[0-8]")]
+    [InlineData(-15, 418, @"-(?:(?:00)?[1-9]|0?1[0-5])|(?:00)?\d|0?[1-9]\d|[1-3]\d{2}|40\d|41[0-8]")]
     public void LeadingZeros_Optional(int min, int max, string expected)
     {
         var pattern = Pattern.NumericRange(min, max, leadingZeros: LeadingZeros.Optional);

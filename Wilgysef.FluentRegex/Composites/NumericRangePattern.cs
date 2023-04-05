@@ -141,7 +141,7 @@ namespace Wilgysef.FluentRegex.Composites
 
                     if (maxAllNinesAfterFirst)
                     {
-                        return orPattern;
+                        return orPattern.Unwrap();
                     }
                 }
 
@@ -160,7 +160,7 @@ namespace Wilgysef.FluentRegex.Composites
                     maxStr[maxEnd],
                     maxStr.Length - maxEnd - 1));
 
-                return orPattern;
+                return orPattern.Unwrap();
 
                 static Pattern DigitRange(char min, char max)
                 {
