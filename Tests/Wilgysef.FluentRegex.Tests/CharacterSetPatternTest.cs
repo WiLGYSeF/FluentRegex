@@ -186,6 +186,35 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void Simplify_Characters_Range()
+    {
+        var pattern = new PatternBuilder().CharacterSet(
+            new[] { new CharacterRange('b', 'f'), new CharacterRange('a', 'k'), });
+
+        pattern.ToString().ShouldBe("[a-k]");
+    }
+
+    [Fact]
+    public void Simplify_Characters_ToRange()
+    {
+        var pattern = new PatternBuilder().CharacterSet("1def0abcz");
+
+        pattern.ToString().ShouldBe("[a-f10z]");
+    }
+
+    [Fact]
+    public void Simplify_Characters_Range_Subtracted()
+    {
+        var pattern = new PatternBuilder().CharacterSet(
+            new[] { new CharacterRange('a', 'f') },
+            Array.Empty<CharacterPattern>(),
+            new[] { new CharacterRange('b', 'd') },
+            new[] { CharacterPattern.Character('c') });
+
+        pattern.ToString().ShouldBe("[a-f-[b-d]]");
+    }
+
+    [Fact]
     public void FluentCharacterRange()
     {
         var pattern = new CharacterSetPattern('a', 'b');

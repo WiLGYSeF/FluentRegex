@@ -104,9 +104,6 @@ namespace Wilgysef.FluentRegex
             Adjacent = EndValue - StartValue == 1;
         }
 
-        private CharacterRange(int start, int end)
-            : this(CharacterLiteralPattern.FromInt(start), CharacterLiteralPattern.FromInt(end)) { }
-
         /// <summary>
         /// Checks if the character range contains the character.
         /// </summary>
