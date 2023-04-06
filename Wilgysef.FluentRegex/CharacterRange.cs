@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Wilgysef.FluentRegex
 {
@@ -23,6 +24,16 @@ namespace Wilgysef.FluentRegex
         /// Indicates if the start and end characters are adjacent.
         /// </summary>
         public bool Adjacent { get; }
+
+        /// <summary>
+        /// Start character pattern value.
+        /// </summary>
+        internal int StartValue { get; }
+
+        /// <summary>
+        /// End character pattern value.
+        /// </summary>
+        internal int EndValue { get; }
 
         /// <summary>
         /// Creates a hexadecimal character range.
@@ -76,31 +87,45 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="start">Start character pattern.</param>
         /// <param name="end">End character pattern.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Pattern must be a character literal pattern.</exception>
         public CharacterRange(CharacterPattern start, CharacterPattern end)
         {
-            if (!(start is CharacterLiteralPattern startLiteral))
-            {
-                throw new ArgumentException("Start range must be a character literal pattern.", nameof(start));
-            }
+            StartValue = GetCharacterLiteralPattern(start).GetValue();
+            EndValue = GetCharacterLiteralPattern(end).GetValue();
 
-            if (!(end is CharacterLiteralPattern endLiteral))
-            {
-                throw new ArgumentException("End range must be a character literal pattern.", nameof(end));
-            }
-
-            var startValue = startLiteral.GetValue();
-            var endValue = endLiteral.GetValue();
-
-            if (startValue > endValue)
+            if (StartValue > EndValue)
             {
                 throw new ArgumentException("Start range cannot be greater than end range.", nameof(start));
             }
 
             Start = start;
             End = end;
-            Single = startValue == endValue;
-            Adjacent = endValue - startValue == 1;
+            Single = StartValue == EndValue;
+            Adjacent = EndValue - StartValue == 1;
+        }
+
+        private CharacterRange(int start, int end)
+            : this(CharacterLiteralPattern.FromInt(start), CharacterLiteralPattern.FromInt(end)) { }
+
+        /// <summary>
+        /// Checks if the character range contains the character.
+        /// </summary>
+        /// <param name="character">Character.</param>
+        /// <returns><see langword="true"/> if the character range contains the character, otherwise <see langword="false"/>.</returns>
+        public bool Contains(char character)
+        {
+            return StartValue <= character && character <= EndValue;
+        }
+
+        /// <summary>
+        /// Checks if the character range contains the pattern.
+        /// </summary>
+        /// <param name="pattern">Character pattern.</param>
+        /// <returns><see langword="true"/> if the character range contains the pattern, otherwise <see langword="false"/>.</returns>
+        public bool Contains(CharacterPattern pattern)
+        {
+            var value = GetCharacterLiteralPattern(pattern).GetValue();
+            return StartValue <= value && value <= EndValue;
         }
 
         /// <summary>
@@ -112,6 +137,115 @@ namespace Wilgysef.FluentRegex
             return new CharacterRange(
                 (CharacterPattern)Start.Copy(),
                 (CharacterPattern)End.Copy());
+        }
+
+        public override string ToString()
+        {
+            return Single
+                ? Start.ToString()
+                : $"{Start}-{End}";
+        }
+
+        /// <summary>
+        /// Creates new character ranges with overlapped ranges simplified.
+        /// </summary>
+        /// <param name="ranges">Character ranges.</param>
+        /// <returns>Simplified ranges.</returns>
+        public static List<CharacterRange> Overlap(params CharacterRange[] ranges)
+        {
+            return Overlap((IEnumerable<CharacterRange>)ranges);
+        }
+
+        /// <summary>
+        /// Creates new character ranges with overlapped ranges simplified.
+        /// </summary>
+        /// <param name="ranges">Character ranges.</param>
+        /// <returns>Simplified ranges.</returns>
+        public static List<CharacterRange> Overlap(IEnumerable<CharacterRange> ranges)
+        {
+            var points = new List<(int Value, CharacterPattern Pattern, int Index, bool IsStart)>();
+
+            var rangeIndex = 0;
+            foreach (var range in ranges)
+            {
+                points.Add((range.StartValue, range.Start, rangeIndex, true));
+                points.Add((range.EndValue, range.End, rangeIndex, false));
+                rangeIndex++;
+            }
+
+            if (points.Count == 0)
+            {
+                return new List<CharacterRange>();
+            }
+
+            points.Sort((a, b) => a.Value - b.Value);
+
+            var rangeEntries = new List<(CharacterRange Range, int Index)>();
+            var indices = new HashSet<int>();
+
+            for (var i = 0; i < points.Count; i++)
+            {
+                var start = points[i];
+                indices.Add(start.Index);
+
+                do
+                {
+                    for (i++; indices.Count > 0; i++)
+                    {
+                        var cur = points[i];
+                        if (cur.IsStart)
+                        {
+                            indices.Add(cur.Index);
+                        }
+                        else
+                        {
+                            indices.Remove(cur.Index);
+                        }
+                    }
+
+                    if (i < points.Count && points[i].Value - points[i - 1].Value <= 1)
+                    {
+                        indices.Add(points[i].Index);
+                    }
+
+                    i--;
+                } while (indices.Count > 0);
+
+                rangeEntries.Add((new CharacterRange(start.Pattern, points[i].Pattern), start.Index));
+            }
+
+            rangeEntries.Sort((a, b) => a.Index - b.Index);
+
+            var simplifiedRanges = new List<CharacterRange>(rangeEntries.Count);
+
+            foreach (var rangeEntry in rangeEntries)
+            {
+                simplifiedRanges.Add(rangeEntry.Range);
+            }
+
+            return simplifiedRanges;
+        }
+
+        /// <summary>
+        /// Checks if the character pattern is an adjacent character left of <see cref="Start"/>.
+        /// </summary>
+        /// <param name="pattern">Character pattern.</param>
+        /// <returns><see langword="true"/> if the character is an adjacent character left of <see cref="Start"/>, otherwise <see langword="false"/>.</returns>
+        internal bool IsAdjacentLeftOfStart(CharacterPattern pattern)
+            => StartValue - GetCharacterLiteralPattern(pattern).GetValue() == 1;
+
+        /// <summary>
+        /// Checks if the character pattern is an adjacent character right of <see cref="End"/>.
+        /// </summary>
+        /// <param name="pattern">Character pattern.</param>
+        /// <returns><see langword="true"/> if the character is an adjacent character right of <see cref="End"/>, otherwise <see langword="false"/>.</returns>
+        internal bool IsAdjacentRightOfEnd(CharacterPattern pattern)
+            => GetCharacterLiteralPattern(pattern).GetValue() - EndValue == 1;
+
+        private static CharacterLiteralPattern GetCharacterLiteralPattern(CharacterPattern pattern)
+        {
+            return (pattern as CharacterLiteralPattern)
+                ?? throw new ArgumentException("Pattern must be a character literal pattern.", nameof(pattern));
         }
     }
 }

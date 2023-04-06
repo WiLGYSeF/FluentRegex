@@ -35,6 +35,28 @@ namespace Wilgysef.FluentRegex
             return false;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is CharacterClassPattern pattern && Equals(pattern);
+        }
+
+        public override bool Equals(CharacterPattern other)
+        {
+            if (!(other is CharacterClassPattern pattern))
+            {
+                return false;
+            }
+
+            switch (pattern.Type)
+            {
+                case CharacterType.Category:
+                case CharacterType.NonCategory:
+                    return Type == pattern.Type && _category == pattern._category;
+                default:
+                    return Type == pattern.Type;
+            }
+        }
+
         public override Pattern Copy()
         {
             return new CharacterClassPattern(Type, _category);

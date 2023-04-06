@@ -153,6 +153,39 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void AdjacentRange()
+    {
+        var pattern = new PatternBuilder().CharacterSet(new CharacterRange('a', 'b'));
+
+        pattern.ToString().ShouldBe("[ab]");
+    }
+
+    [Fact]
+    public void Simplify_Characters_InRange()
+    {
+        var pattern = new PatternBuilder().CharacterSet(
+            new[] { new CharacterRange('a', 'f') },
+            new[] { CharacterPattern.Character('c') });
+
+        pattern.ToString().ShouldBe("[a-f]");
+    }
+
+    [Fact]
+    public void Simplify_Characters_Adjacent()
+    {
+        var pattern = new PatternBuilder().CharacterSet(
+            new[] { new CharacterRange('b', 'f') },
+            new[]
+            {
+                CharacterPattern.Character('a'),
+                CharacterPattern.Character('g'),
+                CharacterPattern.Character('h')
+            });
+
+        pattern.ToString().ShouldBe("[a-h]");
+    }
+
+    [Fact]
     public void FluentCharacterRange()
     {
         var pattern = new CharacterSetPattern('a', 'b');
@@ -163,7 +196,7 @@ public class CharacterSetPatternTest
         pattern.CharacterRanges.Count.ShouldBe(1);
 
         pattern.WithCharacterRange(CharacterPattern.Character('c'), CharacterPattern.Character('e'));
-        pattern.ToString().ShouldBe("[0-9c-eab]");
+        pattern.ToString().ShouldBe("[0-9a-e]");
         pattern.CharacterRanges.Count.ShouldBe(2);
     }
 

@@ -1,8 +1,9 @@
-﻿using Wilgysef.FluentRegex.PatternBuilders;
+﻿using System;
+using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
-    public abstract class CharacterPattern : Pattern
+    public abstract class CharacterPattern : Pattern, IEquatable<CharacterPattern>
     {
         /// <summary>
         /// Matches a character.
@@ -98,6 +99,8 @@ namespace Wilgysef.FluentRegex
         /// <param name="character">Character value.</param>
         /// <returns><see langword="true"/> if the character pattern has a <see langword="char"/> value, otherwise <see langword="false"/>.</returns>
         public abstract bool TryGetChar(out char character);
+
+        public abstract bool Equals(CharacterPattern other);
 
         internal abstract void Build(PatternBuildState state, bool fromCharacterSet);
 

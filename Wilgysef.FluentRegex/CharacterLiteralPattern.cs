@@ -62,6 +62,23 @@ namespace Wilgysef.FluentRegex
             return new CharacterLiteralPattern(CharacterType.Unicode, hex);
         }
 
+        internal static CharacterPattern FromInt(int value)
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("Value cannot be negative");
+            }
+
+            if (value >= ' ' && value <= '~')
+            {
+                return CharacterPattern.Character((char)value);
+            }
+
+            return value <= 0xFF
+                ? CharacterPattern.Hexadecimal(value.ToString("X2"))
+                : CharacterPattern.Unicode(value.ToString("X4"));
+        }
+
         private readonly char _character;
         private readonly string? _string;
 
@@ -92,6 +109,21 @@ namespace Wilgysef.FluentRegex
 
             character = (char)0;
             return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is CharacterLiteralPattern pattern && Equals(pattern);
+        }
+
+        public override bool Equals(CharacterPattern other)
+        {
+            if (!(other is CharacterLiteralPattern pattern))
+            {
+                return false;
+            }
+
+            return GetValue() == pattern.GetValue();
         }
 
         public override Pattern Copy()

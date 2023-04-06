@@ -357,19 +357,27 @@ namespace Wilgysef.FluentRegex
 
             void Build(IPatternStringBuilder builder)
             {
-                if (_subtractedCharacters.Count == 0
-                    && _subtractedCharacterRanges.Count == 0
+                var characterRanges = CharacterRange.Overlap(_characterRanges);
+                var characters = new List<CharacterPattern>(_characters);
+                var subtractedCharacterRanges = CharacterRange.Overlap(_subtractedCharacterRanges);
+                var subtractedCharacters = new List<CharacterPattern>(_subtractedCharacters);
+
+                SimplifyCharacterRanges(ref characterRanges, characters);
+                SimplifyCharacterRanges(ref subtractedCharacterRanges, subtractedCharacters);
+
+                if (subtractedCharacters.Count == 0
+                    && subtractedCharacterRanges.Count == 0
                     && !Negated)
                 {
-                    if (_characters.Count == 1 && _characterRanges.Count == 0)
+                    if (characters.Count == 1 && characterRanges.Count == 0)
                     {
-                        _characters[0].Build(state);
+                        characters[0].Build(state);
                         return;
                     }
 
-                    if (_characters.Count == 0 && _characterRanges.Count == 1 && _characterRanges[0].Single)
+                    if (characters.Count == 0 && characterRanges.Count == 1 && characterRanges[0].Single)
                     {
-                        _characterRanges[0].Start.Build(state);
+                        characterRanges[0].Start.Build(state);
                         return;
                     }
                 }
@@ -383,18 +391,18 @@ namespace Wilgysef.FluentRegex
                     builder.Append('^');
                 }
 
-                AppendRanges(_characterRanges);
-                foreach (var pattern in _characters)
+                AppendRanges(characterRanges);
+                foreach (var pattern in characters)
                 {
                     Append(pattern);
                 }
 
-                if (_subtractedCharacters.Count > 0 || _subtractedCharacterRanges.Count > 0)
+                if (subtractedCharacters.Count > 0 || subtractedCharacterRanges.Count > 0)
                 {
                     builder.Append("-[");
 
-                    AppendRanges(_subtractedCharacterRanges);
-                    foreach (var pattern in _subtractedCharacters)
+                    AppendRanges(subtractedCharacterRanges);
+                    foreach (var pattern in subtractedCharacters)
                     {
                         Append(pattern);
                     }
@@ -442,6 +450,58 @@ namespace Wilgysef.FluentRegex
 
                             Append(range.End);
                         }
+                    }
+                }
+
+                static void SimplifyCharacterRanges(ref List<CharacterRange> ranges, List<CharacterPattern> characters)
+                {
+                    var overlapRanges = false;
+                    int initialCharactersCount;
+
+                    do
+                    {
+                        initialCharactersCount = characters.Count;
+
+                        for (var i = 0; i < characters.Count; i++)
+                        {
+                            for (var j = 0; j < ranges.Count; j++)
+                            {
+                                var removeChar = false;
+                                if (ranges[j].Contains(characters[i]))
+                                {
+                                    removeChar = true;
+                                }
+                                else if (ranges[j].IsAdjacentLeftOfStart(characters[i]))
+                                {
+                                    ranges[j] = new CharacterRange(
+                                            CharacterLiteralPattern.FromInt(ranges[j].StartValue - 1),
+                                            ranges[j].End);
+                                    overlapRanges = true;
+                                    removeChar = true;
+                                }
+                                else if (ranges[j].IsAdjacentRightOfEnd(characters[i]))
+                                {
+                                    ranges[j] = new CharacterRange(
+                                            ranges[j].Start,
+                                            CharacterLiteralPattern.FromInt(ranges[j].EndValue + 1));
+                                    overlapRanges = true;
+                                    removeChar = true;
+                                }
+
+                                if (removeChar)
+                                {
+                                    characters[i] = characters[^1];
+                                    characters.RemoveAt(characters.Count - 1);
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
+                    } while (initialCharactersCount != characters.Count);
+
+                    if (overlapRanges)
+                    {
+                        ranges = CharacterRange.Overlap(ranges);
                     }
                 }
             }
