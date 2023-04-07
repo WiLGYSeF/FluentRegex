@@ -4,7 +4,7 @@ using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
 {
-    public abstract class CharacterPattern : Pattern, IEquatable<CharacterPattern>
+    public abstract class CharacterPattern : Pattern
     {
         /// <summary>
         /// Matches a character.
@@ -110,8 +110,6 @@ namespace Wilgysef.FluentRegex
         /// <param name="value">Character value.</param>
         /// <returns><see langword="true"/> if the character pattern has an <see langword="int"/> value, otherwise <see langword="false"/>.</returns>
         public abstract bool TryGetValue(out int value);
-
-        public abstract bool Equals(CharacterPattern other);
 
         internal abstract void Build(PatternBuildState state, bool fromCharacterSet);
 

@@ -118,21 +118,6 @@ namespace Wilgysef.FluentRegex
             return true;
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is CharacterLiteralPattern pattern && Equals(pattern);
-        }
-
-        public override bool Equals(CharacterPattern other)
-        {
-            if (!(other is CharacterLiteralPattern pattern))
-            {
-                return false;
-            }
-
-            return GetValue() == pattern.GetValue();
-        }
-
         public override Pattern Copy()
         {
             return Type switch

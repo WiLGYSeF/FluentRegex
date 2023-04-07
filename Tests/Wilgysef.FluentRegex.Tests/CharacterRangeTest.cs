@@ -53,6 +53,24 @@ public class CharacterRangeTest
         ShouldBeRange(ranges[0], 'a', 'm');
     }
 
+    [Fact]
+    public void Contains()
+    {
+        var range = new CharacterRange('a', 'z');
+
+        range.Contains('m').ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Range_String()
+    {
+        var range = new CharacterRange('a', 'z');
+        range.ToString().ShouldBe("a-z");
+
+        range = new CharacterRange('a', 'a');
+        range.ToString().ShouldBe("a");
+    }
+
     private static void ShouldBeRange(CharacterRange range, char start, char end)
     {
         range.Start.TryGetChar(out var startChar).ShouldBeTrue();

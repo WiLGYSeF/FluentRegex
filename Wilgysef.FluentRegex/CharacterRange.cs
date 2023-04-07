@@ -131,9 +131,7 @@ namespace Wilgysef.FluentRegex
         /// <returns>Copied character range.</returns>
         public CharacterRange Copy()
         {
-            return new CharacterRange(
-                (CharacterPattern)Start.Copy(),
-                (CharacterPattern)End.Copy());
+            return new CharacterRange((CharacterPattern)Start.Copy(), (CharacterPattern)End.Copy());
         }
 
         public override string ToString()

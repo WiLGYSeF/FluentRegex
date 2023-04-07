@@ -107,6 +107,22 @@ public class CharacterPatternTest
     }
 
     [Fact]
+    public void TryGetValue()
+    {
+        var pattern = CharacterPattern.Character('c');
+
+        pattern.TryGetValue(out var value).ShouldBeTrue();
+        value.ShouldBe('c');
+
+        pattern = CharacterPattern.Hexadecimal("ab");
+        pattern.TryGetValue(out value).ShouldBeTrue();
+        value.ShouldBe(0xAB);
+
+        pattern = CharacterPattern.Word;
+        pattern.TryGetValue(out _).ShouldBeFalse();
+    }
+
+    [Fact]
     public void Word()
     {
         var pattern = new PatternBuilder().Word;

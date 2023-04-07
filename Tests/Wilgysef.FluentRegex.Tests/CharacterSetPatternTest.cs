@@ -203,6 +203,20 @@ public class CharacterSetPatternTest
     }
 
     [Fact]
+    public void Simplify_Characters_ToRange_Special()
+    {
+        var pattern = new PatternBuilder().CharacterSet(new[]
+        {
+            CharacterPattern.Character('a'),
+            CharacterPattern.Digit,
+            CharacterPattern.Hexadecimal("7B"),
+            CharacterPattern.Unicode("123A"),
+        });
+
+        pattern.ToString().ShouldBe(@"[a\d\x7B\u123A]");
+    }
+
+    [Fact]
     public void Simplify_Characters_Range_Subtracted()
     {
         var pattern = new PatternBuilder().CharacterSet(
