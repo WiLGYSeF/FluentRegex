@@ -46,6 +46,29 @@ public class ConcatPatternTest
     }
 
     [Fact]
+    public void NoWrap_Multiple_WithEmpty()
+    {
+        var pattern = new PatternBuilder(new ConcatPattern(
+            new LiteralPattern("b"),
+            new QuantifierPattern(new LiteralPattern("a"), 0, 0, true)))
+                .ZeroOrMore();
+
+        pattern.ToString().ShouldBe("b*");
+    }
+
+    [Fact]
+    public void NoWrap_OrPattern_NoWrapSingle_Empty()
+    {
+        var pattern = new ConcatPattern(
+            new OrPattern(
+                new LiteralPattern("zxc"),
+                new LiteralPattern("vbn")),
+            new QuantifierPattern(new LiteralPattern("a"), 0, 0, true));
+
+        pattern.ToString().ShouldBe("zxc|vbn");
+    }
+
+    [Fact]
     public void Unwrap()
     {
         var pattern = new ConcatPattern();

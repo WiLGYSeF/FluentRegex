@@ -35,6 +35,8 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsSinglePattern => true;
 
+        internal override bool IsEmpty => false;
+
         /// <summary>
         /// Creates a backreference with group number.
         /// </summary>

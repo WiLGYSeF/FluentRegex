@@ -11,14 +11,11 @@ namespace Wilgysef.FluentRegex.Exceptions
 
         public Pattern RecursivePattern { get; }
 
-        public int RecursivePatternIndex { get; }
-
         public PatternRecursionException(IList<Pattern> path, Pattern recursivePattern)
             : base("Pattern is infinitely recursive")
         {
             Path = path;
             RecursivePattern = recursivePattern;
-            RecursivePatternIndex = path.IndexOf(recursivePattern);
         }
 
         public PatternRecursionException(IEnumerable<Pattern> path, Pattern recursivePattern)

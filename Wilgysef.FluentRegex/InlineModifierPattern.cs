@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
@@ -25,7 +25,9 @@ namespace Wilgysef.FluentRegex
         }
         private InlineModifier _disabledModifiers;
 
-        protected override bool HasContents => Modifiers != InlineModifier.None || DisabledModifiers != InlineModifier.None || Pattern != null;
+        internal override bool IsEmpty => Modifiers == InlineModifier.None
+            && DisabledModifiers == InlineModifier.None
+            && Pattern == null;
 
         /// <summary>
         /// Creates an inline modifier pattern.
@@ -191,57 +193,28 @@ namespace Wilgysef.FluentRegex
         {
             if (enable.HasValue)
             {
-                Set(ref _modifiers, enable.Value);
-                Set(ref _disabledModifiers, !enable.Value);
+                Set(ref _modifiers, modifier, enable.Value);
+                Set(ref _disabledModifiers, modifier, !enable.Value);
             }
             else
             {
-                Set(ref _modifiers, false);
-                Set(ref _disabledModifiers, false);
+                Set(ref _modifiers, modifier, false);
+                Set(ref _disabledModifiers, modifier, false);
             }
 
             return this;
 
-            void Set(ref InlineModifier modf, bool b)
+            static void Set(ref InlineModifier modf, InlineModifier value, bool b)
             {
                 if (b)
                 {
-                    modf |= modifier;
+                    modf |= value;
                 }
                 else
                 {
-                    modf &= ~modifier;
+                    modf &= ~value;
                 }
             }
         }
-    }
-
-    [Flags]
-    public enum InlineModifier
-    {
-        /// <summary>
-        /// No modifiers.
-        /// </summary>
-        None = 0,
-        /// <summary>
-        /// Case-insensitive matching.
-        /// </summary>
-        IgnoreCase = 1,
-        /// <summary>
-        /// Multi-line. <see cref="AnchorPattern.BeginLine"/> and <see cref="AnchorPattern.EndLine"/> match the beginning and end of lines instead of the entire string.
-        /// </summary>
-        Multiline = 2,
-        /// <summary>
-        /// All unnamed capturing groups are treated as non-capturing.
-        /// </summary>
-        ExplicitCapture = 4,
-        /// <summary>
-        /// Single-line. The single character pattern matches every character, instead of every character except <c>\n</c>.
-        /// </summary>
-        Singleline = 16,
-        /// <summary>
-        /// Ignore unescaped whitespace from the pattern.
-        /// </summary>
-        IgnorePatternWhitespace = 32,
     }
 }

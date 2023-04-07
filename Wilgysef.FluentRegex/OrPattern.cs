@@ -10,7 +10,7 @@ namespace Wilgysef.FluentRegex
         {
             get
             {
-                if (IsSinglePatternInternal())
+                if (IsSinglePatternInternal(false))
                 {
                     return true;
                 }
@@ -19,6 +19,8 @@ namespace Wilgysef.FluentRegex
                 return categories.IsSingle;
             }
         }
+
+        internal override bool IsEmpty => IsEmptyInternal();
 
         /// <summary>
         /// Creates an or pattern.
@@ -45,6 +47,7 @@ namespace Wilgysef.FluentRegex
 
         public override Pattern Copy()
         {
+            // TODO: recursion check?
             return new OrPattern(_children.Select(c => c.Copy()));
         }
 
@@ -113,6 +116,11 @@ namespace Wilgysef.FluentRegex
                     }
                 }
             }
+        }
+
+        internal override Pattern Unwrap()
+        {
+            return UnwrapInternal();
         }
 
         private CategorizedPatterns CategorizePatterns()

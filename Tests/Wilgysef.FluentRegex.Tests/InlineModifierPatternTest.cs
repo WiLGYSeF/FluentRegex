@@ -1,4 +1,6 @@
-﻿namespace Wilgysef.FluentRegex.Tests;
+﻿using Wilgysef.FluentRegex.Enums;
+
+namespace Wilgysef.FluentRegex.Tests;
 
 public class InlineModifierPatternTest
 {

@@ -286,6 +286,25 @@ public class QuantifierPatternTest
     }
 
     [Fact]
+    public void NoWrap_ExactlyOne()
+    {
+        var pattern = new OrPattern(
+            new QuantifierPattern(new LiteralPattern("b"), 1, 1, true),
+            new LiteralPattern("a"));
+
+        pattern.ToString().ShouldBe("[ba]");
+    }
+
+    [Fact]
+    public void NoWrap_Empty()
+    {
+        var pattern = new OrPattern(
+            new QuantifierPattern(new LiteralPattern("c"), 1, 1, true));
+
+        pattern.ToString().ShouldBe("c");
+    }
+
+    [Fact]
     public void Unwrap()
     {
         var pattern = new OrPattern(
@@ -293,16 +312,6 @@ public class QuantifierPatternTest
             new LiteralPattern("a"));
 
         pattern.ToString().ShouldBe("b{1,2}|a");
-    }
-
-    [Fact]
-    public void Unwrap_ExactlyOne()
-    {
-        var pattern = new OrPattern(
-            new QuantifierPattern(new LiteralPattern("b"), 1, 1, true),
-            new LiteralPattern("a"));
-
-        pattern.ToString().ShouldBe("[ba]");
     }
 
     [Fact]
@@ -345,7 +354,7 @@ public class QuantifierPatternTest
     {
         ShouldCreatePattern(
             () => new PatternBuilder().Concat(new ConcatPattern()).Between(1, 3),
-            null);
+            "");
     }
 
     private static void ShouldCreatePattern(Func<Pattern> func, string? expected)

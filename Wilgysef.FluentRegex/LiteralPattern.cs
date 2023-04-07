@@ -11,7 +11,9 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public string Value { get; set; }
 
-        internal override bool IsSinglePattern => Value.Length == 1;
+        internal override bool IsSinglePattern => Value.Length <= 1;
+
+        internal override bool IsEmpty => Value.Length == 0;
 
         /// <summary>
         /// Creates a literal pattern.

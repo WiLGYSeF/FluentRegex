@@ -19,7 +19,7 @@ public class CommentPatternTest
         pattern.ToString().ShouldBe("(?#asdf)");
 
         pattern.WithValue(null);
-        pattern.ToString().ShouldBe("(?#)");
+        pattern.ToString().ShouldBe("");
     }
 
     [Fact]
@@ -34,6 +34,6 @@ public class CommentPatternTest
         pattern = new CommentPattern(null);
         copy = pattern.Copy();
         pattern.WithValue("abc");
-        copy.ToString().ShouldBe("(?#)");
+        copy.ToString().ShouldBe("");
     }
 }

@@ -11,6 +11,14 @@ public class AtomicGroupPatternTest
     }
 
     [Fact]
+    public void Empty()
+    {
+        var pattern = new PatternBuilder().AtomicGroup(null);
+
+        pattern.ToString().ShouldBe("");
+    }
+
+    [Fact]
     public void FluentPattern()
     {
         var pattern = new AtomicGroupPattern(new LiteralPattern("a"));
@@ -34,6 +42,6 @@ public class AtomicGroupPatternTest
         copy = group.Copy();
         group.WithPattern(copy);
 
-        copy.ToString().ShouldBe("(?>)");
+        copy.ToString().ShouldBe("");
     }
 }

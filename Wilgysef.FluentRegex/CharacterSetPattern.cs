@@ -35,6 +35,8 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsSinglePattern => true;
 
+        internal override bool IsEmpty => _characters.Count == 0 && _characterRanges.Count == 0;
+
         private readonly List<CharacterRange> _characterRanges = new List<CharacterRange>();
         private readonly List<CharacterPattern> _characters = new List<CharacterPattern>();
         private readonly List<CharacterPattern> _subtractedCharacters = new List<CharacterPattern>();
@@ -343,7 +345,7 @@ namespace Wilgysef.FluentRegex
 
         internal override void Build(PatternBuildState state)
         {
-            if (_characters.Count == 0 && _characterRanges.Count == 0)
+            if (IsEmpty)
             {
                 if (_subtractedCharacters.Count > 0 || _subtractedCharacterRanges.Count > 0)
                 {

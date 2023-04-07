@@ -44,11 +44,11 @@ public class LookaheadPatternTest
     }
 
     [Fact]
-    public void NoPattern()
+    public void Empty()
     {
         var pattern = new PatternBuilder().PositiveLookahead(null);
 
-        pattern.ToString().ShouldBe("(?=)");
+        pattern.ToString().ShouldBe("");
     }
 
     [Fact]
@@ -64,6 +64,6 @@ public class LookaheadPatternTest
         pattern = LookaheadPattern.PositiveLookahead(null);
         copy = pattern.Copy();
         pattern.WithPattern(literal);
-        copy.ToString().ShouldBe("(?=)");
+        copy.ToString().ShouldBe("");
     }
 }

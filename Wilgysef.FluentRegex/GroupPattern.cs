@@ -35,7 +35,7 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public bool IsBalancing => SecondName != null;
 
-        protected override bool HasContents => true;
+        internal override bool IsEmpty => !IsCapturing && Pattern.IsNullOrEmpty();
 
         /// <summary>
         /// Creates a group pattern.

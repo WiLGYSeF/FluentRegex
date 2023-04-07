@@ -49,7 +49,11 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public bool IsExactlyOne => Min == 1 && Max.HasValue && Max.Value == 1;
 
-        internal override bool IsSinglePattern => false;
+        internal override bool IsSinglePattern => IsExactlyOne && Pattern.IsSinglePattern
+            || IsEmpty;
+
+        internal override bool IsEmpty => Min == 0 && Max.HasValue && Max.Value == 0
+            || Pattern.IsEmpty;
 
         /// <summary>
         /// Creates a quantifier pattern.
@@ -148,40 +152,30 @@ namespace Wilgysef.FluentRegex
 
         internal override void Build(PatternBuildState state)
         {
+            if (IsEmpty)
+            {
+                return;
+            }
+
             if (Min < 0 || Max.HasValue && Max.Value < 0)
             {
                 throw new InvalidPatternException(this, "Range cannot be negative.");
             }
 
-            if (Max.HasValue)
+            if (Max.HasValue && Min > Max.Value)
             {
-                if (Min > Max.Value)
-                {
-                    throw new InvalidPatternException(this, "Min cannot be greater than max.");
-                }
-
-                if (Min == 0 && Max.Value == 0)
-                {
-                    return;
-                }
+                throw new InvalidPatternException(this, "Min cannot be greater than max.");
             }
 
             state.WithPattern(this, Build);
 
             void Build(IPatternStringBuilder builder)
             {
-                var startLength = builder.Length;
-
                 Pattern.Wrap(state);
 
                 if (IsExactlyOne)
                 {
                     return;
-                }
-
-                if (builder.Length == startLength)
-                {
-                    throw new InvalidPatternException(this, "Quantified pattern cannot be empty.");
                 }
 
                 if (Min == 0)

@@ -16,6 +16,11 @@ namespace Wilgysef.FluentRegex
         internal abstract bool IsSinglePattern { get; }
 
         /// <summary>
+        /// Indicates if the pattern does not have any contents.
+        /// </summary>
+        internal abstract bool IsEmpty { get; }
+
+        /// <summary>
         /// Creates a copy of the pattern object.
         /// </summary>
         /// <returns>Copied pattern.</returns>
@@ -143,7 +148,7 @@ namespace Wilgysef.FluentRegex
                     {
                         if (!traversed.Add(container))
                         {
-                            throw new PatternRecursionException(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), current.Pattern);
+                            throw new PatternRecursionException(stack.Where(i => i.Pattern != null).Select(i => i.Pattern!), container);
                         }
 
                         stack.Push(new TraverseItem(container, container.Children.GetEnumerator()));
@@ -175,6 +180,14 @@ namespace Wilgysef.FluentRegex
                 Pattern = pattern;
                 Enumerator = enumerator;
             }
+        }
+    }
+
+    internal static class PatternExtensions
+    {
+        public static bool IsNullOrEmpty(this Pattern? pattern)
+        {
+            return pattern == null || pattern.IsEmpty;
         }
     }
 }

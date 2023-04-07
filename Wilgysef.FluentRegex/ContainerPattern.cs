@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex
@@ -10,8 +11,6 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public IReadOnlyList<Pattern> Children => _children;
 
-        internal override bool IsSinglePattern => IsSinglePatternInternal();
-
         protected readonly List<Pattern> _children = new List<Pattern>();
 
         protected ContainerPattern() { }
@@ -21,12 +20,7 @@ namespace Wilgysef.FluentRegex
             _children.AddRange(patterns);
         }
 
-        internal override Pattern Unwrap()
-        {
-            return UnwrapInternal();
-        }
-
-        protected bool IsSinglePatternInternal()
+        protected bool IsSinglePatternInternal(bool ignoreEmptyChildren)
         {
             var path = new List<Pattern>();
             var traversed = new HashSet<Pattern>();
@@ -40,14 +34,33 @@ namespace Wilgysef.FluentRegex
                     throw new PatternRecursionException(path, current);
                 }
 
-                if (current is ContainerPattern container)
+                if (IsContainerPattern(current, out var container))
                 {
-                    if (container._children.Count == 0)
+                    var childrenCount = container._children.Count;
+
+                    if (ignoreEmptyChildren)
+                    {
+                        foreach (var child in container._children)
+                        {
+                            if (traversed.Contains(child))
+                            {
+                                path.Add(child);
+                                throw new PatternRecursionException(path, child);
+                            }
+
+                            if (child.IsEmpty)
+                            {
+                                childrenCount--;
+                            }
+                        }
+                    }
+
+                    if (childrenCount == 0)
                     {
                         return true;
                     }
 
-                    if (container._children.Count > 1)
+                    if (childrenCount > 1)
                     {
                         return false;
                     }
@@ -59,6 +72,48 @@ namespace Wilgysef.FluentRegex
                     return current.IsSinglePattern;
                 }
             }
+        }
+
+        protected bool IsEmptyInternal()
+        {
+            var path = new List<Pattern>();
+            var stack = new Stack<(Pattern Pattern, int Depth)>();
+            var depth = 0;
+
+            stack.Push((this, 0));
+            path.Add(this);
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+
+                for (; current.Depth <= depth; depth--)
+                {
+                    path.RemoveAt(path.Count - 1);
+                }
+
+                if (path.Contains(current.Pattern))
+                {
+                    throw new PatternRecursionException(path, current.Pattern);
+                }
+
+                path.Add(current.Pattern);
+                depth++;
+
+                if (IsContainerPattern(current.Pattern, out var container))
+                {
+                    for (var i = container.Children.Count - 1; i >= 0; i--)
+                    {
+                        stack.Push((container.Children[i], current.Depth + 1));
+                    }
+                }
+                else if (!current.Pattern.IsEmpty)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         protected Pattern UnwrapInternal()
@@ -75,7 +130,7 @@ namespace Wilgysef.FluentRegex
                     throw new PatternRecursionException(path, current);
                 }
 
-                if (current is ContainerPattern container)
+                if (IsContainerPattern(current, out var container))
                 {
                     if (container._children.Count != 1)
                     {
@@ -89,6 +144,20 @@ namespace Wilgysef.FluentRegex
                     return current.Unwrap();
                 }
             }
+        }
+
+        private bool IsContainerPattern(
+            Pattern pattern,
+            [MaybeNullWhen(false)] out ContainerPattern container)
+        {
+            if (pattern is ContainerPattern c)
+            {
+                container = c;
+                return true;
+            }
+
+            container = null;
+            return false;
         }
     }
 }

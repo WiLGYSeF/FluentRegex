@@ -6,6 +6,10 @@ namespace Wilgysef.FluentRegex
 {
     public class ConcatPattern : ContainerPattern
     {
+        internal override bool IsSinglePattern => IsSinglePatternInternal(true);
+
+        internal override bool IsEmpty => IsEmptyInternal();
+
         /// <summary>
         /// Concatenates patterns.
         /// </summary>
@@ -31,6 +35,7 @@ namespace Wilgysef.FluentRegex
 
         public override Pattern Copy()
         {
+            // TODO: recursion check?
             return new ConcatPattern(_children.Select(c => c.Copy()));
         }
 
@@ -40,10 +45,18 @@ namespace Wilgysef.FluentRegex
 
             void Build(IPatternStringBuilder builder)
             {
+                var childrenCount = _children.Count;
                 foreach (var child in _children)
                 {
-                    if (_children.Count > 1
-                        && ContainsUnwrappedOrPattern(child))
+                    if (child.IsEmpty)
+                    {
+                        childrenCount--;
+                    }
+                }
+
+                foreach (var child in _children)
+                {
+                    if (childrenCount > 1 && ContainsUnwrappedOrPattern(child))
                     {
                         child.Wrap(state, always: true);
                     }
@@ -53,6 +66,11 @@ namespace Wilgysef.FluentRegex
                     }
                 }
             }
+        }
+
+        internal override Pattern Unwrap()
+        {
+            return UnwrapInternal();
         }
     }
 }

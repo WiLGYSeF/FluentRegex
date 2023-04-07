@@ -11,6 +11,8 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsSinglePattern => true;
 
+        internal override bool IsEmpty => Regex.Length == 0;
+
         /// <summary>
         /// Creates a raw regex pattern.
         /// </summary>

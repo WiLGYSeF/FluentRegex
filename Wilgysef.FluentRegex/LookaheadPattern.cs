@@ -39,7 +39,7 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public LookaheadType Type { get; }
 
-        protected override bool HasContents => true;
+        internal override bool IsEmpty => Pattern.IsNullOrEmpty();
 
         private LookaheadPattern(Pattern? pattern, LookaheadType type) : base(pattern)
         {

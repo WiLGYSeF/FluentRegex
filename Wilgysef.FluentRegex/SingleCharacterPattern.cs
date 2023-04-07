@@ -6,6 +6,8 @@ namespace Wilgysef.FluentRegex
     {
         internal override bool IsSinglePattern => true;
 
+        internal override bool IsEmpty => false;
+
         public override Pattern Copy()
         {
             return new SingleCharacterPattern();

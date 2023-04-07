@@ -53,6 +53,8 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsSinglePattern => true;
 
+        internal override bool IsEmpty => false;
+
         private AnchorPattern(AnchorType type)
         {
             Type = type;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.Exceptions;
 using Wilgysef.FluentRegex.PatternBuilders;
 
@@ -8,6 +9,10 @@ namespace Wilgysef.FluentRegex
 {
     public class PatternBuilder : ContainerPattern
     {
+        internal override bool IsSinglePattern => IsSinglePatternInternal(true);
+
+        internal override bool IsEmpty => IsEmptyInternal();
+
         /// <summary>
         /// Creates a new pattern builder.
         /// </summary>

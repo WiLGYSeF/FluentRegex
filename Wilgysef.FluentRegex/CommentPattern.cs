@@ -4,7 +4,7 @@ namespace Wilgysef.FluentRegex
 {
     public class CommentPattern : AbstractGroupPattern
     {
-        protected override bool HasContents => true;
+        internal override bool IsEmpty => Pattern.IsNullOrEmpty();
 
         /// <summary>
         /// Creates a comment.

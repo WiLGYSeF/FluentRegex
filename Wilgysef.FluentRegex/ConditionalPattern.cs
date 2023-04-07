@@ -55,7 +55,7 @@ namespace Wilgysef.FluentRegex
             set => SetChildPattern(value, ref _no, NoIndex);
         }
 
-        protected override bool HasContents => true;
+        internal override bool IsEmpty => false;
 
         private int ExpressionIndex => 0;
 

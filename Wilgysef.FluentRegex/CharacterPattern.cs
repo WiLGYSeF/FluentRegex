@@ -1,5 +1,4 @@
-﻿using System;
-using Wilgysef.FluentRegex.Enums;
+﻿using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
@@ -96,6 +95,8 @@ namespace Wilgysef.FluentRegex
         public CharacterType Type { get; protected set; }
 
         internal override bool IsSinglePattern => true;
+
+        internal override bool IsEmpty => false;
 
         /// <summary>
         /// Gets the character value of the character pattern.

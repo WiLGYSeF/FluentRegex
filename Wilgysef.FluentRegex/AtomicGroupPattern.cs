@@ -4,7 +4,7 @@ namespace Wilgysef.FluentRegex
 {
     public class AtomicGroupPattern : AbstractGroupPattern
     {
-        protected override bool HasContents => true;
+        internal override bool IsEmpty => Pattern.IsNullOrEmpty();
 
         /// <summary>
         /// Creates an atomic group with a pattern.

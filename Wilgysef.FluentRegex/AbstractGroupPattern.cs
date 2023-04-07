@@ -7,11 +7,6 @@ namespace Wilgysef.FluentRegex
         internal sealed override bool IsSinglePattern => true;
 
         /// <summary>
-        /// Indicates if the group has contents.
-        /// </summary>
-        protected abstract bool HasContents { get; }
-
-        /// <summary>
         /// Group pattern.
         /// </summary>
         protected Pattern? Pattern
@@ -50,7 +45,7 @@ namespace Wilgysef.FluentRegex
 
         internal sealed override void Build(PatternBuildState state)
         {
-            if (!HasContents)
+            if (IsEmpty)
             {
                 return;
             }
