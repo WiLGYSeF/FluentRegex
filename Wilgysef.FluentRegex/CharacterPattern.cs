@@ -1,4 +1,5 @@
 ﻿using System;
+using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
@@ -89,40 +90,31 @@ namespace Wilgysef.FluentRegex
         /// <returns>Character pattern.</returns>
         public static CharacterPattern NonCategory(string category) => CharacterClassPattern.NonCategory(category);
 
-        protected CharacterType Type { get; set; }
+        /// <summary>
+        /// Character pattern type.
+        /// </summary>
+        public CharacterType Type { get; protected set; }
 
         internal override bool IsSinglePattern => true;
 
         /// <summary>
-        /// Try to get the character value of the character pattern.
+        /// Gets the character value of the character pattern.
         /// </summary>
         /// <param name="character">Character value.</param>
         /// <returns><see langword="true"/> if the character pattern has a <see langword="char"/> value, otherwise <see langword="false"/>.</returns>
         public abstract bool TryGetChar(out char character);
+
+        /// <summary>
+        /// Gets the integer value of the character pattern.
+        /// </summary>
+        /// <param name="value">Character value.</param>
+        /// <returns><see langword="true"/> if the character pattern has an <see langword="int"/> value, otherwise <see langword="false"/>.</returns>
+        public abstract bool TryGetValue(out int value);
 
         public abstract bool Equals(CharacterPattern other);
 
         internal abstract void Build(PatternBuildState state, bool fromCharacterSet);
 
         internal abstract void Build(IPatternStringBuilder builder, bool fromCharacterSet);
-
-        protected enum CharacterType
-        {
-            Character,
-            Control,
-            Escape,
-            Hexadecimal,
-            Octal,
-            Unicode,
-
-            Word,
-            NonWord,
-            Digit,
-            NonDigit,
-            Whitespace,
-            NonWhitespace,
-            Category,
-            NonCategory,
-        }
     }
 }

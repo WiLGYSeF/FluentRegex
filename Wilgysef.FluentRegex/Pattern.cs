@@ -11,15 +11,15 @@ namespace Wilgysef.FluentRegex
     public abstract class Pattern
     {
         /// <summary>
+        /// Indicates if the pattern can be treated as a single unit.
+        /// </summary>
+        internal abstract bool IsSinglePattern { get; }
+
+        /// <summary>
         /// Creates a copy of the pattern object.
         /// </summary>
         /// <returns>Copied pattern.</returns>
         public abstract Pattern Copy();
-
-        /// <summary>
-        /// Indicates if the pattern can be treated as a single unit.
-        /// </summary>
-        internal abstract bool IsSinglePattern { get; }
 
         /// <summary>
         /// Build pattern.

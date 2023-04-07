@@ -44,9 +44,12 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public bool Greedy { get; set; }
 
-        internal override bool IsSinglePattern => false;
+        /// <summary>
+        /// Indicates if the quantifier occurrences is exactly 1.
+        /// </summary>
+        public bool IsExactlyOne => Min == 1 && Max.HasValue && Max.Value == 1;
 
-        private bool IsExactlyOne => Min == 1 && Max.HasValue && Max.Value == 1;
+        internal override bool IsSinglePattern => false;
 
         /// <summary>
         /// Creates a quantifier pattern.

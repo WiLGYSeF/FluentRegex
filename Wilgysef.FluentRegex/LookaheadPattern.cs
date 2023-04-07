@@ -1,4 +1,5 @@
 ﻿using System;
+using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
@@ -33,13 +34,16 @@ namespace Wilgysef.FluentRegex
         /// <returns>Lookahead pattern.</returns>
         public static LookaheadPattern NegativeLookbehind(Pattern? pattern) => new LookaheadPattern(pattern, LookaheadType.NegativeLookbehind);
 
-        protected override bool HasContents => true;
+        /// <summary>
+        /// Lookahead type.
+        /// </summary>
+        public LookaheadType Type { get; }
 
-        private readonly LookaheadType _type;
+        protected override bool HasContents => true;
 
         private LookaheadPattern(Pattern? pattern, LookaheadType type) : base(pattern)
         {
-            _type = type;
+            Type = type;
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace Wilgysef.FluentRegex
 
         public override Pattern Copy()
         {
-            return new LookaheadPattern(Pattern?.Copy(), _type);
+            return new LookaheadPattern(Pattern?.Copy(), Type);
         }
 
         private protected override void GroupContents(PatternBuildState state)
@@ -66,7 +70,7 @@ namespace Wilgysef.FluentRegex
             {
                 builder.Append('?');
 
-                switch (_type)
+                switch (Type)
                 {
                     case LookaheadType.PositiveLookahead:
                         builder.Append('=');
@@ -86,14 +90,6 @@ namespace Wilgysef.FluentRegex
 
                 Pattern?.Build(state);
             }
-        }
-
-        private enum LookaheadType
-        {
-            PositiveLookahead,
-            NegativeLookahead,
-            PositiveLookbehind,
-            NegativeLookbehind,
         }
     }
 }

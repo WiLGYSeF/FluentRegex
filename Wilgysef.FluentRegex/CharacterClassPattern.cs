@@ -1,4 +1,5 @@
 ﻿using System;
+using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
@@ -21,17 +22,26 @@ namespace Wilgysef.FluentRegex
 
         internal static new CharacterClassPattern NonCategory(string category) => new CharacterClassPattern(CharacterType.NonCategory, category);
 
-        private readonly string? _category;
+        /// <summary>
+        /// Category name.
+        /// </summary>
+        public string? CategoryName;
 
         private CharacterClassPattern(CharacterType type, string? category = null)
         {
             Type = type;
-            _category = category;
+            CategoryName = category;
         }
 
         public override bool TryGetChar(out char character)
         {
             character = (char)0;
+            return false;
+        }
+
+        public override bool TryGetValue(out int value)
+        {
+            value = 0;
             return false;
         }
 
@@ -51,7 +61,7 @@ namespace Wilgysef.FluentRegex
             {
                 case CharacterType.Category:
                 case CharacterType.NonCategory:
-                    return Type == pattern.Type && _category == pattern._category;
+                    return Type == pattern.Type && CategoryName == pattern.CategoryName;
                 default:
                     return Type == pattern.Type;
             }
@@ -59,7 +69,7 @@ namespace Wilgysef.FluentRegex
 
         public override Pattern Copy()
         {
-            return new CharacterClassPattern(Type, _category);
+            return new CharacterClassPattern(Type, CategoryName);
         }
 
         internal override void Build(PatternBuildState state)
@@ -101,12 +111,12 @@ namespace Wilgysef.FluentRegex
                     break;
                 case CharacterType.Category:
                     builder.Append(@"\p{");
-                    builder.Append(_category!);
+                    builder.Append(CategoryName!);
                     builder.Append('}');
                     break;
                 case CharacterType.NonCategory:
                     builder.Append(@"\P{");
-                    builder.Append(_category!);
+                    builder.Append(CategoryName!);
                     builder.Append('}');
                     break;
                 default:

@@ -1,4 +1,5 @@
 ﻿using System;
+using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
@@ -109,6 +110,12 @@ namespace Wilgysef.FluentRegex
 
             character = (char)0;
             return false;
+        }
+
+        public override bool TryGetValue(out int value)
+        {
+            value = GetValue();
+            return true;
         }
 
         public override bool Equals(object obj)

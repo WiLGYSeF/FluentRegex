@@ -20,7 +20,16 @@ namespace Wilgysef.FluentRegex
         public Pattern? Expression
         {
             get => _expression;
-            set => SetChildPattern(value, ref _expression, ExpressionIndex);
+            set
+            {
+                SetChildPattern(value, ref _expression, ExpressionIndex);
+
+                if (value != null)
+                {
+                    GroupName = null;
+                    GroupNumber = null;
+                }
+            }
         }
 
         /// <summary>
@@ -184,15 +193,7 @@ namespace Wilgysef.FluentRegex
 
                 if (Expression != null)
                 {
-                    if (Lookahead)
-                    {
-                        builder.Append("?=");
-                    }
-                    else
-                    {
-                        builder.Append("?<=");
-                    }
-
+                    builder.Append(Lookahead ? "?=" : "?<=");
                     Expression.Build(state);
                 }
                 else if (GroupName != null)

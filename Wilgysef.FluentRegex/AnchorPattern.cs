@@ -1,4 +1,5 @@
 ﻿using System;
+using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.PatternBuilders;
 
 namespace Wilgysef.FluentRegex
@@ -45,18 +46,21 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public static AnchorPattern NonWordBoundary => new AnchorPattern(AnchorType.NonWordBoundary);
 
-        internal override bool IsSinglePattern => true;
+        /// <summary>
+        /// Anchor type.
+        /// </summary>
+        public AnchorType Type { get; }
 
-        private readonly AnchorType _type;
+        internal override bool IsSinglePattern => true;
 
         private AnchorPattern(AnchorType type)
         {
-            _type = type;
+            Type = type;
         }
 
         public override Pattern Copy()
         {
-            return new AnchorPattern(_type);
+            return new AnchorPattern(Type);
         }
 
         internal override void Build(PatternBuildState state)
@@ -65,7 +69,7 @@ namespace Wilgysef.FluentRegex
 
             void Build(IPatternStringBuilder builder)
             {
-                switch (_type)
+                switch (Type)
                 {
                     case AnchorType.BeginLine:
                         builder.Append(@"^");
@@ -100,18 +104,6 @@ namespace Wilgysef.FluentRegex
         internal override Pattern Unwrap()
         {
             return this;
-        }
-
-        private enum AnchorType
-        {
-            BeginLine,
-            EndLine,
-            Start,
-            End,
-            AbsoluteEnd,
-            StartOfMatch,
-            WordBoundary,
-            NonWordBoundary,
         }
     }
 }
