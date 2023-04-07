@@ -178,35 +178,28 @@ namespace Wilgysef.FluentRegex
             points.Sort((a, b) => a.Value - b.Value);
 
             var rangeEntries = new List<(CharacterRange Range, int Index)>();
-            var indices = new HashSet<int>();
+            var pointPair = 0;
 
             for (var i = 0; i < points.Count; i++)
             {
                 var start = points[i];
-                indices.Add(start.Index);
+                pointPair = 1;
 
                 do
                 {
-                    for (i++; indices.Count > 0; i++)
+                    for (i++; pointPair > 0; i++)
                     {
-                        var cur = points[i];
-                        if (cur.IsStart)
-                        {
-                            indices.Add(cur.Index);
-                        }
-                        else
-                        {
-                            indices.Remove(cur.Index);
-                        }
+                        pointPair += points[i].IsStart ? 1 : -1;
                     }
 
                     if (i < points.Count && points[i].Value - points[i - 1].Value <= 1)
                     {
-                        indices.Add(points[i].Index);
+                        pointPair++;
+                        i++;
                     }
 
                     i--;
-                } while (indices.Count > 0);
+                } while (pointPair > 0);
 
                 rangeEntries.Add((new CharacterRange(start.Pattern, points[i].Pattern), start.Index));
             }
