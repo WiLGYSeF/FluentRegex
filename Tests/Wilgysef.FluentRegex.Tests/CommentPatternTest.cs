@@ -18,8 +18,11 @@ public class CommentPatternTest
         pattern.WithValue("asdf");
         pattern.ToString().ShouldBe("(?#asdf)");
 
-        pattern.WithValue(null);
+        pattern.WithValue((string?)null);
         pattern.ToString().ShouldBe("");
+
+        pattern.WithValue(new LiteralPattern("aaa"));
+        pattern.ToString().ShouldBe("(?#aaa)");
     }
 
     [Fact]
@@ -31,9 +34,17 @@ public class CommentPatternTest
         pattern.WithValue("abc");
         copy.ToString().ShouldBe("(?#test)");
 
-        pattern = new CommentPattern(null);
+        pattern = new CommentPattern((string?)null);
         copy = pattern.Copy();
         pattern.WithValue("abc");
         copy.ToString().ShouldBe("");
+    }
+
+    [Fact]
+    public void Unwrap()
+    {
+        var pattern = new CommentPattern("test");
+
+        pattern.Unwrap().ShouldBe(pattern);
     }
 }

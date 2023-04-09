@@ -124,6 +124,13 @@ namespace Wilgysef.FluentRegex
                 : new GroupPattern(Pattern?.Copy(), Name, Capture);
         }
 
+        public override Pattern Unwrap()
+        {
+            return !IsCapturing && Pattern != null
+                ? Pattern.Unwrap()
+                : this;
+        }
+
         private protected override void GroupContents(PatternBuildState state)
         {
             state.WithPattern(this, Build);

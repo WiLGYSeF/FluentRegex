@@ -307,11 +307,18 @@ public class QuantifierPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(
-            new QuantifierPattern(new LiteralPattern("b"), 1, 2, true),
-            new LiteralPattern("a"));
+        var pattern = new QuantifierPattern(new LiteralPattern("b"), 1, 2, true);
 
-        pattern.ToString().ShouldBe("b{1,2}|a");
+        pattern.Unwrap().ShouldBe(pattern);
+    }
+
+    [Fact]
+    public void Unwrap_ExactlyOne()
+    {
+        var literal = new LiteralPattern("b");
+        var pattern = new QuantifierPattern(literal, 1, 1, true);
+
+        pattern.Unwrap().ShouldBe(literal);
     }
 
     [Fact]

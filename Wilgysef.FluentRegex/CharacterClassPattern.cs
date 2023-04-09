@@ -101,10 +101,5 @@ namespace Wilgysef.FluentRegex
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        internal override Pattern Unwrap()
-        {
-            return this;
-        }
     }
 }

@@ -29,6 +29,14 @@ public class PatternBuilderTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var builder = new PatternBuilder();
+
+        builder.Unwrap().ShouldBe(builder);
+    }
+
+    [Fact]
     public void GetGroups_Simple()
     {
         var builder = new PatternBuilder()

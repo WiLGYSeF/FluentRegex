@@ -44,4 +44,12 @@ public class AtomicGroupPatternTest
 
         copy.ToString().ShouldBe("");
     }
+
+    [Fact]
+    public void Unwrap()
+    {
+        var pattern = new AtomicGroupPattern(new LiteralPattern("a"));
+
+        pattern.Unwrap().ShouldBe(pattern);
+    }
 }

@@ -38,6 +38,11 @@ namespace Wilgysef.FluentRegex
             return new RawPattern(Regex);
         }
 
+        public override Pattern Unwrap()
+        {
+            return this;
+        }
+
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -46,11 +51,6 @@ namespace Wilgysef.FluentRegex
             {
                 builder.Append(Regex);
             }
-        }
-
-        internal override Pattern Unwrap()
-        {
-            return this;
         }
     }
 }

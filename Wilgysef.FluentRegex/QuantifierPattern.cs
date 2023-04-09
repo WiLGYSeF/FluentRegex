@@ -49,6 +49,11 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public bool IsExactlyOne => Min == 1 && Max.HasValue && Max.Value == 1;
 
+        /// <summary>
+        /// Indicates if the quantifier occurrences are exact.
+        /// </summary>
+        public bool IsExact => Max.HasValue && Min == Max.Value;
+
         internal override bool IsSinglePattern => IsExactlyOne && Pattern.IsSinglePattern
             || IsEmpty;
 
@@ -150,6 +155,13 @@ namespace Wilgysef.FluentRegex
             return new QuantifierPattern(Pattern.Copy(), Min, Max, Greedy);
         }
 
+        public override Pattern Unwrap()
+        {
+            return IsExactlyOne
+                ? UnwrapInternal()
+                : this;
+        }
+
         internal override void Build(PatternBuildState state)
         {
             if (IsEmpty)
@@ -220,18 +232,11 @@ namespace Wilgysef.FluentRegex
                     builder.Append('}');
                 }
 
-                if (!Greedy)
+                if (!Greedy && !IsExact)
                 {
                     builder.Append('?');
                 }
             }
-        }
-
-        internal override Pattern Unwrap()
-        {
-            return IsExactlyOne
-                ? UnwrapInternal()
-                : this;
         }
 
         private QuantifierPattern Set(int min, int? max, bool greedy)

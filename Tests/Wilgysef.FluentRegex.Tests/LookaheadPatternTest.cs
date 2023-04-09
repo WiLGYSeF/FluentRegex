@@ -66,4 +66,12 @@ public class LookaheadPatternTest
         pattern.WithPattern(literal);
         copy.ToString().ShouldBe("");
     }
+
+    [Fact]
+    public void Unwrap()
+    {
+        var pattern = LookaheadPattern.PositiveLookahead(new LiteralPattern("a"));
+
+        pattern.Unwrap().ShouldBe(pattern);
+    }
 }

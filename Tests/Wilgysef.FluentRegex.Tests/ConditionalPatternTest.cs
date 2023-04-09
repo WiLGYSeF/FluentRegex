@@ -146,4 +146,12 @@ public class ConditionalPatternTest
             copy.ToString().ShouldBe($"(?({expectedConditional})a{(useNoPattern ? "|b" : "")})");
         }
     }
+
+    [Fact]
+    public void Unwrap()
+    {
+        var pattern = new ConditionalPattern(1, new LiteralPattern("a"), null);
+
+        pattern.Unwrap().ShouldBe(pattern);
+    }
 }

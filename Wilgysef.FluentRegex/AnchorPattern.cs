@@ -65,6 +65,11 @@ namespace Wilgysef.FluentRegex
             return new AnchorPattern(Type);
         }
 
+        public override Pattern Unwrap()
+        {
+            return this;
+        }
+
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -101,11 +106,6 @@ namespace Wilgysef.FluentRegex
                         throw new ArgumentOutOfRangeException();
                 }
             }
-        }
-
-        internal override Pattern Unwrap()
-        {
-            return this;
         }
     }
 }

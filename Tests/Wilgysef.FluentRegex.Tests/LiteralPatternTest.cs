@@ -38,6 +38,14 @@ public class LiteralPatternTest
     }
 
     [Fact]
+    public void Unwrap()
+    {
+        var pattern = new LiteralPattern("a");
+
+        pattern.Unwrap().ShouldBe(pattern);
+    }
+
+    [Fact]
     public void EscapeString()
     {
         LiteralPattern.EscapeString(@"test$()*+.?[\]^{|}")

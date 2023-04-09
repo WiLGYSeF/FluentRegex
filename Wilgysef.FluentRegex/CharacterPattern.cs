@@ -115,5 +115,10 @@ namespace Wilgysef.FluentRegex
         internal abstract void Build(PatternBuildState state, bool fromCharacterSet);
 
         internal abstract void Build(IPatternStringBuilder builder, bool fromCharacterSet);
+
+        public override Pattern Unwrap()
+        {
+            return this;
+        }
     }
 }

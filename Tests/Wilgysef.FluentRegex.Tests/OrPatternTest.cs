@@ -95,13 +95,12 @@ public class OrPatternTest
     }
 
     [Fact]
-    public void Unwrap_Concat()
+    public void Unwrap()
     {
-        var pattern = new OrPattern(
-            new ConcatPattern(new LiteralPattern("abc")),
-            new LiteralPattern("123"));
+        var literal = new LiteralPattern("123");
+        var pattern = new OrPattern(literal);
 
-        pattern.ToString().ShouldBe("abc|123");
+        pattern.Unwrap().ShouldBe(literal);
     }
 
     #region CharacterSetPattern combinations

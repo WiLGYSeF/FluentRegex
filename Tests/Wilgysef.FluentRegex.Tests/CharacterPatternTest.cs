@@ -197,11 +197,9 @@ public class CharacterPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(CharacterPattern.Character('b'), new LiteralPattern("a"));
-        pattern.ToString().ShouldBe("[ba]");
+        var pattern = CharacterPattern.Character('a');
 
-        pattern = new OrPattern(CharacterPattern.Word, new LiteralPattern("a"));
-        pattern.ToString().ShouldBe(@"[\wa]");
+        pattern.Unwrap().ShouldBe(pattern);
     }
 
     [Fact]

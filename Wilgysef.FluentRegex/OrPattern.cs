@@ -51,6 +51,11 @@ namespace Wilgysef.FluentRegex
             return new OrPattern(_children.Select(c => c.Copy()));
         }
 
+        public override Pattern Unwrap()
+        {
+            return UnwrapInternal();
+        }
+
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -116,11 +121,6 @@ namespace Wilgysef.FluentRegex
                     }
                 }
             }
-        }
-
-        internal override Pattern Unwrap()
-        {
-            return UnwrapInternal();
         }
 
         private CategorizedPatterns CategorizePatterns()

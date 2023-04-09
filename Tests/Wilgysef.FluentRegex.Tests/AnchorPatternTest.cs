@@ -77,8 +77,8 @@ public class AnchorPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(AnchorPattern.BeginLine, new LiteralPattern("a"));
+        var pattern = AnchorPattern.BeginLine;
 
-        pattern.ToString().ShouldBe("^|a");
+        pattern.Unwrap().ShouldBe(pattern);
     }
 }

@@ -706,14 +706,14 @@ namespace Wilgysef.FluentRegex
             return new PatternBuilder(_children.Select(c => c.Copy()));
         }
 
+        public override Pattern Unwrap()
+        {
+            return this;
+        }
+
         internal override void Build(PatternBuildState state)
         {
             Build().Build(state);
-        }
-
-        internal override Pattern Unwrap()
-        {
-            return this;
         }
 
         /// <summary>

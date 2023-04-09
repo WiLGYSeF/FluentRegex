@@ -71,11 +71,9 @@ public class ConcatPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new ConcatPattern();
-        pattern.Concat(pattern);
+        var literal = new LiteralPattern("a");
+        var pattern = new ConcatPattern(literal);
 
-        var orPattern = new OrPattern(pattern, new LiteralPattern("a"));
-
-        Should.Throw<PatternRecursionException>(() => orPattern.ToString());
+        pattern.Unwrap().ShouldBe(literal);
     }
 }

@@ -99,9 +99,22 @@ public class GroupPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(new GroupPattern(new LiteralPattern("b")), new LiteralPattern("a"));
+        var literal = new LiteralPattern("b");
+        var pattern = new GroupPattern(literal);
 
-        pattern.ToString().ShouldBe(@"(b)|a");
+        pattern.Unwrap().ShouldBe(pattern);
+
+        pattern = new GroupPattern(literal, capture: false);
+        pattern.Unwrap().ShouldBe(literal);
+    }
+
+    [Fact]
+    public void Unwrap_Noncapturing()
+    {
+        var literal = new LiteralPattern("b");
+        var pattern = new GroupPattern(literal, capture: false);
+
+        pattern.Unwrap().ShouldBe(literal);
     }
 
     [Fact]

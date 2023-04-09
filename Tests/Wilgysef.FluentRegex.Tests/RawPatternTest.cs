@@ -30,9 +30,9 @@ public class RawPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(new RawPattern("be"), new LiteralPattern("a"));
+        var pattern = new RawPattern("be");
 
-        pattern.ToString().ShouldBe("be|a");
+        pattern.Unwrap().ShouldBe(pattern);
     }
 
     [Fact]

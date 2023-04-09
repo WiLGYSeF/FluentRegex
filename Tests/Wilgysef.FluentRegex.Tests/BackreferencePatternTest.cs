@@ -48,9 +48,9 @@ public class BackreferencePatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(new BackreferencePattern(1), new LiteralPattern("a"));
+        var pattern = new BackreferencePattern(1);
 
-        pattern.ToString().ShouldBe(@"\1|a");
+        pattern.Unwrap().ShouldBe(pattern);
     }
 
     [Fact]

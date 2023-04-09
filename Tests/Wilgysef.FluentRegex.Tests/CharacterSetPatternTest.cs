@@ -300,9 +300,40 @@ public class CharacterSetPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(new CharacterSetPattern('b'), new LiteralPattern("a"));
+        var pattern = new CharacterSetPattern("abc");
 
-        pattern.ToString().ShouldBe("[ba]");
+        pattern.Unwrap().ShouldBe(pattern);
+    }
+
+    [Fact]
+    public void Unwrap_Single()
+    {
+        var character = CharacterPattern.Character('a');
+        var pattern = new CharacterSetPattern(character);
+
+        pattern.Unwrap().ShouldBe(character);
+    }
+
+    [Fact]
+    public void Unwrap_Single_Negated()
+    {
+        var pattern = new CharacterSetPattern("a", negated: true);
+
+        pattern.Unwrap().ShouldBe(pattern);
+    }
+
+    [Fact]
+    public void Unwrap_RangeSingle()
+    {
+        var character = CharacterPattern.Character('a');
+        var pattern = new CharacterSetPattern(new CharacterRange(character, character));
+
+        pattern.Unwrap().ShouldBe(character);
+
+        pattern = new CharacterSetPattern(
+            new[] { new CharacterRange(character, character) },
+            new[] { character });
+        pattern.Unwrap().ShouldBe(character);
     }
 
     [Fact]

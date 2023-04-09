@@ -326,6 +326,35 @@ namespace Wilgysef.FluentRegex
                 Negated);
         }
 
+        public override Pattern Unwrap()
+        {
+            if (_subtractedCharacterRanges.Count > 0
+                || _subtractedCharacters.Count > 0
+                || Negated)
+            {
+                return this;
+            }
+
+            var characterRanges = CharacterRange.Overlap(_characterRanges);
+            var characters = new List<CharacterPattern>(_characters);
+
+            SimplifyCharacterRanges(ref characterRanges, characters);
+
+            if (characterRanges.Count == 1
+                && characters.Count == 0
+                && characterRanges[0].Single)
+            {
+                return characterRanges[0].Start.Unwrap();
+            }
+            else if (characterRanges.Count == 0 && characters.Count == 1)
+            {
+                return characters[0].Unwrap();
+            }
+
+            return this;
+
+        }
+
         internal static CharacterSetPattern Combine(IEnumerable<CharacterSetPattern> patterns)
         {
             var negated = patterns.FirstOrDefault()?.Negated ?? false;
@@ -454,114 +483,109 @@ namespace Wilgysef.FluentRegex
                         }
                     }
                 }
-
-                static void SimplifyCharacterRanges(ref List<CharacterRange> ranges, List<CharacterPattern> characters)
-                {
-                    var overlapRanges = false;
-
-                    var characterEntries = new List<(int Value, int Index, CharacterPattern Pattern)>();
-
-                    for (var i = 0; i < characters.Count; i++)
-                    {
-                        if (characters[i] is CharacterLiteralPattern literalPattern)
-                        {
-                            characterEntries.Add((literalPattern.GetValue(), i, literalPattern));
-                        }
-                    }
-
-                    if (characterEntries.Count >= 3)
-                    {
-                        var charsToRemove = new HashSet<int>();
-
-                        characterEntries.Sort((a, b) => a.Value - b.Value);
-
-                        // convert consecutive characters into ranges
-
-                        for (var i = 0; i < characterEntries.Count; i++)
-                        {
-                            var start = characterEntries[i];
-                            var index = i;
-
-                            for (i++; i < characterEntries.Count && characterEntries[i].Value - characterEntries[i - 1].Value <= 1; i++) ;
-                            i--;
-
-                            if (i - index >= 3)
-                            {
-                                ranges.Add(new CharacterRange(start.Pattern, characterEntries[i].Pattern));
-                                overlapRanges = true;
-
-                                for (var j = index; j <= i; j++)
-                                {
-                                    charsToRemove.Add(characterEntries[j].Index);
-                                }
-                            }
-                        }
-
-                        for (var i = characters.Count - 1; i >= 0 && charsToRemove.Count > 0; i--)
-                        {
-                            if (charsToRemove.Contains(i))
-                            {
-                                characters.RemoveAt(i);
-                            }
-                        }
-                    }
-
-                    int originalCharacterCount;
-
-                    // simplify characters into ranges
-
-                    do
-                    {
-                        originalCharacterCount = characters.Count;
-
-                        for (var i = 0; i < characters.Count; i++)
-                        {
-                            for (var rangeIndex = 0; rangeIndex < ranges.Count; rangeIndex++)
-                            {
-                                var range = ranges[rangeIndex];
-                                var removeChar = false;
-
-                                if (range.Contains(characters[i]))
-                                {
-                                    removeChar = true;
-                                }
-                                else if (range.IsAdjacentLeftOfStart(characters[i]))
-                                {
-                                    ranges[rangeIndex] = new CharacterRange(
-                                            CharacterLiteralPattern.FromInt(range.StartValue - 1),
-                                            range.End);
-                                    overlapRanges = true;
-                                    removeChar = true;
-                                }
-                                else if (range.IsAdjacentRightOfEnd(characters[i]))
-                                {
-                                    ranges[rangeIndex] = new CharacterRange(
-                                            range.Start,
-                                            CharacterLiteralPattern.FromInt(range.EndValue + 1));
-                                    overlapRanges = true;
-                                    removeChar = true;
-                                }
-
-                                if (removeChar)
-                                {
-                                    characters.RemoveAt(i--);
-                                    break;
-                                }
-                            }
-                        }
-                    } while (characters.Count != originalCharacterCount);
-
-                    if (overlapRanges)
-                    {
-                        ranges = CharacterRange.Overlap(ranges);
-                    }
-                }
             }
         }
 
-        internal override Pattern Unwrap()
+        private static void SimplifyCharacterRanges(ref List<CharacterRange> ranges, List<CharacterPattern> characters)
         {
-            return this;
+            var overlapRanges = false;
+
+            var characterEntries = new List<(int Value, int Index, CharacterPattern Pattern)>();
+
+            for (var i = 0; i < characters.Count; i++)
+            {
+                if (characters[i] is CharacterLiteralPattern literalPattern)
+                {
+                    characterEntries.Add((literalPattern.GetValue(), i, literalPattern));
+                }
+            }
+
+            if (characterEntries.Count >= 3)
+            {
+                var charsToRemove = new HashSet<int>();
+
+                characterEntries.Sort((a, b) => a.Value - b.Value);
+
+                // convert consecutive characters into ranges
+
+                for (var i = 0; i < characterEntries.Count; i++)
+                {
+                    var start = characterEntries[i];
+                    var index = i;
+
+                    for (i++; i < characterEntries.Count && characterEntries[i].Value - characterEntries[i - 1].Value <= 1; i++) ;
+                    i--;
+
+                    if (i - index >= 3)
+                    {
+                        ranges.Add(new CharacterRange(start.Pattern, characterEntries[i].Pattern));
+                        overlapRanges = true;
+
+                        for (var j = index; j <= i; j++)
+                        {
+                            charsToRemove.Add(characterEntries[j].Index);
+                        }
+                    }
+                }
+
+                for (var i = characters.Count - 1; i >= 0 && charsToRemove.Count > 0; i--)
+                {
+                    if (charsToRemove.Contains(i))
+                    {
+                        characters.RemoveAt(i);
+                    }
+                }
+            }
+
+            int originalCharacterCount;
+
+            // simplify characters into ranges
+
+            do
+            {
+                originalCharacterCount = characters.Count;
+
+                for (var i = 0; i < characters.Count; i++)
+                {
+                    for (var rangeIndex = 0; rangeIndex < ranges.Count; rangeIndex++)
+                    {
+                        var range = ranges[rangeIndex];
+                        var removeChar = false;
+
+                        if (range.Contains(characters[i]))
+                        {
+                            removeChar = true;
+                        }
+                        else if (range.IsAdjacentLeftOfStart(characters[i]))
+                        {
+                            ranges[rangeIndex] = new CharacterRange(
+                                    CharacterLiteralPattern.FromInt(range.StartValue - 1),
+                                    range.End);
+                            overlapRanges = true;
+                            removeChar = true;
+                        }
+                        else if (range.IsAdjacentRightOfEnd(characters[i]))
+                        {
+                            ranges[rangeIndex] = new CharacterRange(
+                                    range.Start,
+                                    CharacterLiteralPattern.FromInt(range.EndValue + 1));
+                            overlapRanges = true;
+                            removeChar = true;
+                        }
+
+                        if (removeChar)
+                        {
+                            characters.RemoveAt(i--);
+                            break;
+                        }
+                    }
+                }
+            } while (characters.Count != originalCharacterCount);
+
+            if (overlapRanges)
+            {
+                ranges = CharacterRange.Overlap(ranges);
+            }
         }
     }
 }

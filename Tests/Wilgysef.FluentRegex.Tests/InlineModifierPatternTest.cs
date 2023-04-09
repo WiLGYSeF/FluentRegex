@@ -101,6 +101,24 @@ public class InlineModifierPatternTest
         copy.ToString().ShouldBe("(?i)");
     }
 
+    [Fact]
+    public void Unwrap()
+    {
+        var literal = new LiteralPattern("a");
+        var pattern = new InlineModifierPattern(literal, InlineModifier.IgnoreCase);
+
+        pattern.Unwrap().ShouldBe(pattern);
+    }
+
+    [Fact]
+    public void Unwrap_None()
+    {
+        var literal = new LiteralPattern("a");
+        var pattern = new InlineModifierPattern(literal, InlineModifier.None);
+
+        pattern.Unwrap().ShouldBe(literal);
+    }
+
     private static void ShouldHaveModifier(InlineModifier modifiers, InlineModifier flag)
     {
         (modifiers & flag).ShouldBe(flag);

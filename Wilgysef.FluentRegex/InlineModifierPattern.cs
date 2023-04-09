@@ -134,6 +134,15 @@ namespace Wilgysef.FluentRegex
             return new InlineModifierPattern(Pattern?.Copy(), Modifiers, DisabledModifiers);
         }
 
+        public override Pattern Unwrap()
+        {
+            return Modifiers == InlineModifier.None
+                && DisabledModifiers == InlineModifier.None
+                && Pattern != null
+                    ? Pattern.Unwrap()
+                    : this;
+        }
+
         private protected override void GroupContents(PatternBuildState state)
         {
             state.WithPattern(this, Build);

@@ -11,7 +11,13 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         /// <param name="value">Comment value.</param>
         public CommentPattern(string? value)
-            : base(value != null ? new LiteralPattern(value) : null) { }
+            : this(value != null ? new LiteralPattern(value) : null) { }
+
+        /// <summary>
+        /// Creates a comment.
+        /// </summary>
+        /// <param name="literal">Comment literal value.</param>
+        public CommentPattern(LiteralPattern? literal) : base(literal) { }
 
         /// <summary>
         /// Sets the comment value.
@@ -26,9 +32,25 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
+        /// <summary>
+        /// Sets the comment value.
+        /// </summary>
+        /// <param name="literal">Comment literal value.</param>
+        /// <returns>Current comment pattern.</returns>
+        public CommentPattern WithValue(LiteralPattern literal)
+        {
+            Pattern = literal;
+            return this;
+        }
+
         public override Pattern Copy()
         {
             return new CommentPattern((Pattern as LiteralPattern)?.Value);
+        }
+
+        public override Pattern Unwrap()
+        {
+            return this;
         }
 
         private protected override void GroupContents(PatternBuildState state)

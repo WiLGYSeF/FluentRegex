@@ -59,10 +59,5 @@ namespace Wilgysef.FluentRegex
                 builder.Append(')');
             }
         }
-
-        internal override Pattern Unwrap()
-        {
-            return this;
-        }
     }
 }

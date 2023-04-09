@@ -21,9 +21,9 @@ public class SingleCharacterPatternTest
     [Fact]
     public void Unwrap()
     {
-        var pattern = new OrPattern(new SingleCharacterPattern(), new LiteralPattern("a"));
+        var pattern = new SingleCharacterPattern();
 
-        pattern.ToString().ShouldBe(".|a");
+        pattern.Unwrap().ShouldBe(pattern);
     }
 
     [Fact]

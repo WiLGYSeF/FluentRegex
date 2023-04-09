@@ -28,6 +28,11 @@ namespace Wilgysef.FluentRegex
             return new AtomicGroupPattern(Pattern?.Copy());
         }
 
+        public override Pattern Unwrap()
+        {
+            return this;
+        }
+
         private protected override void GroupContents(PatternBuildState state)
         {
             state.WithPattern(this, Build);

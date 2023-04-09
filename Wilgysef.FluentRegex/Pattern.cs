@@ -27,16 +27,17 @@ namespace Wilgysef.FluentRegex
         public abstract Pattern Copy();
 
         /// <summary>
+        /// Unwraps the pattern, if possible.
+        /// Gets the inner pattern if the parent pattern is transparent.
+        /// </summary>
+        /// <returns>Pattern.</returns>
+        public abstract Pattern Unwrap();
+
+        /// <summary>
         /// Build pattern.
         /// </summary>
         /// <param name="state">Pattern build state.</param>
         internal abstract void Build(PatternBuildState state);
-
-        /// <summary>
-        /// Unwraps the pattern, if possible.
-        /// </summary>
-        /// <returns>Pattern.</returns>
-        internal abstract Pattern Unwrap();
 
         /// <summary>
         /// Compiles the pattern into a regular expression.

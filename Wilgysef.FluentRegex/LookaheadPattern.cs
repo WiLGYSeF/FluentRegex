@@ -62,6 +62,11 @@ namespace Wilgysef.FluentRegex
             return new LookaheadPattern(Pattern?.Copy(), Type);
         }
 
+        public override Pattern Unwrap()
+        {
+            return this;
+        }
+
         private protected override void GroupContents(PatternBuildState state)
         {
             state.WithPattern(this, Build);
