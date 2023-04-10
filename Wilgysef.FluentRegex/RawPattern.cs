@@ -10,8 +10,6 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public string Regex { get; set; }
 
-        internal override bool IsSinglePattern => true;
-
         /// <summary>
         /// Creates a raw regex pattern.
         /// </summary>
@@ -55,6 +53,11 @@ namespace Wilgysef.FluentRegex
         internal override bool IsEmpty(PatternBuildState state)
         {
             return string.IsNullOrEmpty(Regex);
+        }
+
+        internal override bool IsSinglePattern(PatternBuildState state)
+        {
+            return true;
         }
     }
 }

@@ -52,8 +52,6 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public AnchorType Type { get; }
 
-        internal override bool IsSinglePattern => true;
-
         private AnchorPattern(AnchorType type)
         {
             Type = type;
@@ -110,6 +108,11 @@ namespace Wilgysef.FluentRegex
         internal override bool IsEmpty(PatternBuildState state)
         {
             return false;
+        }
+
+        internal override bool IsSinglePattern(PatternBuildState state)
+        {
+            return true;
         }
     }
 }

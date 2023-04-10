@@ -9,8 +9,6 @@ namespace Wilgysef.FluentRegex
 {
     public class PatternBuilder : ContainerPattern
     {
-        internal override bool IsSinglePattern => IsSinglePatternInternal(true);
-
         /// <summary>
         /// Creates a new pattern builder.
         /// </summary>
@@ -717,6 +715,11 @@ namespace Wilgysef.FluentRegex
         internal override bool IsEmpty(PatternBuildState state)
         {
             return AreAllChildrenEmpty(state);
+        }
+
+        internal override bool IsSinglePattern(PatternBuildState state)
+        {
+            return IsSinglePatternInternal(state, true);
         }
 
         /// <summary>

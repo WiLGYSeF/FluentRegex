@@ -11,6 +11,7 @@ namespace Wilgysef.FluentRegex.PatternStates
         private readonly PatternTraverseState<string> _stringResult;
         private readonly PatternTraverseState<Pattern> _unwrapState;
         private readonly PatternTraverseState<bool> _emptyState;
+        private readonly PatternTraverseState<bool> _singlePatternState;
 
         public PatternBuildState()
         {
@@ -18,6 +19,7 @@ namespace Wilgysef.FluentRegex.PatternStates
             _stringResult = new PatternTraverseState<string>(this);
             _unwrapState = new PatternTraverseState<Pattern>(this);
             _emptyState = new PatternTraverseState<bool>(this);
+            _singlePatternState = new PatternTraverseState<bool>(this);
         }
 
         public void WithPattern(Pattern pattern, Action<IPatternStringBuilder> action)
@@ -54,6 +56,11 @@ namespace Wilgysef.FluentRegex.PatternStates
         public bool IsEmpty(Pattern pattern)
         {
             return _emptyState.Compute(pattern, pattern.IsEmpty, null);
+        }
+
+        public bool IsSinglePattern(Pattern pattern)
+        {
+            return _singlePatternState.Compute(pattern, pattern.IsSinglePattern, null);
         }
 
         public override string ToString()

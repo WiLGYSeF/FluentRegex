@@ -7,20 +7,6 @@ namespace Wilgysef.FluentRegex
 {
     public class OrPattern : ContainerPattern
     {
-        internal override bool IsSinglePattern
-        {
-            get
-            {
-                if (IsSinglePatternInternal(false))
-                {
-                    return true;
-                }
-
-                var categories = CategorizePatterns();
-                return categories.IsSingle;
-            }
-        }
-
         /// <summary>
         /// Creates an or pattern.
         /// </summary>
@@ -128,6 +114,17 @@ namespace Wilgysef.FluentRegex
         internal override bool IsEmpty(PatternBuildState state)
         {
             return AreAllChildrenEmpty(state);
+        }
+
+        internal override bool IsSinglePattern(PatternBuildState state)
+        {
+            if (IsSinglePatternInternal(state, false))
+            {
+                return true;
+            }
+
+            var categories = CategorizePatterns();
+            return categories.IsSingle;
         }
 
         private CategorizedPatterns CategorizePatterns()

@@ -11,11 +11,6 @@ namespace Wilgysef.FluentRegex
     public abstract class Pattern
     {
         /// <summary>
-        /// Indicates if the pattern can be treated as a single unit.
-        /// </summary>
-        internal abstract bool IsSinglePattern { get; }
-
-        /// <summary>
         /// Creates a copy of the pattern object.
         /// </summary>
         /// <returns>Copied pattern.</returns>
@@ -38,7 +33,16 @@ namespace Wilgysef.FluentRegex
         /// <summary>
         /// Indicates if the pattern does not have any contents.
         /// </summary>
+        /// <param name="state">Pattern build state.</param>
+        /// <returns><see langword="true"/> if the pattern is empty, otherwise <see langword="false"/>.</returns>
         internal abstract bool IsEmpty(PatternBuildState state);
+
+        /// <summary>
+        /// Indicates if the pattern can be treated as a single unit.
+        /// </summary>
+        /// <param name="state">Pattern build state.</param>
+        /// <returns><see langword="true"/> if the pattern is single, otherwise <see langword="false"/>.</returns>
+        internal abstract bool IsSinglePattern(PatternBuildState state);
 
         /// <summary>
         /// Compiles the pattern into a regular expression.
@@ -105,7 +109,7 @@ namespace Wilgysef.FluentRegex
         /// <param name="always">Indicates if wrapping should always be done.</param>
         internal void Wrap(PatternBuildState state, bool always = false)
         {
-            if (always || !IsSinglePattern)
+            if (always || !state.IsSinglePattern(this))
             {
                 GroupPattern.NonCapturingGroup(state, this);
             }
@@ -115,7 +119,7 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        internal static bool ContainsUnwrappedOrPattern(Pattern pattern)
+        internal static bool ContainsUnwrappedOrPattern(PatternBuildState state, Pattern pattern)
         {
             foreach (var current in Traverse(new[] { pattern }))
             {
@@ -127,7 +131,7 @@ namespace Wilgysef.FluentRegex
                 }
                 else if (current is OrPattern orPattern)
                 {
-                    return !orPattern.IsSinglePattern;
+                    return !state.IsSinglePattern(orPattern);
                 }
             }
 

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Wilgysef.FluentRegex.Exceptions;
 using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
@@ -21,59 +19,32 @@ namespace Wilgysef.FluentRegex
             _children.AddRange(patterns);
         }
 
-        protected bool IsSinglePatternInternal(bool ignoreEmptyChildren)
+        private protected bool IsSinglePatternInternal(PatternBuildState state, bool ignoreEmptyChildren)
         {
-            var path = new List<Pattern>();
-            var traversed = new HashSet<Pattern>();
-            Pattern current = this;
+            var childrenCount = _children.Count;
 
-            while (true)
+            if (ignoreEmptyChildren)
             {
-                path.Add(current);
-                if (!traversed.Add(current))
+                foreach (var child in _children)
                 {
-                    throw new PatternRecursionException(path, current);
-                }
-
-                if (IsContainerPattern(current, out var container))
-                {
-                    var childrenCount = container._children.Count;
-
-                    if (ignoreEmptyChildren)
+                    if (state.IsEmpty(child))
                     {
-                        foreach (var child in container._children)
-                        {
-                            if (traversed.Contains(child))
-                            {
-                                path.Add(child);
-                                throw new PatternRecursionException(path, child);
-                            }
-
-                            // TODO: fix
-                            if (child.IsEmpty(new PatternBuildState()))
-                            {
-                                childrenCount--;
-                            }
-                        }
+                        childrenCount--;
                     }
-
-                    if (childrenCount == 0)
-                    {
-                        return true;
-                    }
-
-                    if (childrenCount > 1)
-                    {
-                        return false;
-                    }
-
-                    current = container._children[0];
-                }
-                else
-                {
-                    return current.IsSinglePattern;
                 }
             }
+
+            if (childrenCount == 0)
+            {
+                return true;
+            }
+
+            if (childrenCount > 1)
+            {
+                return false;
+            }
+
+            return state.IsSinglePattern(_children[0]);
         }
 
         /// <summary>
@@ -111,20 +82,6 @@ namespace Wilgysef.FluentRegex
             }
 
             return true;
-        }
-
-        private bool IsContainerPattern(
-            Pattern pattern,
-            [MaybeNullWhen(false)] out ContainerPattern container)
-        {
-            if (pattern is ContainerPattern c)
-            {
-                container = c;
-                return true;
-            }
-
-            container = null;
-            return false;
         }
     }
 }

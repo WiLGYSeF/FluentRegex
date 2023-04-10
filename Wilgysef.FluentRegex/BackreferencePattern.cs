@@ -35,8 +35,6 @@ namespace Wilgysef.FluentRegex
             _ => throw new ArgumentOutOfRangeException(),
         };
 
-        internal override bool IsSinglePattern => true;
-
         /// <summary>
         /// Creates a backreference with group number.
         /// </summary>
@@ -124,6 +122,11 @@ namespace Wilgysef.FluentRegex
         internal override bool IsEmpty(PatternBuildState state)
         {
             return false;
+        }
+
+        internal override bool IsSinglePattern(PatternBuildState state)
+        {
+            return true;
         }
     }
 }

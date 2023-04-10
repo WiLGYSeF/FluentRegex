@@ -51,11 +51,14 @@ namespace Wilgysef.FluentRegex
         public bool IsExactlyOne => Min == 1 && Max.HasValue && Max.Value == 1;
 
         /// <summary>
+        /// Indicates if the quantifier occurrences is exactly 0.
+        /// </summary>
+        public bool IsExactlyZero => Min == 0 && Max.HasValue && Max.Value == 0;
+
+        /// <summary>
         /// Indicates if the quantifier occurrences are exact.
         /// </summary>
         public bool IsExact => Max.HasValue && Min == Max.Value;
-
-        internal override bool IsSinglePattern => IsExactlyOne && Pattern.IsSinglePattern;
 
         /// <summary>
         /// Creates a quantifier pattern.
@@ -152,19 +155,6 @@ namespace Wilgysef.FluentRegex
             return new QuantifierPattern(Pattern.Copy(), Min, Max, Greedy);
         }
 
-        internal override Pattern UnwrapInternal(PatternBuildState state)
-        {
-            return IsExactlyOne
-                ? state.Unwrap(Pattern)
-                : this;
-        }
-
-        internal override bool IsEmpty(PatternBuildState state)
-        {
-            return Min == 0 && Max.HasValue && Max.Value == 0
-                || state.IsEmpty(Pattern);
-        }
-
         internal override void Build(PatternBuildState state)
         {
             if (state.IsEmpty(this))
@@ -240,6 +230,24 @@ namespace Wilgysef.FluentRegex
                     builder.Append('?');
                 }
             }
+        }
+
+        internal override Pattern UnwrapInternal(PatternBuildState state)
+        {
+            return IsExactlyOne
+                ? state.Unwrap(Pattern)
+                : this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return IsExactlyZero || state.IsEmpty(Pattern);
+        }
+
+        internal override bool IsSinglePattern(PatternBuildState state)
+        {
+            return IsExactlyZero
+                || (IsExactlyOne && state.IsSinglePattern(Pattern));
         }
 
         private QuantifierPattern Set(int min, int? max, bool greedy)

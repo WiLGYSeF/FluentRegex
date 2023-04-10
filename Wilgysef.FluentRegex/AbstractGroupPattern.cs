@@ -5,8 +5,6 @@ namespace Wilgysef.FluentRegex
 {
     public abstract class AbstractGroupPattern : ContainerPattern
     {
-        internal sealed override bool IsSinglePattern => true;
-
         /// <summary>
         /// Group pattern.
         /// </summary>
@@ -59,6 +57,11 @@ namespace Wilgysef.FluentRegex
                 GroupContents(state);
                 builder.Append(')');
             }
+        }
+
+        internal sealed override bool IsSinglePattern(PatternBuildState state)
+        {
+            return true;
         }
     }
 }

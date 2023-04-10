@@ -7,8 +7,6 @@ namespace Wilgysef.FluentRegex
 {
     public class ConcatPattern : ContainerPattern
     {
-        internal override bool IsSinglePattern => IsSinglePatternInternal(true);
-
         /// <summary>
         /// Concatenates patterns.
         /// </summary>
@@ -55,7 +53,7 @@ namespace Wilgysef.FluentRegex
 
                 foreach (var child in _children)
                 {
-                    if (childrenCount > 1 && ContainsUnwrappedOrPattern(child))
+                    if (childrenCount > 1 && ContainsUnwrappedOrPattern(state, child))
                     {
                         child.Wrap(state, always: true);
                     }
@@ -78,6 +76,11 @@ namespace Wilgysef.FluentRegex
         internal override bool IsEmpty(PatternBuildState state)
         {
             return AreAllChildrenEmpty(state);
+        }
+
+        internal override bool IsSinglePattern(PatternBuildState state)
+        {
+            return IsSinglePatternInternal(state, true);
         }
     }
 }

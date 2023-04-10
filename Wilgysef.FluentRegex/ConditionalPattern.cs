@@ -226,7 +226,7 @@ namespace Wilgysef.FluentRegex
 
                 void Wrap(Pattern pattern)
                 {
-                    if (ContainsUnwrappedOrPattern(pattern))
+                    if (ContainsUnwrappedOrPattern(state, pattern))
                     {
                         pattern.Wrap(state);
                     }
