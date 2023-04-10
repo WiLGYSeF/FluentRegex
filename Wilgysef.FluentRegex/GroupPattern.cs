@@ -126,7 +126,7 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return !IsCapturing && Pattern != null
-                ? state.UnwrapState.Unwrap(Pattern)
+                ? state.Unwrap(Pattern)
                 : this;
         }
 

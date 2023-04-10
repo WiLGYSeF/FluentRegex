@@ -71,7 +71,7 @@ namespace Wilgysef.FluentRegex
         {
             var nonEmptyIndex = GetSingleNonEmptyChildIndex(state);
             return nonEmptyIndex != -1
-                ? state.UnwrapState.Unwrap(_children[nonEmptyIndex])
+                ? state.Unwrap(_children[nonEmptyIndex])
                 : this;
         }
 

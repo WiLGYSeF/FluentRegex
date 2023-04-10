@@ -136,7 +136,7 @@ namespace Wilgysef.FluentRegex
             return Modifiers == InlineModifier.None
                 && DisabledModifiers == InlineModifier.None
                 && Pattern != null
-                    ? state.UnwrapState.Unwrap(Pattern)
+                    ? state.Unwrap(Pattern)
                     : this;
         }
 

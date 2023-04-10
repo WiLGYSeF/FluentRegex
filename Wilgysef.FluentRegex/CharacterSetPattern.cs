@@ -474,11 +474,11 @@ namespace Wilgysef.FluentRegex
                 && characters.Count == 0
                 && characterRanges[0].Single)
             {
-                return state.UnwrapState.Unwrap(characterRanges[0].Start);
+                return state.Unwrap(characterRanges[0].Start);
             }
             else if (characterRanges.Count == 0 && characters.Count == 1)
             {
-                return state.UnwrapState.Unwrap(characters[0]);
+                return state.Unwrap(characters[0]);
             }
 
             return this;

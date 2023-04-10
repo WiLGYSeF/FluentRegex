@@ -155,7 +155,7 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return IsExactlyOne
-                ? state.UnwrapState.Unwrap(Pattern)
+                ? state.Unwrap(Pattern)
                 : this;
         }
 

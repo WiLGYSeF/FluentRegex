@@ -5,20 +5,18 @@ namespace Wilgysef.FluentRegex.PatternStates
 {
     internal class PatternBuildState
     {
-        public PatternUnwrapState UnwrapState { get; }
-
         private readonly PatternStringBuilder _stringBuilder = new PatternStringBuilder();
         private readonly PatternStringBuilderReplicator _replicator;
 
         private readonly PatternTraverseState<string> _stringResult;
+        private readonly PatternTraverseState<Pattern> _unwrapState;
         private readonly PatternTraverseState<bool> _emptyState;
 
         public PatternBuildState()
         {
-            UnwrapState = new PatternUnwrapState(this);
-
             _replicator = new PatternStringBuilderReplicator(_stringBuilder);
             _stringResult = new PatternTraverseState<string>(this);
+            _unwrapState = new PatternTraverseState<Pattern>(this);
             _emptyState = new PatternTraverseState<bool>(this);
         }
 
@@ -46,6 +44,11 @@ namespace Wilgysef.FluentRegex.PatternStates
         public void WithBuilder(Action<IPatternStringBuilder> action)
         {
             action(_replicator);
+        }
+
+        public Pattern Unwrap(Pattern pattern)
+        {
+            return _unwrapState.Compute(pattern, pattern.UnwrapInternal, null);
         }
 
         public bool IsEmpty(Pattern pattern)
