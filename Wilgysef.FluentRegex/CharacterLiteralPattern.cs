@@ -119,20 +119,6 @@ namespace Wilgysef.FluentRegex
             return true;
         }
 
-        public override Pattern Copy()
-        {
-            return Type switch
-            {
-                CharacterType.Character => Character(_character),
-                CharacterType.Control => Control(_character),
-                CharacterType.Escape => Escape,
-                CharacterType.Hexadecimal => Hexadecimal(_string!),
-                CharacterType.Octal => Octal(_string!),
-                CharacterType.Unicode => Unicode(_string!),
-                _ => throw new ArgumentOutOfRangeException(),
-            };
-        }
-
         internal int GetValue()
         {
             return Type switch
@@ -232,6 +218,20 @@ namespace Wilgysef.FluentRegex
                     builder.Append(_string!);
                     break;
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return Type switch
+            {
+                CharacterType.Character => Character(_character),
+                CharacterType.Control => Control(_character),
+                CharacterType.Escape => Escape,
+                CharacterType.Hexadecimal => Hexadecimal(_string!),
+                CharacterType.Octal => Octal(_string!),
+                CharacterType.Unicode => Unicode(_string!),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
         }
 
         private static bool IsControl(char c)

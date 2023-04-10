@@ -35,6 +35,15 @@ public class ConcatPatternTest
     }
 
     [Fact]
+    public void Copy_Recursive()
+    {
+        var pattern = new ConcatPattern();
+        pattern.Concat(pattern);
+
+        Should.Throw<PatternRecursionException>(() => pattern.Copy());
+    }
+
+    [Fact]
     public void Wrap()
     {
         var pattern = new ConcatPattern();

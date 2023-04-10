@@ -697,14 +697,14 @@ namespace Wilgysef.FluentRegex
             return Traverse(_children);
         }
 
-        public override Pattern Copy()
-        {
-            return new PatternBuilder(_children.Select(c => c.Copy()));
-        }
-
         internal override void Build(PatternBuildState state)
         {
             Build().Build(state);
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new PatternBuilder(_children.Select(c => state.Copy(c)));
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

@@ -167,19 +167,19 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
+        internal override Pattern CopyInternal(PatternBuildState state)
         {
             if (Expression != null)
             {
-                return new ConditionalPattern(Expression.Copy(), YesPattern.Copy(), NoPattern?.Copy(), Lookahead);
+                return new ConditionalPattern(state.Copy(Expression), state.Copy(YesPattern), state.Copy(NoPattern), Lookahead);
             }
 
             if (GroupNumber.HasValue)
             {
-                return new ConditionalPattern(GroupNumber.Value, YesPattern.Copy(), NoPattern?.Copy());
+                return new ConditionalPattern(GroupNumber.Value, state.Copy(YesPattern), state.Copy(NoPattern));
             }
 
-            return new ConditionalPattern(GroupName!, YesPattern.Copy(), NoPattern?.Copy());
+            return new ConditionalPattern(GroupName!, state.Copy(YesPattern), state.Copy(NoPattern));
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

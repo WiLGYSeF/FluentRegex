@@ -116,11 +116,11 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
+        internal override Pattern CopyInternal(PatternBuildState state)
         {
             return IsBalancing
-                ? new GroupPattern(Pattern?.Copy(), Name, SecondName!)
-                : new GroupPattern(Pattern?.Copy(), Name, Capture);
+                ? new GroupPattern(state.Copy(Pattern), Name, SecondName!)
+                : new GroupPattern(state.Copy(Pattern), Name, Capture);
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

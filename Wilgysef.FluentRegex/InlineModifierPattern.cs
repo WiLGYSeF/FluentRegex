@@ -126,9 +126,9 @@ namespace Wilgysef.FluentRegex
 
         #endregion
 
-        public override Pattern Copy()
+        internal override Pattern CopyInternal(PatternBuildState state)
         {
-            return new InlineModifierPattern(Pattern?.Copy(), Modifiers, DisabledModifiers);
+            return new InlineModifierPattern(state.Copy(Pattern), Modifiers, DisabledModifiers);
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

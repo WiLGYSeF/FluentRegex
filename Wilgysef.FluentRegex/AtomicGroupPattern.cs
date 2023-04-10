@@ -22,11 +22,6 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
-        {
-            return new AtomicGroupPattern(Pattern?.Copy());
-        }
-
         private protected override void GroupContents(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -36,6 +31,11 @@ namespace Wilgysef.FluentRegex
                 builder.Append("?>");
                 Pattern?.Build(state);
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new AtomicGroupPattern(state.Copy(Pattern));
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

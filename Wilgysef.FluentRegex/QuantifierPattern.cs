@@ -150,11 +150,6 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
-        {
-            return new QuantifierPattern(Pattern.Copy(), Min, Max, Greedy);
-        }
-
         internal override void Build(PatternBuildState state)
         {
             if (state.IsEmpty(this))
@@ -230,6 +225,11 @@ namespace Wilgysef.FluentRegex
                     builder.Append('?');
                 }
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new QuantifierPattern(state.Copy(Pattern), Min, Max, Greedy);
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

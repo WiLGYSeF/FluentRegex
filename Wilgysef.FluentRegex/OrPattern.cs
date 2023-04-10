@@ -30,12 +30,6 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
-        {
-            // TODO: recursion check?
-            return new OrPattern(_children.Select(c => c.Copy()));
-        }
-
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -101,6 +95,11 @@ namespace Wilgysef.FluentRegex
                     }
                 }
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new OrPattern(_children.Select(c => state.Copy(c)));
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

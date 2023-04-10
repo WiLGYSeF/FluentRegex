@@ -19,20 +19,24 @@ namespace Wilgysef.FluentRegex.PatternStates
         public TResult Compute(
             Pattern pattern,
             Func<PatternBuildState, TResult> action,
-            Action<TResult>? actionCached)
+            Action<TResult>? actionCached,
+            bool noCache = false)
         {
             if (_stack.Contains(pattern))
             {
                 throw new PatternRecursionException(_stack, pattern);
             }
 
-            if (!_results.TryGetValue(pattern, out var result))
+            if (noCache || !_results.TryGetValue(pattern, out var result))
             {
                 _stack.Push(pattern);
                 result = action(_buildState);
                 _stack.Pop();
 
-                _results[pattern] = result;
+                if (!noCache)
+                {
+                    _results[pattern] = result;
+                }
             }
             else
             {

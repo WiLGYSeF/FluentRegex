@@ -79,16 +79,6 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
-        {
-            return Type switch
-            {
-                BackreferenceType.Number => new BackreferencePattern(GroupNumber!.Value),
-                BackreferenceType.Name => new BackreferencePattern(GroupName!),
-                _ => throw new ArgumentOutOfRangeException(),
-            };
-        }
-
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -112,6 +102,16 @@ namespace Wilgysef.FluentRegex
                     builder.Append('>');
                 }
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return Type switch
+            {
+                BackreferenceType.Number => new BackreferencePattern(GroupNumber!.Value),
+                BackreferenceType.Name => new BackreferencePattern(GroupName!),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

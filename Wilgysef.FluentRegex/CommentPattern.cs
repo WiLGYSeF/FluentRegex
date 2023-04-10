@@ -42,7 +42,7 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
+        internal override Pattern CopyInternal(PatternBuildState state)
         {
             return new CommentPattern((Pattern as LiteralPattern)?.Value);
         }

@@ -56,9 +56,9 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
+        internal override Pattern CopyInternal(PatternBuildState state)
         {
-            return new LookaheadPattern(Pattern?.Copy(), Type);
+            return new LookaheadPattern(state.Copy(Pattern), Type);
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

@@ -46,11 +46,6 @@ namespace Wilgysef.FluentRegex
             return false;
         }
 
-        public override Pattern Copy()
-        {
-            return new CharacterClassPattern(Type, CategoryName);
-        }
-
         internal override void Build(PatternBuildState state)
         {
             Build(state, false);
@@ -101,6 +96,11 @@ namespace Wilgysef.FluentRegex
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new CharacterClassPattern(Type, CategoryName);
         }
     }
 }

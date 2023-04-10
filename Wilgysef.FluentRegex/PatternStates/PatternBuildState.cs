@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Wilgysef.FluentRegex.PatternStringBuilders;
 
 namespace Wilgysef.FluentRegex.PatternStates
@@ -12,14 +13,17 @@ namespace Wilgysef.FluentRegex.PatternStates
         private readonly PatternTraverseState<Pattern> _unwrapState;
         private readonly PatternTraverseState<bool> _emptyState;
         private readonly PatternTraverseState<bool> _singlePatternState;
+        private readonly PatternTraverseState<Pattern> _copyState;
 
         public PatternBuildState()
         {
             _replicator = new PatternStringBuilderReplicator(_stringBuilder);
+
             _stringResult = new PatternTraverseState<string>(this);
             _unwrapState = new PatternTraverseState<Pattern>(this);
             _emptyState = new PatternTraverseState<bool>(this);
             _singlePatternState = new PatternTraverseState<bool>(this);
+            _copyState = new PatternTraverseState<Pattern>(this);
         }
 
         public void WithPattern(Pattern pattern, Action<IPatternStringBuilder> action)
@@ -61,6 +65,14 @@ namespace Wilgysef.FluentRegex.PatternStates
         public bool IsSinglePattern(Pattern pattern)
         {
             return _singlePatternState.Compute(pattern, pattern.IsSinglePattern, null);
+        }
+
+        [return: NotNullIfNotNull("pattern")]
+        public Pattern? Copy(Pattern? pattern)
+        {
+            return pattern != null
+                ? _copyState.Compute(pattern, pattern.CopyInternal, null, noCache: true)
+                : null;
         }
 
         public override string ToString()

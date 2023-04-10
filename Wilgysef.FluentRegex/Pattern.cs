@@ -11,16 +11,17 @@ namespace Wilgysef.FluentRegex
     public abstract class Pattern
     {
         /// <summary>
-        /// Creates a copy of the pattern object.
-        /// </summary>
-        /// <returns>Copied pattern.</returns>
-        public abstract Pattern Copy();
-
-        /// <summary>
         /// Build pattern.
         /// </summary>
         /// <param name="state">Pattern build state.</param>
         internal abstract void Build(PatternBuildState state);
+
+        /// <summary>
+        /// Creates a copy of the pattern object.
+        /// </summary>
+        /// <param name="state">Pattern build state.</param>
+        /// <returns>Copied pattern.</returns>
+        internal abstract Pattern CopyInternal(PatternBuildState state);
 
         /// <summary>
         /// Unwraps the pattern, if possible.
@@ -63,6 +64,15 @@ namespace Wilgysef.FluentRegex
         public Regex Compile(RegexOptions options, TimeSpan matchTimeout)
         {
             return new Regex(ToString(), options, matchTimeout);
+        }
+
+        /// <summary>
+        /// Creates a copy of the pattern object.
+        /// </summary>
+        /// <returns>Copied pattern.</returns>
+        public Pattern Copy()
+        {
+            return CopyInternal(new PatternBuildState());
         }
 
         /// <summary>

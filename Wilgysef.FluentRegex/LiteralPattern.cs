@@ -32,11 +32,6 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
-        {
-            return new LiteralPattern(Value);
-        }
-
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -45,6 +40,11 @@ namespace Wilgysef.FluentRegex
             {
                 EscapeString(builder, Value);
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new LiteralPattern(Value);
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

@@ -313,13 +313,13 @@ namespace Wilgysef.FluentRegex
 
         #endregion
 
-        public override Pattern Copy()
+        internal override Pattern CopyInternal(PatternBuildState state)
         {
             return new CharacterSetPattern(
                 _characterRanges.Select(r => r.Copy()),
-                _characters.Select(c => (CharacterPattern)c.Copy()),
+                _characters.Select(c => (CharacterPattern)state.Copy(c)),
                 _subtractedCharacterRanges.Select(r => r.Copy()),
-                _subtractedCharacters.Select(c => (CharacterPattern)c.Copy()),
+                _subtractedCharacters.Select(c => (CharacterPattern)state.Copy(c)),
                 Negated);
         }
 

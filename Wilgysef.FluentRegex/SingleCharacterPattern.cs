@@ -5,11 +5,6 @@ namespace Wilgysef.FluentRegex
 {
     public class SingleCharacterPattern : Pattern
     {
-        public override Pattern Copy()
-        {
-            return new SingleCharacterPattern();
-        }
-
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -18,6 +13,11 @@ namespace Wilgysef.FluentRegex
             {
                 builder.Append('.');
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new SingleCharacterPattern();
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)

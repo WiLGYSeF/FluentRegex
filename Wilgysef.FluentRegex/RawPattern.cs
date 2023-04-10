@@ -30,11 +30,6 @@ namespace Wilgysef.FluentRegex
             return this;
         }
 
-        public override Pattern Copy()
-        {
-            return new RawPattern(Regex);
-        }
-
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -43,6 +38,11 @@ namespace Wilgysef.FluentRegex
             {
                 builder.Append(Regex);
             }
+        }
+
+        internal override Pattern CopyInternal(PatternBuildState state)
+        {
+            return new RawPattern(Regex);
         }
 
         internal override Pattern UnwrapInternal(PatternBuildState state)
