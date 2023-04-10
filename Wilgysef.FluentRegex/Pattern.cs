@@ -16,11 +16,6 @@ namespace Wilgysef.FluentRegex
         internal abstract bool IsSinglePattern { get; }
 
         /// <summary>
-        /// Indicates if the pattern does not have any contents.
-        /// </summary>
-        internal abstract bool IsEmpty { get; }
-
-        /// <summary>
         /// Creates a copy of the pattern object.
         /// </summary>
         /// <returns>Copied pattern.</returns>
@@ -39,6 +34,11 @@ namespace Wilgysef.FluentRegex
         /// <param name="state">Pattern build state.</param>
         /// <returns>Pattern.</returns>
         internal abstract Pattern UnwrapInternal(PatternBuildState state);
+
+        /// <summary>
+        /// Indicates if the pattern does not have any contents.
+        /// </summary>
+        internal abstract bool IsEmpty(PatternBuildState state);
 
         /// <summary>
         /// Compiles the pattern into a regular expression.
@@ -197,9 +197,9 @@ namespace Wilgysef.FluentRegex
 
     internal static class PatternExtensions
     {
-        public static bool IsNullOrEmpty(this Pattern? pattern)
+        public static bool IsNullOrEmpty(this Pattern? pattern, PatternBuildState state)
         {
-            return pattern == null || pattern.IsEmpty;
+            return pattern == null || state.IsEmpty(pattern);
         }
     }
 }

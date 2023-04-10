@@ -5,8 +5,6 @@ namespace Wilgysef.FluentRegex
 {
     public class AtomicGroupPattern : AbstractGroupPattern
     {
-        internal override bool IsEmpty => Pattern.IsNullOrEmpty();
-
         /// <summary>
         /// Creates an atomic group with a pattern.
         /// </summary>
@@ -43,6 +41,11 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return Pattern.IsNullOrEmpty(state);
         }
     }
 }

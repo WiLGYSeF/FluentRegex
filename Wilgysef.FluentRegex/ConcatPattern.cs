@@ -9,8 +9,6 @@ namespace Wilgysef.FluentRegex
     {
         internal override bool IsSinglePattern => IsSinglePatternInternal(true);
 
-        internal override bool IsEmpty => IsEmptyInternal();
-
         /// <summary>
         /// Concatenates patterns.
         /// </summary>
@@ -49,7 +47,7 @@ namespace Wilgysef.FluentRegex
                 var childrenCount = _children.Count;
                 foreach (var child in _children)
                 {
-                    if (child.IsEmpty)
+                    if (state.IsEmpty(child))
                     {
                         childrenCount--;
                     }
@@ -71,10 +69,15 @@ namespace Wilgysef.FluentRegex
 
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
-            var nonEmptyIndex = GetSingleNonEmptyChildIndex();
+            var nonEmptyIndex = GetSingleNonEmptyChildIndex(state);
             return nonEmptyIndex != -1
                 ? state.UnwrapState.Unwrap(_children[nonEmptyIndex])
                 : this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return AreAllChildrenEmpty(state);
         }
     }
 }

@@ -4,16 +4,21 @@ using Wilgysef.FluentRegex.Exceptions;
 
 namespace Wilgysef.FluentRegex.PatternStates
 {
-    internal abstract class PatternTraverseState<TResult, TState>
+    internal class PatternTraverseState<TResult>
     {
         protected readonly Stack<Pattern> _stack = new Stack<Pattern>();
         protected readonly Dictionary<Pattern, TResult> _results = new Dictionary<Pattern, TResult>();
 
-        protected abstract TState GetState();
+        private readonly PatternBuildState _buildState;
 
-        protected TResult Compute(
+        public PatternTraverseState(PatternBuildState buildState)
+        {
+            _buildState = buildState;
+        }
+
+        public TResult Compute(
             Pattern pattern,
-            Func<TState, TResult> action,
+            Func<PatternBuildState, TResult> action,
             Action<TResult>? actionCached)
         {
             if (_stack.Contains(pattern))
@@ -24,7 +29,7 @@ namespace Wilgysef.FluentRegex.PatternStates
             if (!_results.TryGetValue(pattern, out var result))
             {
                 _stack.Push(pattern);
-                result = action(GetState());
+                result = action(_buildState);
                 _stack.Pop();
 
                 _results[pattern] = result;

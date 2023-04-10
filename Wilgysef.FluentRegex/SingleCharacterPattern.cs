@@ -7,8 +7,6 @@ namespace Wilgysef.FluentRegex
     {
         internal override bool IsSinglePattern => true;
 
-        internal override bool IsEmpty => false;
-
         public override Pattern Copy()
         {
             return new SingleCharacterPattern();
@@ -27,6 +25,11 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return false;
         }
     }
 }

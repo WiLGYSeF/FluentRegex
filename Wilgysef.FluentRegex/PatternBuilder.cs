@@ -11,8 +11,6 @@ namespace Wilgysef.FluentRegex
     {
         internal override bool IsSinglePattern => IsSinglePatternInternal(true);
 
-        internal override bool IsEmpty => IsEmptyInternal();
-
         /// <summary>
         /// Creates a new pattern builder.
         /// </summary>
@@ -714,6 +712,11 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return AreAllChildrenEmpty(state);
         }
 
         /// <summary>

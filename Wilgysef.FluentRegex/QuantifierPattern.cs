@@ -55,11 +55,7 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public bool IsExact => Max.HasValue && Min == Max.Value;
 
-        internal override bool IsSinglePattern => IsExactlyOne && Pattern.IsSinglePattern
-            || IsEmpty;
-
-        internal override bool IsEmpty => Min == 0 && Max.HasValue && Max.Value == 0
-            || Pattern.IsEmpty;
+        internal override bool IsSinglePattern => IsExactlyOne && Pattern.IsSinglePattern;
 
         /// <summary>
         /// Creates a quantifier pattern.
@@ -163,9 +159,15 @@ namespace Wilgysef.FluentRegex
                 : this;
         }
 
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return Min == 0 && Max.HasValue && Max.Value == 0
+                || state.IsEmpty(Pattern);
+        }
+
         internal override void Build(PatternBuildState state)
         {
-            if (IsEmpty)
+            if (state.IsEmpty(this))
             {
                 return;
             }

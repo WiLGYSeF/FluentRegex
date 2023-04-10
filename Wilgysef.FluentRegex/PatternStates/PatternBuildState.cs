@@ -3,23 +3,28 @@ using Wilgysef.FluentRegex.PatternStringBuilders;
 
 namespace Wilgysef.FluentRegex.PatternStates
 {
-    internal class PatternBuildState : PatternTraverseState<string, PatternBuildState>
+    internal class PatternBuildState
     {
         public PatternUnwrapState UnwrapState { get; }
 
         private readonly PatternStringBuilder _stringBuilder = new PatternStringBuilder();
         private readonly PatternStringBuilderReplicator _replicator;
 
+        private readonly PatternTraverseState<string> _stringResult;
+        private readonly PatternTraverseState<bool> _emptyState;
+
         public PatternBuildState()
         {
             UnwrapState = new PatternUnwrapState(this);
 
             _replicator = new PatternStringBuilderReplicator(_stringBuilder);
+            _stringResult = new PatternTraverseState<string>(this);
+            _emptyState = new PatternTraverseState<bool>(this);
         }
 
         public void WithPattern(Pattern pattern, Action<IPatternStringBuilder> action)
         {
-            Compute(pattern, Build, Append);
+            _stringResult.Compute(pattern, Build, Append);
 
             string Build(PatternBuildState state)
             {
@@ -43,14 +48,14 @@ namespace Wilgysef.FluentRegex.PatternStates
             action(_replicator);
         }
 
+        public bool IsEmpty(Pattern pattern)
+        {
+            return _emptyState.Compute(pattern, pattern.IsEmpty, null);
+        }
+
         public override string ToString()
         {
             return _stringBuilder.ToString();
-        }
-
-        protected override PatternBuildState GetState()
-        {
-            return this;
         }
     }
 }

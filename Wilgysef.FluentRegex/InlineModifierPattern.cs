@@ -26,10 +26,6 @@ namespace Wilgysef.FluentRegex
         }
         private InlineModifier _disabledModifiers;
 
-        internal override bool IsEmpty => Modifiers == InlineModifier.None
-            && DisabledModifiers == InlineModifier.None
-            && Pattern == null;
-
         /// <summary>
         /// Creates an inline modifier pattern.
         /// </summary>
@@ -142,6 +138,13 @@ namespace Wilgysef.FluentRegex
                 && Pattern != null
                     ? state.UnwrapState.Unwrap(Pattern)
                     : this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return Modifiers == InlineModifier.None
+                && DisabledModifiers == InlineModifier.None
+                && Pattern.IsNullOrEmpty(state);
         }
 
         private protected override void GroupContents(PatternBuildState state)

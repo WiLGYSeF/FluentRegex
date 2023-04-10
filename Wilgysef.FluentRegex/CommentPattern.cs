@@ -5,8 +5,6 @@ namespace Wilgysef.FluentRegex
 {
     public class CommentPattern : AbstractGroupPattern
     {
-        internal override bool IsEmpty => Pattern.IsNullOrEmpty();
-
         /// <summary>
         /// Creates a comment.
         /// </summary>
@@ -52,6 +50,11 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return Pattern.IsNullOrEmpty(state);
         }
 
         private protected override void GroupContents(PatternBuildState state)

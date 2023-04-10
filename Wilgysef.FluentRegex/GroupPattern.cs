@@ -36,8 +36,6 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public bool IsBalancing => SecondName != null;
 
-        internal override bool IsEmpty => !IsCapturing && Pattern.IsNullOrEmpty();
-
         /// <summary>
         /// Creates a group pattern.
         /// </summary>
@@ -130,6 +128,11 @@ namespace Wilgysef.FluentRegex
             return !IsCapturing && Pattern != null
                 ? state.UnwrapState.Unwrap(Pattern)
                 : this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return !IsCapturing && Pattern.IsNullOrEmpty(state);
         }
 
         private protected override void GroupContents(PatternBuildState state)

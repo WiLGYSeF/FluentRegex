@@ -21,8 +21,6 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        internal override bool IsEmpty => IsEmptyInternal();
-
         /// <summary>
         /// Creates an or pattern.
         /// </summary>
@@ -121,10 +119,15 @@ namespace Wilgysef.FluentRegex
 
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
-            var nonEmptyIndex = GetSingleNonEmptyChildIndex();
+            var nonEmptyIndex = GetSingleNonEmptyChildIndex(state);
             return nonEmptyIndex != -1
                 ? state.UnwrapState.Unwrap(_children[nonEmptyIndex])
                 : this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return AreAllChildrenEmpty(state);
         }
 
         private CategorizedPatterns CategorizePatterns()

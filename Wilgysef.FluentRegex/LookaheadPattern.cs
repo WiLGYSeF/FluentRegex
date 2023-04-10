@@ -40,8 +40,6 @@ namespace Wilgysef.FluentRegex
         /// </summary>
         public LookaheadType Type { get; }
 
-        internal override bool IsEmpty => Pattern.IsNullOrEmpty();
-
         private LookaheadPattern(Pattern? pattern, LookaheadType type) : base(pattern)
         {
             Type = type;
@@ -66,6 +64,11 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return Pattern.IsNullOrEmpty(state);
         }
 
         private protected override void GroupContents(PatternBuildState state)

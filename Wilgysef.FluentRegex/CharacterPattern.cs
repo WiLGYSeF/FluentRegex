@@ -97,8 +97,6 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsSinglePattern => true;
 
-        internal override bool IsEmpty => false;
-
         /// <summary>
         /// Gets the character value of the character pattern.
         /// </summary>
@@ -120,6 +118,11 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return false;
         }
     }
 }

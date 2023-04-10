@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Wilgysef.FluentRegex.Exceptions;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -48,7 +49,8 @@ namespace Wilgysef.FluentRegex
                                 throw new PatternRecursionException(path, child);
                             }
 
-                            if (child.IsEmpty)
+                            // TODO: fix
+                            if (child.IsEmpty(new PatternBuildState()))
                             {
                                 childrenCount--;
                             }
@@ -74,59 +76,17 @@ namespace Wilgysef.FluentRegex
             }
         }
 
-        protected bool IsEmptyInternal()
-        {
-            var path = new List<Pattern>();
-            var stack = new Stack<(Pattern Pattern, int Depth)>();
-            var depth = 0;
-
-            stack.Push((this, 0));
-            path.Add(this);
-
-            while (stack.Count > 0)
-            {
-                var current = stack.Pop();
-
-                for (; current.Depth <= depth; depth--)
-                {
-                    path.RemoveAt(path.Count - 1);
-                }
-
-                if (path.Contains(current.Pattern))
-                {
-                    throw new PatternRecursionException(path, current.Pattern);
-                }
-
-                path.Add(current.Pattern);
-                depth++;
-
-                if (IsContainerPattern(current.Pattern, out var container))
-                {
-                    for (var i = container.Children.Count - 1; i >= 0; i--)
-                    {
-                        stack.Push((container.Children[i], current.Depth + 1));
-                    }
-                }
-                else if (!current.Pattern.IsEmpty)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         /// <summary>
         /// Gets the index of the single non-empty child.
         /// </summary>
         /// <returns>Index of single non-empty child, or <c>-1</c> if there are none or more than one.</returns>
-        protected int GetSingleNonEmptyChildIndex()
+        private protected int GetSingleNonEmptyChildIndex(PatternBuildState state)
         {
             var nonEmptyIndex = -1;
 
             for (var i = 0; i < _children.Count; i++)
             {
-                if (!_children[i].IsEmpty)
+                if (!state.IsEmpty(_children[i]))
                 {
                     if (nonEmptyIndex != -1)
                     {
@@ -138,6 +98,19 @@ namespace Wilgysef.FluentRegex
             }
 
             return nonEmptyIndex;
+        }
+
+        private protected bool AreAllChildrenEmpty(PatternBuildState state)
+        {
+            foreach (var child in _children)
+            {
+                if (!state.IsEmpty(child))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private bool IsContainerPattern(

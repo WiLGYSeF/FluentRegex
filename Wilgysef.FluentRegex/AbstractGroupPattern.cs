@@ -46,7 +46,7 @@ namespace Wilgysef.FluentRegex
 
         internal sealed override void Build(PatternBuildState state)
         {
-            if (IsEmpty)
+            if (state.IsEmpty(this))
             {
                 return;
             }

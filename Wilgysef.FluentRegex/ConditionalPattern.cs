@@ -56,8 +56,6 @@ namespace Wilgysef.FluentRegex
             set => SetChildPattern(value, ref _no, NoIndex);
         }
 
-        internal override bool IsEmpty => false;
-
         private int ExpressionIndex => 0;
 
         private int YesIndex => Expression != null ? 1 : 0;
@@ -187,6 +185,11 @@ namespace Wilgysef.FluentRegex
         internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
+        }
+
+        internal override bool IsEmpty(PatternBuildState state)
+        {
+            return false;
         }
 
         private protected override void GroupContents(PatternBuildState state)
