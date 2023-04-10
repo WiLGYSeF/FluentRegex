@@ -137,6 +137,7 @@ namespace Wilgysef.FluentRegex
                     || current is ConcatPattern
                     || current is QuantifierPattern)
                 {
+                    // patterns are wrapped or employ wrapping
                     return false;
                 }
                 else if (current is OrPattern orPattern)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Wilgysef.FluentRegex.PatternStringBuilders;
 
@@ -14,6 +15,8 @@ namespace Wilgysef.FluentRegex.PatternStates
         private readonly PatternTraverseState<bool> _emptyState;
         private readonly PatternTraverseState<bool> _singlePatternState;
         private readonly PatternTraverseState<Pattern> _copyState;
+
+        private readonly Dictionary<Pattern, bool> _containsUnwrappedOrPatternState = new Dictionary<Pattern, bool>();
 
         public PatternBuildState()
         {
@@ -73,6 +76,17 @@ namespace Wilgysef.FluentRegex.PatternStates
             return pattern != null
                 ? _copyState.Compute(pattern, pattern.CopyInternal, null, noCache: true)
                 : null;
+        }
+
+        public bool ContainsUnwrappedOrPattern(Pattern pattern)
+        {
+            if (!_containsUnwrappedOrPatternState.TryGetValue(pattern, out var result))
+            {
+                result = Pattern.ContainsUnwrappedOrPattern(this, pattern);
+                _containsUnwrappedOrPatternState[pattern] = result;
+            }
+
+            return result;
         }
 
         public override string ToString()
