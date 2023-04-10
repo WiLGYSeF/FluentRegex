@@ -1,44 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using Wilgysef.FluentRegex.Exceptions;
+using Wilgysef.FluentRegex.PatternStringBuilders;
 
-namespace Wilgysef.FluentRegex.PatternBuilders
+namespace Wilgysef.FluentRegex.PatternStates
 {
-    internal class PatternBuildState
+    internal class PatternBuildState : PatternTraverseState<string, PatternBuildState>
     {
-        private readonly PatternStringBuilder _stringBuilder = new PatternStringBuilder();
-        private readonly Stack<Pattern> _buildStack = new Stack<Pattern>();
-        private readonly Dictionary<Pattern, string> _patternStrings = new Dictionary<Pattern, string>();
+        public PatternUnwrapState UnwrapState { get; }
 
+        private readonly PatternStringBuilder _stringBuilder = new PatternStringBuilder();
         private readonly PatternStringBuilderReplicator _replicator;
 
         public PatternBuildState()
         {
+            UnwrapState = new PatternUnwrapState(this);
+
             _replicator = new PatternStringBuilderReplicator(_stringBuilder);
         }
 
         public void WithPattern(Pattern pattern, Action<IPatternStringBuilder> action)
         {
-            if (_buildStack.Contains(pattern))
-            {
-                throw new PatternRecursionException(_buildStack, pattern);
-            }
+            Compute(pattern, Build, Append);
 
-            if (!_patternStrings.TryGetValue(pattern, out var value))
+            string Build(PatternBuildState state)
             {
                 var patternStringBuilder = new PatternStringBuilder();
                 _replicator.Add(patternStringBuilder);
-                _buildStack.Push(pattern);
 
                 action(_replicator);
 
-                _buildStack.Pop();
                 _replicator.Remove(patternStringBuilder);
-                _patternStrings[pattern] = patternStringBuilder.ToString();
+                return patternStringBuilder.ToString();
             }
-            else
+
+            void Append(string result)
             {
-                _replicator.Append(value);
+                _replicator.Append(result);
             }
         }
 
@@ -50,6 +46,11 @@ namespace Wilgysef.FluentRegex.PatternBuilders
         public override string ToString()
         {
             return _stringBuilder.ToString();
+        }
+
+        protected override PatternBuildState GetState()
+        {
+            return this;
         }
     }
 }

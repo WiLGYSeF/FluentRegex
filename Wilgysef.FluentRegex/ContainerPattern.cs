@@ -116,34 +116,28 @@ namespace Wilgysef.FluentRegex
             return true;
         }
 
-        protected Pattern UnwrapInternal()
+        /// <summary>
+        /// Gets the index of the single non-empty child.
+        /// </summary>
+        /// <returns>Index of single non-empty child, or <c>-1</c> if there are none or more than one.</returns>
+        protected int GetSingleNonEmptyChildIndex()
         {
-            var path = new List<Pattern>();
-            var traversed = new HashSet<Pattern>();
-            Pattern current = this;
+            var nonEmptyIndex = -1;
 
-            while (true)
+            for (var i = 0; i < _children.Count; i++)
             {
-                path.Add(current);
-                if (!traversed.Add(current))
+                if (!_children[i].IsEmpty)
                 {
-                    throw new PatternRecursionException(path, current);
-                }
-
-                if (IsContainerPattern(current, out var container))
-                {
-                    if (container._children.Count != 1)
+                    if (nonEmptyIndex != -1)
                     {
-                        return current;
+                        return -1;
                     }
 
-                    current = container._children[0];
-                }
-                else
-                {
-                    return current.Unwrap();
+                    nonEmptyIndex = i;
                 }
             }
+
+            return nonEmptyIndex;
         }
 
         private bool IsContainerPattern(

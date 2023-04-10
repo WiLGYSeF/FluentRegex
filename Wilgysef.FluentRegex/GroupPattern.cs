@@ -1,5 +1,6 @@
 ﻿using Wilgysef.FluentRegex.Exceptions;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -124,10 +125,10 @@ namespace Wilgysef.FluentRegex
                 : new GroupPattern(Pattern?.Copy(), Name, Capture);
         }
 
-        public override Pattern Unwrap()
+        internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return !IsCapturing && Pattern != null
-                ? Pattern.Unwrap()
+                ? state.UnwrapState.Unwrap(Pattern)
                 : this;
         }
 

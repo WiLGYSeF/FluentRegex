@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Wilgysef.FluentRegex.Composites;
 using Wilgysef.FluentRegex.Exceptions;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -27,17 +27,18 @@ namespace Wilgysef.FluentRegex
         public abstract Pattern Copy();
 
         /// <summary>
-        /// Unwraps the pattern, if possible.
-        /// Gets the inner pattern if the parent pattern is transparent.
-        /// </summary>
-        /// <returns>Pattern.</returns>
-        public abstract Pattern Unwrap();
-
-        /// <summary>
         /// Build pattern.
         /// </summary>
         /// <param name="state">Pattern build state.</param>
         internal abstract void Build(PatternBuildState state);
+
+        /// <summary>
+        /// Unwraps the pattern, if possible.
+        /// Gets the inner pattern if the parent pattern is transparent.
+        /// </summary>
+        /// <param name="state">Pattern build state.</param>
+        /// <returns>Pattern.</returns>
+        internal abstract Pattern UnwrapInternal(PatternBuildState state);
 
         /// <summary>
         /// Compiles the pattern into a regular expression.
@@ -58,6 +59,16 @@ namespace Wilgysef.FluentRegex
         public Regex Compile(RegexOptions options, TimeSpan matchTimeout)
         {
             return new Regex(ToString(), options, matchTimeout);
+        }
+
+        /// <summary>
+        /// Unwraps the pattern, if possible.
+        /// Gets the inner pattern if the parent pattern is transparent.
+        /// </summary>
+        /// <returns>Pattern.</returns>
+        public Pattern Unwrap()
+        {
+            return UnwrapInternal(new PatternBuildState());
         }
 
         public override string ToString()

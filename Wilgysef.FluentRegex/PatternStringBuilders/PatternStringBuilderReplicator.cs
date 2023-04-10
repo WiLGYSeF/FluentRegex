@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Wilgysef.FluentRegex.PatternBuilders
+namespace Wilgysef.FluentRegex.PatternStringBuilders
 {
     internal class PatternStringBuilderReplicator : IPatternStringBuilder
     {

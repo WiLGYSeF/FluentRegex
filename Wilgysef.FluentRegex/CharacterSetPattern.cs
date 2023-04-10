@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Wilgysef.FluentRegex.Exceptions;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -326,35 +327,6 @@ namespace Wilgysef.FluentRegex
                 Negated);
         }
 
-        public override Pattern Unwrap()
-        {
-            if (_subtractedCharacterRanges.Count > 0
-                || _subtractedCharacters.Count > 0
-                || Negated)
-            {
-                return this;
-            }
-
-            var characterRanges = CharacterRange.Overlap(_characterRanges);
-            var characters = new List<CharacterPattern>(_characters);
-
-            SimplifyCharacterRanges(ref characterRanges, characters);
-
-            if (characterRanges.Count == 1
-                && characters.Count == 0
-                && characterRanges[0].Single)
-            {
-                return characterRanges[0].Start.Unwrap();
-            }
-            else if (characterRanges.Count == 0 && characters.Count == 1)
-            {
-                return characters[0].Unwrap();
-            }
-
-            return this;
-
-        }
-
         internal static CharacterSetPattern Combine(IEnumerable<CharacterSetPattern> patterns)
         {
             var negated = patterns.FirstOrDefault()?.Negated ?? false;
@@ -484,6 +456,34 @@ namespace Wilgysef.FluentRegex
                     }
                 }
             }
+        }
+
+        internal override Pattern UnwrapInternal(PatternBuildState state)
+        {
+            if (_subtractedCharacterRanges.Count > 0
+                || _subtractedCharacters.Count > 0
+                || Negated)
+            {
+                return this;
+            }
+
+            var characterRanges = CharacterRange.Overlap(_characterRanges);
+            var characters = new List<CharacterPattern>(_characters);
+
+            SimplifyCharacterRanges(ref characterRanges, characters);
+
+            if (characterRanges.Count == 1
+                && characters.Count == 0
+                && characterRanges[0].Single)
+            {
+                return state.UnwrapState.Unwrap(characterRanges[0].Start);
+            }
+            else if (characterRanges.Count == 0 && characters.Count == 1)
+            {
+                return state.UnwrapState.Unwrap(characters[0]);
+            }
+
+            return this;
         }
 
         private static void SimplifyCharacterRanges(ref List<CharacterRange> ranges, List<CharacterPattern> characters)

@@ -1,5 +1,6 @@
 ﻿using Wilgysef.FluentRegex.Exceptions;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -155,10 +156,10 @@ namespace Wilgysef.FluentRegex
             return new QuantifierPattern(Pattern.Copy(), Min, Max, Greedy);
         }
 
-        public override Pattern Unwrap()
+        internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return IsExactlyOne
-                ? UnwrapInternal()
+                ? state.UnwrapState.Unwrap(Pattern)
                 : this;
         }
 

@@ -1,5 +1,6 @@
 ﻿using Wilgysef.FluentRegex.Enums;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -116,7 +117,7 @@ namespace Wilgysef.FluentRegex
 
         internal abstract void Build(IPatternStringBuilder builder, bool fromCharacterSet);
 
-        public override Pattern Unwrap()
+        internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
         }

@@ -1,4 +1,5 @@
-﻿using Wilgysef.FluentRegex.PatternBuilders;
+﻿using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -48,7 +49,7 @@ namespace Wilgysef.FluentRegex
             return new CommentPattern((Pattern as LiteralPattern)?.Value);
         }
 
-        public override Pattern Unwrap()
+        internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
         }

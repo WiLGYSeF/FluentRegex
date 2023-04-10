@@ -1,4 +1,5 @@
-﻿using Wilgysef.FluentRegex.PatternBuilders;
+﻿using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -183,7 +184,7 @@ namespace Wilgysef.FluentRegex
             return new ConditionalPattern(GroupName!, YesPattern.Copy(), NoPattern?.Copy());
         }
 
-        public override Pattern Unwrap()
+        internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return this;
         }

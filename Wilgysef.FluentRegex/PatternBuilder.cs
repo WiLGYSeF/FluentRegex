@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Wilgysef.FluentRegex.Enums;
 using Wilgysef.FluentRegex.Exceptions;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -706,14 +706,14 @@ namespace Wilgysef.FluentRegex
             return new PatternBuilder(_children.Select(c => c.Copy()));
         }
 
-        public override Pattern Unwrap()
-        {
-            return this;
-        }
-
         internal override void Build(PatternBuildState state)
         {
             Build().Build(state);
+        }
+
+        internal override Pattern UnwrapInternal(PatternBuildState state)
+        {
+            return this;
         }
 
         /// <summary>

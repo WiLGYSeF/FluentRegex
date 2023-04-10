@@ -1,5 +1,6 @@
 ﻿using Wilgysef.FluentRegex.Enums;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -134,12 +135,12 @@ namespace Wilgysef.FluentRegex
             return new InlineModifierPattern(Pattern?.Copy(), Modifiers, DisabledModifiers);
         }
 
-        public override Pattern Unwrap()
+        internal override Pattern UnwrapInternal(PatternBuildState state)
         {
             return Modifiers == InlineModifier.None
                 && DisabledModifiers == InlineModifier.None
                 && Pattern != null
-                    ? Pattern.Unwrap()
+                    ? state.UnwrapState.Unwrap(Pattern)
                     : this;
         }
 

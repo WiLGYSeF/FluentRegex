@@ -76,4 +76,13 @@ public class ConcatPatternTest
 
         pattern.Unwrap().ShouldBe(literal);
     }
+
+    [Fact]
+    public void Unwrap_Recursive()
+    {
+        var pattern = new ConcatPattern();
+        pattern.Concat(pattern);
+
+        Should.Throw<PatternRecursionException>(() => pattern.Unwrap());
+    }
 }

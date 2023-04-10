@@ -1,4 +1,5 @@
-﻿using Wilgysef.FluentRegex.PatternBuilders;
+﻿using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -28,11 +29,6 @@ namespace Wilgysef.FluentRegex
             return new AtomicGroupPattern(Pattern?.Copy());
         }
 
-        public override Pattern Unwrap()
-        {
-            return this;
-        }
-
         private protected override void GroupContents(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -42,6 +38,11 @@ namespace Wilgysef.FluentRegex
                 builder.Append("?>");
                 Pattern?.Build(state);
             }
+        }
+
+        internal override Pattern UnwrapInternal(PatternBuildState state)
+        {
+            return this;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
@@ -39,11 +40,6 @@ namespace Wilgysef.FluentRegex
             return new ConcatPattern(_children.Select(c => c.Copy()));
         }
 
-        public override Pattern Unwrap()
-        {
-            return UnwrapInternal();
-        }
-
         internal override void Build(PatternBuildState state)
         {
             state.WithPattern(this, Build);
@@ -71,6 +67,14 @@ namespace Wilgysef.FluentRegex
                     }
                 }
             }
+        }
+
+        internal override Pattern UnwrapInternal(PatternBuildState state)
+        {
+            var nonEmptyIndex = GetSingleNonEmptyChildIndex();
+            return nonEmptyIndex != -1
+                ? state.UnwrapState.Unwrap(_children[nonEmptyIndex])
+                : this;
         }
     }
 }

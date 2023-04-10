@@ -1,6 +1,7 @@
 ﻿using System;
 using Wilgysef.FluentRegex.Enums;
-using Wilgysef.FluentRegex.PatternBuilders;
+using Wilgysef.FluentRegex.PatternStringBuilders;
+using Wilgysef.FluentRegex.PatternStates;
 
 namespace Wilgysef.FluentRegex
 {
