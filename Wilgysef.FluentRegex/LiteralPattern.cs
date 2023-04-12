@@ -22,6 +22,15 @@ namespace Wilgysef.FluentRegex
         }
 
         /// <summary>
+        /// Creates a literal pattern.
+        /// </summary>
+        /// <param name="value">Literal value.</param>
+        public LiteralPattern(char value)
+        {
+            Value = value.ToString();
+        }
+
+        /// <summary>
         /// Sets the literal value.
         /// </summary>
         /// <param name="value">Literal value.</param>
@@ -29,6 +38,17 @@ namespace Wilgysef.FluentRegex
         public LiteralPattern WithValue(string value)
         {
             Value = value;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the literal value.
+        /// </summary>
+        /// <param name="value">Literal value.</param>
+        /// <returns>Current literal pattern.</returns>
+        public LiteralPattern WithValue(char value)
+        {
+            Value = value.ToString();
             return this;
         }
 

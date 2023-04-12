@@ -480,6 +480,13 @@ namespace Wilgysef.FluentRegex
         public PatternBuilder Literal(string value) => Add(new LiteralPattern(value));
 
         /// <summary>
+        /// Adds a <see cref="LiteralPattern"/> to the pattern.
+        /// </summary>
+        /// <param name="value">Literal value.</param>
+        /// <returns>Current pattern builder.</returns>
+        public PatternBuilder Literal(char value) => Add(new LiteralPattern(value));
+
+        /// <summary>
         /// Adds a <see cref="RawPattern"/> to the pattern.
         /// </summary>
         /// <param name="regex">Regex.</param>

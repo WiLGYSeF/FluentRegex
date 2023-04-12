@@ -16,6 +16,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().ZeroOrOne(new LiteralPattern("a"), greedy),
             expected);
+
+        ShouldCreatePattern(
+            () => QuantifierPattern.ZeroOrOne(new LiteralPattern("a"), greedy),
+            expected);
     }
 
     [Theory]
@@ -30,6 +34,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().ZeroOrMore(new LiteralPattern("a"), greedy),
             expected);
+
+        ShouldCreatePattern(
+            () => QuantifierPattern.ZeroOrMore(new LiteralPattern("a"), greedy),
+            expected);
     }
 
     [Theory]
@@ -43,6 +51,10 @@ public class QuantifierPatternTest
 
         ShouldCreatePattern(
             () => new PatternBuilder().OneOrMore(new LiteralPattern("a"), greedy),
+            expected);
+
+        ShouldCreatePattern(
+            () => QuantifierPattern.OneOrMore(new LiteralPattern("a"), greedy),
             expected);
     }
 
@@ -60,6 +72,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().Exactly(new LiteralPattern("a"), count),
             expected);
+
+        ShouldCreatePattern(
+            () => QuantifierPattern.Exactly(new LiteralPattern("a"), count),
+            expected);
     }
 
     [Theory]
@@ -75,6 +91,10 @@ public class QuantifierPatternTest
 
         ShouldCreatePattern(
             () => new PatternBuilder().Between(new LiteralPattern("a"), min, max, greedy),
+            expected);
+
+        ShouldCreatePattern(
+            () => QuantifierPattern.Between(new LiteralPattern("a"), min, max, greedy),
             expected);
     }
 
@@ -93,6 +113,10 @@ public class QuantifierPatternTest
         ShouldCreatePattern(
             () => new PatternBuilder().AtLeast(new LiteralPattern("a"), min, greedy),
             expected);
+
+        ShouldCreatePattern(
+            () => QuantifierPattern.AtLeast(new LiteralPattern("a"), min, greedy),
+            expected);
     }
 
     [Theory]
@@ -109,6 +133,10 @@ public class QuantifierPatternTest
 
         ShouldCreatePattern(
             () => new PatternBuilder().AtMost(new LiteralPattern("a"), max, greedy),
+            expected);
+
+        ShouldCreatePattern(
+            () => QuantifierPattern.AtMost(new LiteralPattern("a"), max, greedy),
             expected);
     }
 

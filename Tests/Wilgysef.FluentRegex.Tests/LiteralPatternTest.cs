@@ -11,6 +11,15 @@ public class LiteralPatternTest
     }
 
     [Fact]
+    public void Literal_Char()
+    {
+        var pattern = new PatternBuilder().Literal('c');
+
+        pattern.ToString().ShouldBe("c");
+    }
+
+
+    [Fact]
     public void Escaped()
     {
         var pattern = new PatternBuilder().Literal(@"test$()*+.?[\]^{|}");
@@ -25,6 +34,9 @@ public class LiteralPatternTest
 
         pattern.WithValue("test");
         pattern.ToString().ShouldBe("test");
+
+        pattern.WithValue('c');
+        pattern.ToString().ShouldBe("c");
     }
 
     [Fact]

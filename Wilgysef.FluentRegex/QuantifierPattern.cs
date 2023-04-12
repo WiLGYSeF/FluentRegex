@@ -6,6 +6,70 @@ namespace Wilgysef.FluentRegex
 {
     public class QuantifierPattern : ContainerPattern
     {
+        #region Static Methods
+
+        /// <summary>
+        /// Creates a quantifier pattern to match zero or one occurrences.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
+        public static QuantifierPattern ZeroOrOne(Pattern pattern, bool greedy = true) => new QuantifierPattern(pattern, 0, 1, greedy);
+
+        /// <summary>
+        /// Creates a quantifier pattern to match zero or more occurrences.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
+        public static QuantifierPattern ZeroOrMore(Pattern pattern, bool greedy = true) => new QuantifierPattern(pattern, 0, null, greedy);
+
+        /// <summary>
+        /// Creates a quantifier pattern to match one or more occurrences.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
+        public static QuantifierPattern OneOrMore(Pattern pattern, bool greedy = true) => new QuantifierPattern(pattern, 1, null, greedy);
+
+        /// <summary>
+        /// Creates a quantifier pattern to match exactly <paramref name="number"/> occurrences.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="number">Number of occurrences to match.</param>
+        /// <returns>Current quantifier pattern.</returns>
+        public static QuantifierPattern Exactly(Pattern pattern, int number) => new QuantifierPattern(pattern, number, number, true);
+
+        /// <summary>
+        /// Creates a quantifier pattern to match between <paramref name="min"/> and <paramref name="max"/> occurrences.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
+        public static QuantifierPattern Between(Pattern pattern, int min, int max, bool greedy = true) => new QuantifierPattern(pattern, min, max, greedy);
+
+        /// <summary>
+        /// Creates a quantifier pattern to match at least <paramref name="min"/> occurrences.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="min">Minimum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
+        public static QuantifierPattern AtLeast(Pattern pattern, int min, bool greedy = true) => new QuantifierPattern(pattern, min, null, greedy);
+
+        /// <summary>
+        /// Creates a quantifier pattern to match at most <paramref name="max"/> occurrences.
+        /// </summary>
+        /// <param name="pattern">Pattern to match.</param>
+        /// <param name="max">Maximum number of occurrences to match.</param>
+        /// <param name="greedy">Indicates if the match is greedy.</param>
+        /// <returns>Current quantifier pattern.</returns>
+        public static QuantifierPattern AtMost(Pattern pattern, int max, bool greedy = true) => new QuantifierPattern(pattern, 0, max, greedy);
+
+        #endregion
+
         /// <summary>
         /// Pattern to match.
         /// </summary>
@@ -74,6 +138,8 @@ namespace Wilgysef.FluentRegex
             Max = max;
             Greedy = greedy;
         }
+
+        #region Fluent Methods
 
         /// <summary>
         /// Sets the quantifier to match zero or one occurrences.
@@ -149,6 +215,8 @@ namespace Wilgysef.FluentRegex
             Pattern = pattern;
             return this;
         }
+
+        #endregion
 
         internal override void Build(PatternBuildState state)
         {

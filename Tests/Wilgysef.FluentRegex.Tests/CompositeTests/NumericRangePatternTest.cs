@@ -59,10 +59,52 @@ public class NumericRangePatternTest
             .ShouldBe(@"12(?:379|3[89]\d|[4-8]\d{2}|9[0-7]\d|98\d)");
     }
 
+    [Theory]
+    [InlineData(1.0512, 21.23, LeadingZeros.None, 0, null, @"1\.051[2-9]\d*|1\.05[2-9]\d*|1\.0[6-9]\d*|1\.[1-9]\d*|(?:[2-9]|1\d|20)(?:\.\d*)?|21\.?|21\.[01]\d*|21\.2[0-2]\d*|21\.230*")]
+    [InlineData(1.0599, 16.1, LeadingZeros.None, 0, null, @"1\.0599\d*|1\.0[6-9]\d*|1\.[1-9]\d*|(?:[2-9]|1[0-5])(?:\.\d*)?|16\.?|16\.0\d*|16\.10*")]
+    [InlineData(24.932, 33, LeadingZeros.None, 0, null, @"24\.93[2-9]\d*|24\.9[4-9]\d*|(?:2[5-9]|3[0-2])(?:\.\d*)?|33\.?|33\.0*")]
+    [InlineData(24, 33.152, LeadingZeros.None, 0, null, @"24(?:\.\d*)?|(?:2[5-9]|3[0-2])(?:\.\d*)?|33\.?|33\.0\d*|33\.1[0-4]\d*|33\.15[01]\d*|33\.1520*")]
+    [InlineData(1.2, 2.489, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.4[0-7]\d*|2\.48[0-8]\d*|2\.4890*")]
+    [InlineData(1.2, 2.4894, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.4[0-7]\d*|2\.48[0-8]\d*|2\.489[0-3]\d*|2\.48940*")]
+    [InlineData(5.47, 7.47, LeadingZeros.None, 0, null, @"5\.4[7-9]\d*|5\.[5-9]\d*|6(?:\.\d*)?|7\.?|7\.[0-3]\d*|7\.4[0-6]\d*|7\.470*")]
+
+    [InlineData(4.93, 233.8, LeadingZeros.Optional, 0, null, @"(?:00)?4\.9[3-9]\d*|(?:(?:00)?[5-9]|0?[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d*)?|233\.?|233\.[0-7]\d*|233\.80*")]
+
+    [InlineData(4.93, 233.8, LeadingZeros.None, 2, null, @"4\.9[3-9]\d*|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d{2,})?|233\.[0-7]\d+|233\.80+")]
+    [InlineData(4.93, 233.8, LeadingZeros.None, 0, 3, @"4\.9[3-9]\d?|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d{0,3})?|233\.?|233\.[0-7]\d{0,2}|233\.80{0,2}")]
+    [InlineData(4.93, 233.8, LeadingZeros.None, 1, 3, @"4\.9[3-9]\d?|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d{1,3})?|233\.[0-7]\d{0,2}|233\.80{0,2}")]
+    public void NumericRange_Double(
+        double min,
+        double max,
+        LeadingZeros leadingZeros,
+        int minFractionalDigits,
+        int? maxFractionalDigits,
+        string expected)
+    {
+        var pattern = Pattern.NumericRange(min, max, leadingZeros, minFractionalDigits, maxFractionalDigits);
+
+        pattern.ToString().ShouldBe(expected);
+    }
+
     [Fact]
     public void InvalidRange()
     {
         Should.Throw<ArgumentException>(() => Pattern.NumericRange(5, 0));
+    }
+
+    [Fact]
+    public void InvalidRange_Double()
+    {
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(5, double.NaN));
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(double.NaN, 5));
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(5, double.PositiveInfinity));
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(double.NegativeInfinity, 5));
+
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(5d, 0d));
+
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(1.23, 6.94, minFractionalDigits: -1));
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(8.4, 27.634, minFractionalDigits: 4, maxFractionalDigits: 3));
+        Should.Throw<ArgumentException>(() => Pattern.NumericRange(8.4, 27.634, maxFractionalDigits: 2));
     }
 
     [Theory]

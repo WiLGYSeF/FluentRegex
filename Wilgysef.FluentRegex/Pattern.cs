@@ -113,6 +113,25 @@ namespace Wilgysef.FluentRegex
             => NumericRangePattern.NumericRange(min, max, leadingZeros);
 
         /// <summary>
+        /// Creates a pattern that matches numbers in the range between <paramref name="min"/> and <paramref name="max"/>.
+        /// </summary>
+        /// <param name="min">Minimum number to match, inclusive.</param>
+        /// <param name="max">Maximum number to match, inclusive.</param>
+        /// <param name="leadingZeros">Whether to match leading zeros.</param>
+        /// <param name="minFractionalDigits">Minimum number of fractional digits to match.</param>
+        /// <param name="maxFractionalDigits">Maximum number of fractional digits to match.</param>
+        /// <param name="fractionalSeparator">Character that separates integer and fractional parts.</param>
+        /// <returns>Pattern that matches numeric range.</returns>
+        public static Pattern NumericRange(
+            double min,
+            double max,
+            LeadingZeros leadingZeros = LeadingZeros.None,
+            int minFractionalDigits = 0,
+            int? maxFractionalDigits = null,
+            char fractionalSeparator = '.')
+            => NumericRangePattern.NumericRange(min, max, leadingZeros, minFractionalDigits, maxFractionalDigits, fractionalSeparator);
+
+        /// <summary>
         /// Wraps the pattern if necessary.
         /// </summary>
         /// <param name="state">Pattern build state.</param>
