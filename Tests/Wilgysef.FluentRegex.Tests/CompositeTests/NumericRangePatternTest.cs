@@ -67,12 +67,23 @@ public class NumericRangePatternTest
     [InlineData(1.2, 2.489, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.4[0-7]\d*|2\.48[0-8]\d*|2\.4890*")]
     [InlineData(1.2, 2.4894, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.4[0-7]\d*|2\.48[0-8]\d*|2\.489[0-3]\d*|2\.48940*")]
     [InlineData(5.47, 7.47, LeadingZeros.None, 0, null, @"5\.4[7-9]\d*|5\.[5-9]\d*|6(?:\.\d*)?|7\.?|7\.[0-3]\d*|7\.4[0-6]\d*|7\.470*")]
+    [InlineData(1.234, 1.234, LeadingZeros.None, 0, null, @"1\.2340*")]
+    [InlineData(1.1, 1.27, LeadingZeros.None, 0, null, @"1\.1\d*|1\.2|1\.2[0-6]\d*|1\.270*")]
+    [InlineData(1.234, 1.235, LeadingZeros.None, 0, null, @"1\.234\d*|1\.2350*")]
+    [InlineData(1.234, 1.2567, LeadingZeros.None, 0, null, @"1\.23[4-9]\d*|1\.24\d*|1\.25|1\.25[0-5]\d*|1\.256[0-6]\d*|1\.25670*")]
+    [InlineData(1.234, 1.2567, LeadingZeros.None, 2, null, @"1\.23[4-9]\d*|1\.24\d*|1\.25|1\.25[0-5]\d*|1\.256[0-6]\d*|1\.25670*")]
+    [InlineData(1.2345, 1.267, LeadingZeros.None, 0, null, @"1\.234[5-9]\d*|1\.23[56]\d*|1\.2[45]\d*|1\.26|1\.26[0-6]\d*|1\.2670*")]
 
     [InlineData(4.93, 233.8, LeadingZeros.Optional, 0, null, @"(?:00)?4\.9[3-9]\d*|(?:(?:00)?[5-9]|0?[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d*)?|233\.?|233\.[0-7]\d*|233\.80*")]
 
     [InlineData(4.93, 233.8, LeadingZeros.None, 2, null, @"4\.9[3-9]\d*|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d{2,})?|233\.[0-7]\d+|233\.80+")]
     [InlineData(4.93, 233.8, LeadingZeros.None, 0, 3, @"4\.9[3-9]\d?|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d{0,3})?|233\.?|233\.[0-7]\d{0,2}|233\.80{0,2}")]
     [InlineData(4.93, 233.8, LeadingZeros.None, 1, 3, @"4\.9[3-9]\d?|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d{1,3})?|233\.[0-7]\d{0,2}|233\.80{0,2}")]
+
+    [InlineData(-8.6, -5.97, LeadingZeros.None, 0, null, @"-(?:5\.9[7-9]\d*|[67](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*)")]
+    [InlineData(-8.684, -5.3, LeadingZeros.None, 0, null, @"-(?:5\.[3-9]\d*|[67](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.6[0-7]\d*|8\.68[0-3]\d*|8\.6840*)")]
+    [InlineData(-8.6, 5.97, LeadingZeros.None, 0, null, @"-(?:0(?:\.\d*)?|[1-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*)|0(?:\.\d*)?|[1-4](?:\.\d*)?|5\.?|5\.[0-8]\d*|5\.9[0-6]\d*|5\.970*")]
+    [InlineData(-8.684, 5.3, LeadingZeros.None, 0, null, @"-(?:0(?:\.\d*)?|[1-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.6[0-7]\d*|8\.68[0-3]\d*|8\.6840*)|0(?:\.\d*)?|[1-4](?:\.\d*)?|5\.?|5\.[0-2]\d*|5\.30*")]
     public void NumericRange_Double(
         double min,
         double max,
@@ -84,6 +95,14 @@ public class NumericRangePatternTest
         var pattern = Pattern.NumericRange(min, max, leadingZeros, minFractionalDigits, maxFractionalDigits);
 
         pattern.ToString().ShouldBe(expected);
+    }
+
+    [Fact]
+    public void NumericRange_Double_FractionalSeparator()
+    {
+        var pattern = Pattern.NumericRange(24, 33.152, fractionalSeparator: ',');
+
+        pattern.ToString().ShouldBe(@"24(?:,\d*)?|(?:2[5-9]|3[0-2])(?:,\d*)?|33,?|33,0\d*|33,1[0-4]\d*|33,15[01]\d*|33,1520*");
     }
 
     [Fact]

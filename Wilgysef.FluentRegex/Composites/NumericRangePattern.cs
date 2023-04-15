@@ -24,6 +24,18 @@ namespace Wilgysef.FluentRegex.Composites
             int? maxFractionalDigits = null,
             char fractionalSeparator = '.')
         {
+            return NumericRange(min, max, leadingZeros, minFractionalDigits, maxFractionalDigits, fractionalSeparator, null);
+        }
+
+        private static Pattern NumericRange(
+            double min,
+            double max,
+            LeadingZeros leadingZeros = LeadingZeros.None,
+            int minFractionalDigits = 0,
+            int? maxFractionalDigits = null,
+            char fractionalSeparator = '.',
+            int? maxIntegerPartLen = null)
+        {
             if (double.IsNaN(min))
             {
                 throw new ArgumentException("Minimum cannot be NaN");
@@ -53,21 +65,37 @@ namespace Wilgysef.FluentRegex.Composites
                 throw new ArgumentException("Minimum fractional digits cannot be greater than maximum fractional digits.", nameof(maxFractionalDigits));
             }
 
-            var numberFormatInfo = new NumberFormatInfo
+            GetDecimalParts(
+                min,
+                max,
+                out var minIntegerPart,
+                out var minFractionalPart,
+                out var maxIntegerPart,
+                out var maxFractionalPart);
+            maxIntegerPartLen ??= maxIntegerPart.Length;
+
+            if (min == max)
             {
-                NumberDecimalSeparator = ".",
-                NumberGroupSeparator = "",
-            };
+                return Number(maxIntegerPart, maxFractionalPart);
+            }
 
-            var minStr = min.ToString(numberFormatInfo);
-            var maxStr = max.ToString(numberFormatInfo);
+            if (min < 0)
+            {
+                if (max < 0)
+                {
+                    return new ConcatPattern(
+                        CharacterPattern.Character('-'),
+                        NumericRange(-max, -min, leadingZeros, minFractionalDigits, maxFractionalDigits, fractionalSeparator, null));
+                }
 
-            var minIntegerPart = GetDecimalPart(minStr, true, numberFormatInfo.NumberDecimalSeparator);
-            var minFractionalPart = GetDecimalPart(minStr, false, numberFormatInfo.NumberDecimalSeparator);
-            var maxIntegerPart = GetDecimalPart(maxStr, true, numberFormatInfo.NumberDecimalSeparator);
-            var maxFractionalPart = GetDecimalPart(maxStr, false, numberFormatInfo.NumberDecimalSeparator);
+                return new OrPattern(
+                    new ConcatPattern(
+                        CharacterPattern.Character('-'),
+                        NumericRange(0, -min, leadingZeros, minFractionalDigits, maxFractionalDigits, fractionalSeparator, maxIntegerPartLen)),
+                    NumericRange(0, max, leadingZeros, minFractionalDigits, maxFractionalDigits, fractionalSeparator, maxIntegerPartLen));
+            }
 
-            var maxIntegerPartLen = maxIntegerPart.Length;
+            var integerPartMatch = minIntegerPart.ToString() == maxIntegerPart.ToString();
             var largestFractionalDigitLength = Math.Max(minFractionalPart.Length, maxFractionalPart.Length);
 
             if (maxFractionalDigits < largestFractionalDigitLength)
@@ -80,31 +108,52 @@ namespace Wilgysef.FluentRegex.Composites
             var nextMinInt = (long)min + 1;
             var prevMaxInt = (long)max - 1;
 
+            var fractionalPrefixEnd = 0;
+
+            if (integerPartMatch)
+            {
+                for (; fractionalPrefixEnd < minFractionalPart.Length && fractionalPrefixEnd < maxFractionalPart.Length && minFractionalPart[fractionalPrefixEnd] == maxFractionalPart[fractionalPrefixEnd]; fractionalPrefixEnd++) ;
+            }
+
+            var maxEnd = maxFractionalPart.Length - 1;
+            for (; maxEnd > 0 && maxFractionalPart[maxEnd] == '9'; maxEnd--) ;
+
+            if (maxEnd != maxFractionalPart.Length - 1)
+            {
+                maxEnd++;
+            }
+
             if (minFractionalPart.Length > 0)
             {
+                var maxDigit = integerPartMatch && minFractionalPart.Length - 1 == fractionalPrefixEnd
+                    ? (char)(maxFractionalPart[minFractionalPart.Length - 1] - 1)
+                    : '9';
+
                 orPattern.Or(FractionalPattern(
                     minIntegerPart,
-                    DigitPattern(minFractionalPart[..^1], minFractionalPart[^1], '9', 0),
+                    DigitPattern(minFractionalPart[..^1], minFractionalPart[^1], maxDigit, 0),
                     minFractionalPart.Length));
             }
             else
             {
-                orPattern.Or(new ConcatPattern(
-                    PadZero(
-                        new LiteralPattern(minIntegerPart.ToString()),
-                        maxIntegerPartLen - minIntegerPart.Length,
-                        leadingZeros),
-                    OptionalFractionalPart()));
+                orPattern.Or(FractionalPattern(
+                    minIntegerPart,
+                    OptionalAnyFractionalPart(),
+                    null,
+                    patternContainsSeparator: true));
             }
 
-            for (var i = minFractionalPart.Length - 2; i >= 0; i--)
+            for (var i = minFractionalPart.Length - 2; i >= fractionalPrefixEnd; i--)
             {
                 var digit = (char)(minFractionalPart[i] + 1);
                 if (digit <= '9')
                 {
+                    var maxDigit = integerPartMatch
+                        ? (char)(maxFractionalPart[i] - 1)
+                        : '9';
                     orPattern.Or(FractionalPattern(
                         minIntegerPart,
-                        DigitPattern(minFractionalPart[..i], digit, '9', 0),
+                        DigitPattern(minFractionalPart[..i], digit, maxDigit, 0),
                         i + 1));
                 }
             }
@@ -113,81 +162,102 @@ namespace Wilgysef.FluentRegex.Composites
             {
                 orPattern.Or(new ConcatPattern(
                     NumericRange(nextMinInt, prevMaxInt, leadingZeros),
-                    OptionalFractionalPart()));
+                    OptionalAnyFractionalPart()));
             }
 
-            if (minFractionalDigits == 0)
+            if ((fractionalPrefixEnd == 0 || fractionalPrefixEnd + 1 < maxFractionalPart.Length)
+                && (minFractionalDigits == 0 || (fractionalPrefixEnd != 0 && fractionalPrefixEnd + 1 >= minFractionalDigits)))
             {
-                orPattern.Or(new ConcatPattern(
-                    new LiteralPattern(maxIntegerPart.ToString()),
-                    QuantifierPattern.ZeroOrOne(new LiteralPattern(fractionalSeparator))));
+                Pattern fractionPattern = fractionalPrefixEnd > 0 || integerPartMatch
+                    ? (Pattern)new LiteralPattern($"{fractionalSeparator}{maxFractionalPart[..(fractionalPrefixEnd + 1)].ToString()}")
+                    : QuantifierPattern.ZeroOrOne(new LiteralPattern(fractionalSeparator));
+
+                orPattern.Or(new ConcatPattern(new LiteralPattern(maxIntegerPart.ToString()), fractionPattern));
             }
 
-            if (maxFractionalPart.Length > 0)
+            for (var i = integerPartMatch ? fractionalPrefixEnd + 1 : 0; i <= maxEnd; i++)
             {
-                var maxEnd = maxFractionalPart.Length - 1;
-                for (; maxEnd > 0 && maxFractionalPart[maxEnd] == '9'; maxEnd--) ;
-
-                if (maxEnd != maxFractionalPart.Length - 1)
+                var digit = (char)(maxFractionalPart[i] - 1);
+                if (digit >= '0')
                 {
-                    maxEnd++;
-                }
-
-                for (var i = 0; i <= maxEnd; i++)
-                {
-                    var digit = (char)(maxFractionalPart[i] - 1);
-                    if (digit >= '0')
-                    {
-                        orPattern.Or(FractionalPattern(
-                            maxIntegerPart,
-                            DigitPattern(maxFractionalPart[..i], '0', digit, 0),
-                            i + 1));
-                    }
+                    orPattern.Or(FractionalPattern(
+                        maxIntegerPart,
+                        DigitPattern(maxFractionalPart[..i], '0', digit, 0),
+                        i + 1));
                 }
             }
 
-            var finalPattern = new ConcatPattern(new LiteralPattern(maxStr));
-
-            if (maxFractionalPart.Length == 0)
-            {
-                finalPattern.Concat(new LiteralPattern(fractionalSeparator));
-            }
-
-            finalPattern.Concat(ZeroDigits(maxFractionalPart.Length));
-
-            orPattern.Or(finalPattern);
+            orPattern.Or(Number(maxIntegerPart, maxFractionalPart));
 
             return orPattern;
 
-            Pattern FractionalPattern(ReadOnlySpan<char> integerPart, Pattern pattern, int patternDigits)
+            Pattern FractionalPattern(
+                ReadOnlySpan<char> integerPart,
+                Pattern pattern,
+                int? patternDigits,
+                bool patternContainsSeparator = false)
             {
-                return new ConcatPattern(
+                var concatPattern = new ConcatPattern(
                     PadZero(
-                        new LiteralPattern($"{integerPart.ToString()}{fractionalSeparator}"),
-                        maxIntegerPartLen - integerPart.Length,
+                        new LiteralPattern(patternContainsSeparator
+                            ? integerPart.ToString()
+                            : $"{integerPart.ToString()}{fractionalSeparator}"),
+                        maxIntegerPartLen.Value - integerPart.Length,
                         leadingZeros),
-                    pattern,
-                    Digits(patternDigits));
+                    pattern);
+
+                if (patternDigits.HasValue)
+                {
+                    var digitsPattern = Digits(patternDigits.Value);
+                    if (!digitsPattern.IsExactlyZero)
+                    {
+                        concatPattern.Concat(digitsPattern);
+                    }
+                }
+
+                return concatPattern;
             }
 
-            Pattern OptionalFractionalPart()
+            Pattern OptionalAnyFractionalPart()
             {
-                return QuantifierPattern.ZeroOrOne(new ConcatPattern(
-                    new LiteralPattern(fractionalSeparator),
-                    Digits(0)));
+                var concatPattern = new ConcatPattern(new LiteralPattern(fractionalSeparator));
+
+                var digitsPattern = Digits(0);
+                if (!digitsPattern.IsExactlyZero)
+                {
+                    concatPattern.Concat(digitsPattern);
+                }
+
+                return QuantifierPattern.ZeroOrOne(concatPattern);
             }
 
-            Pattern Digits(int length)
+            Pattern Number(ReadOnlySpan<char> integerPart, ReadOnlySpan<char> fractionalPart)
+            {
+                var pattern = new ConcatPattern(FractionalPattern(
+                    integerPart,
+                    new LiteralPattern(fractionalPart.ToString()),
+                    null));
+
+                var zeroDigits = ZeroDigits(fractionalPart.Length);
+                if (!zeroDigits.IsExactlyZero)
+                {
+                    pattern.Concat(zeroDigits);
+                }
+
+                return pattern;
+            }
+
+            QuantifierPattern Digits(int length)
             {
                 return QuantifierDigits(CharacterPattern.Digit, length);
             }
 
-            Pattern ZeroDigits(int length)
+            QuantifierPattern ZeroDigits(int length)
             {
                 return QuantifierDigits(CharacterPattern.Character('0'), length);
             }
 
-            Pattern QuantifierDigits(CharacterPattern pattern, int length)
+            QuantifierPattern QuantifierDigits(CharacterPattern pattern, int length)
             {
                 return new QuantifierPattern(
                     pattern,
@@ -196,19 +266,39 @@ namespace Wilgysef.FluentRegex.Composites
                     true);
             }
 
-            static ReadOnlySpan<char> GetDecimalPart(ReadOnlySpan<char> str, bool left, string separator)
+            static void GetDecimalParts(
+                double min,
+                double max,
+                out ReadOnlySpan<char> minIntegerPart,
+                out ReadOnlySpan<char> minFractionalPart,
+                out ReadOnlySpan<char> maxIntegerPart,
+                out ReadOnlySpan<char> maxFractionalPart)
             {
-                var index = str.IndexOf(separator);
-                if (left)
+                var numberFormatInfo = new NumberFormatInfo
                 {
-                    return index == -1
-                        ? str
-                        : str[..index];
+                    NumberDecimalSeparator = ".",
+                    NumberGroupSeparator = "",
+                };
+
+                var minStr = min.ToString(numberFormatInfo);
+                var maxStr = max.ToString(numberFormatInfo);
+
+                minIntegerPart = GetIntegerPart(minStr, numberFormatInfo.NumberDecimalSeparator);
+                minFractionalPart = GetFractionalPart(minStr, numberFormatInfo.NumberDecimalSeparator);
+                maxIntegerPart = GetIntegerPart(maxStr, numberFormatInfo.NumberDecimalSeparator);
+                maxFractionalPart = GetFractionalPart(maxStr, numberFormatInfo.NumberDecimalSeparator);
+
+                static ReadOnlySpan<char> GetIntegerPart(ReadOnlySpan<char> str, string separator)
+                {
+                    var index = str.IndexOf(separator);
+                    return index == -1 ? str : str[..index];
                 }
 
-                return index == -1
-                    ? string.Empty
-                    : str[(index + 1)..];
+                static ReadOnlySpan<char> GetFractionalPart(ReadOnlySpan<char> str, string separator)
+                {
+                    var index = str.IndexOf(separator);
+                    return index == -1 ? string.Empty : str[(index + 1)..];
+                }
             }
         }
 
@@ -262,12 +352,7 @@ namespace Wilgysef.FluentRegex.Composites
                 while (mid.Length < maxStr.Length)
                 {
                     orPattern.Or(PadZero(
-                        NumericRange(
-                            last,
-                            mid.ToString(),
-                            depth + 1,
-                            maxDigitsLength,
-                            leadingZeros),
+                        NumericRange(last, mid.ToString(), depth + 1, maxDigitsLength, leadingZeros),
                         maxDigitsLength - mid.Length,
                         leadingZeros));
                     mid.Append('9');
@@ -276,12 +361,7 @@ namespace Wilgysef.FluentRegex.Composites
                 }
 
                 orPattern.Or(PadZero(
-                    NumericRange(
-                        last,
-                        maxStr,
-                        depth + 1,
-                        maxDigitsLength,
-                        leadingZeros),
+                    NumericRange(last, maxStr, depth + 1, maxDigitsLength, leadingZeros),
                     maxDigitsLength - maxStr.Length,
                     leadingZeros));
                 return orPattern;
@@ -310,12 +390,7 @@ namespace Wilgysef.FluentRegex.Composites
 
                 return new ConcatPattern(
                     new LiteralPattern(minStr[..prefix].ToString()),
-                    NumericRange(
-                        minStr[prefix..],
-                        maxStr[prefix..],
-                        depth + 1,
-                        maxDigitsLength,
-                        leadingZeros));
+                    NumericRange(minStr[prefix..], maxStr[prefix..], depth + 1, maxDigitsLength, leadingZeros));
             }
 
             // min and max are the same length of at least 2 and do not share a prefix
@@ -375,12 +450,7 @@ namespace Wilgysef.FluentRegex.Composites
                 }
             }
 
-            orPattern.Or(DigitPattern(
-                maxStr[..maxEnd],
-                '0',
-                maxStr[maxEnd],
-                maxStr.Length - maxEnd - 1));
-
+            orPattern.Or(DigitPattern(maxStr[..maxEnd], '0', maxStr[maxEnd], maxStr.Length - maxEnd - 1));
             return orPattern.Unwrap();
 
             static Pattern DigitRange(char min, char max)
