@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using Wilgysef.FluentRegex.Composites;
 
 namespace Wilgysef.FluentRegex.Tests.CompositeTests;
@@ -53,9 +54,9 @@ public class NumericRangePatternTest
     }
 
     [Fact]
-    public void NumericRange_Long()
+    public void NumericRange_Int()
     {
-        Pattern.NumericRange(12379L, 12989L).ToString()
+        Pattern.NumericRange(12379, 12989).ToString()
             .ShouldBe(@"12(?:379|3[89]\d|[4-8]\d{2}|9[0-7]\d|98\d)");
     }
 
@@ -84,6 +85,7 @@ public class NumericRangePatternTest
     [InlineData(12, 14, LeadingZeros.None, 0, null, @"1[23](?:\.\d*)?|14(?:\.0*)?")]
 
     [InlineData(4.93, 233.8, LeadingZeros.Optional, 0, null, @"(?:00)?4\.9[3-9]\d*|(?:(?:00)?[5-9]|0?[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d*)?|233\.?|233\.[0-7]\d*|233\.80*")]
+    [InlineData(4.93, 233.8, LeadingZeros.Required, 0, null, @"004\.9[3-9]\d*|(?:00[5-9]|0[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d*)?|233\.?|233\.[0-7]\d*|233\.80*")]
 
     [InlineData(1.234, 1.2567, LeadingZeros.None, 2, null, @"1\.23[4-9]\d*|1\.24\d*|1\.25|1\.25[0-5]\d*|1\.256[0-6]\d*|1\.25670*")]
     [InlineData(1.234, 1.2567, LeadingZeros.None, 3, null, @"1\.23[4-9]\d*|1\.24\d+|1\.25[0-5]\d*|1\.256[0-6]\d*|1\.25670*")]
@@ -109,6 +111,7 @@ public class NumericRangePatternTest
     {
         var pattern = Pattern.NumericRange(min, max, leadingZeros, minFractionalDigits, maxFractionalDigits);
 
+        ShouldMatchNumbers(pattern, min, max, leadingZeros, minFractionalDigits, maxFractionalDigits);
         pattern.ToString().ShouldBe(expected);
     }
 
@@ -118,7 +121,7 @@ public class NumericRangePatternTest
         var pattern = Pattern.NumericRange(24, 33.152, fractionalSeparator: ',');
 
         pattern.ToString()
-            .ShouldBe(@"24(?:,\d*)?|(?:2[5-9]|3[0-2])(?:,\d*)?|33,?|33,0\d*|33,1[0-4]\d*|33,15[01]\d*|33,1520*");
+            .ShouldBe(@"(?:2[4-9]|3[0-2])(?:,\d*)?|33,?|33,0\d*|33,1[0-4]\d*|33,15[01]\d*|33,1520*");
     }
 
     [Fact]
@@ -222,6 +225,117 @@ public class NumericRangePatternTest
         pattern.ToString().ShouldBe(expected);
     }
 
+    private static void ShouldMatchNumbers(
+        Pattern pattern,
+        double min,
+        double max,
+        LeadingZeros leadingZeros,
+        int minFractionalDigits,
+        int? maxFractionalDigits)
+    {
+        GetTestRange((long)min, (long)max, out var start, out var end);
+
+        var minIntDigitCount = IntegerDigitsCount(min);
+        var maxIntDigitCount = IntegerDigitsCount(max);
+        var minFracDigitCount = FractionalDigitsCount(min);
+        var maxFracDigitCount = FractionalDigitsCount(max);
+        var testMaxIntegerDigits = Math.Max(minIntDigitCount, maxIntDigitCount);
+        var testMaxFractionalDigits = maxFractionalDigits ?? Math.Max(minFracDigitCount, maxFracDigitCount) + 1;
+        var maxFracPart = (long)Math.Pow(10, testMaxFractionalDigits) - 1;
+
+        var minInt = (long)min;
+        var maxInt = (long)max;
+        var minFrac = Math.Abs(Math.Round((min - minInt) * (maxFracPart + 1), testMaxFractionalDigits));
+        var maxFrac = Math.Abs(Math.Round((max - maxInt) * (maxFracPart + 1), testMaxFractionalDigits));
+
+        var regex = CompilePattern(pattern);
+
+        for (var cur = start; cur <= end; cur++)
+        {
+            var intStr = cur.ToString();
+            var curIntDigitCount = cur >= 0 ? intStr.Length : intStr.Length - 1;
+
+            var leadFracZeros = maxFracPart.ToString().Length - 1;
+            var lastLength = 1;
+            for (var fracPart = 0; fracPart <= maxFracPart; fracPart++)
+            {
+                var fracStr = fracPart.ToString();
+                if (fracStr.Length > lastLength)
+                {
+                    lastLength = fracStr.Length;
+                    leadFracZeros--;
+                }
+
+                var numStr = intStr + "." + new string('0', leadFracZeros) + fracStr;
+                var numStrWithLeadingZeros = PadZero(numStr, testMaxIntegerDigits - intStr.Length);
+
+                var result = regex.IsMatch(numStr);
+                var resultWithLeadingZeros = regex.IsMatch(numStrWithLeadingZeros);
+
+                var expected = minInt <= cur && cur <= maxInt
+                    && (cur != minInt || (cur >= 0 ? fracPart >= minFrac : fracPart <= minFrac))
+                    && (cur != maxInt || (cur >= 0 ? fracPart <= maxFrac : fracPart >= maxFrac))
+                    && fracStr.Length + leadFracZeros >= minFractionalDigits
+                    && (!maxFractionalDigits.HasValue || fracStr.Length + leadFracZeros <= maxFractionalDigits);
+
+                bool expectedWithLeadingZeros;
+
+                switch (leadingZeros)
+                {
+                    case LeadingZeros.Optional:
+                        expectedWithLeadingZeros = expected;
+                        break;
+                    case LeadingZeros.Required:
+                        expectedWithLeadingZeros = expected;
+                        expected = expected && testMaxIntegerDigits - curIntDigitCount == 0;
+                        break;
+                    case LeadingZeros.None:
+                        expectedWithLeadingZeros = expected && testMaxIntegerDigits - curIntDigitCount == 0;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                result.ShouldBe(expected, $"{numStr} {(expected ? "should" : "should not")} be between {min} and {max}");
+                resultWithLeadingZeros.ShouldBe(expectedWithLeadingZeros, $"{numStrWithLeadingZeros} {(expectedWithLeadingZeros ? "should" : "should not")} be between {min} and {max}");
+            }
+        }
+
+        static string PadZero(string s, int zeros)
+        {
+            if (zeros <= 0)
+            {
+                return s;
+            }
+
+            return s[0] == '-'
+                ? $"{s[0]}{new string('0', zeros)}{s[1..]}"
+                : new string('0', zeros) + s;
+        }
+
+        static int IntegerDigitsCount(double d)
+        {
+            var str = Math.Abs(d).ToString(new NumberFormatInfo
+            {
+                NumberDecimalSeparator = ".",
+            });
+
+            var index = str.IndexOf('.');
+            return index != -1 ? index : str.Length;
+        }
+
+        static int FractionalDigitsCount(double d)
+        {
+            var str = Math.Abs(d).ToString(new NumberFormatInfo
+            {
+                NumberDecimalSeparator = ".",
+            });
+
+            var index = str.IndexOf('.');
+            return index != -1 ? str.Length - index - 1 : 0;
+        }
+    }
+
     private static Regex CompilePattern(Pattern pattern)
     {
         return new PatternBuilder().BeginLine.Concat(pattern).EndLine.Compile();
@@ -232,23 +346,33 @@ public class NumericRangePatternTest
         regex.IsMatch(match).ShouldBe(shouldMatch, $"{match} {(shouldMatch ? "should" : "should not")} match");
     }
 
-    private static void GetTestRange(int min, int max, out int start, out int end)
+    private static void GetTestRange(long min, long max, out long start, out long end)
     {
         start = min >= 0
-            ? (int)Math.Pow(10, Math.Max(0, min.ToString().Length - 2))
-            : (int)-Math.Pow(10, min.ToString().Length - 1);
+            ? (long)Math.Pow(10, Math.Max(0, min.ToString().Length - 2))
+            : (long)-Math.Pow(10, min.ToString().Length - 1);
         end = max >= 0
-            ? (int)Math.Pow(10, max.ToString().Length)
-            : (int)-Math.Pow(10, Math.Max(0, max.ToString().Length - 3));
+            ? (long)Math.Pow(10, max.ToString().Length)
+            : (long)-Math.Pow(10, Math.Max(0, max.ToString().Length - 3));
+
+        if (start == 1)
+        {
+            start = 0;
+        }
     }
 
-    private static void GetLeadingZeroTestRange(int min, int max, out int start, out int end)
+    private static void GetLeadingZeroTestRange(long min, long max, out long start, out long end)
     {
         start = min >= 0
-            ? (int)Math.Pow(10, Math.Max(0, min.ToString().Length - 2))
-            : (int)-Math.Pow(10, min.ToString().Length - 1) + 1;
+            ? (long)Math.Pow(10, Math.Max(0, min.ToString().Length - 2))
+            : (long)-Math.Pow(10, min.ToString().Length - 1) + 1;
         end = max >= 0
-            ? (int)Math.Pow(10, max.ToString().Length) - 1
-            : (int)-Math.Pow(10, Math.Max(0, max.ToString().Length - 3)) + 1;
+            ? (long)Math.Pow(10, max.ToString().Length) - 1
+            : (long)-Math.Pow(10, Math.Max(0, max.ToString().Length - 3)) + 1;
+
+        if (start == 1)
+        {
+            start = 0;
+        }
     }
 }
