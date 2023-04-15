@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using Wilgysef.FluentRegex.Composites;
 
@@ -61,34 +63,34 @@ public class NumericRangePatternTest
     }
 
     [Theory]
-    [InlineData(1.0512, 21.23, LeadingZeros.None, 0, null, @"1\.051[2-9]\d*|1\.05[2-9]\d*|1\.0[6-9]\d*|1\.[1-9]\d*|(?:[2-9]|1\d|20)(?:\.\d*)?|21\.?|21\.[01]\d*|21\.2[0-2]\d*|21\.230*")]
+    [InlineData(1.0512, 21.23, LeadingZeros.None, 0, null, @"1\.051[2-9]\d*|1\.05[2-9]\d*|1\.0[6-9]\d*|1\.[1-9]\d*|(?:[2-9]|1\d|20)(?:\.\d*)?|21\.?|21\.[01]\d*|21\.20*|21\.2[0-2]\d*|21\.230*")]
     [InlineData(1.0599, 16.1, LeadingZeros.None, 0, null, @"1\.0599\d*|1\.0[6-9]\d*|1\.[1-9]\d*|(?:[2-9]|1[0-5])(?:\.\d*)?|16\.?|16\.0\d*|16\.10*")]
     [InlineData(1.9, 5.6, LeadingZeros.None, 0, null, @"1\.9\d*|[2-4](?:\.\d*)?|5\.?|5\.[0-5]\d*|5\.60*")]
-    [InlineData(1.91, 5.69, LeadingZeros.None, 0, null, @"1\.9[1-9]\d*|[2-4](?:\.\d*)?|5\.?|5\.[0-5]\d*|5\.6[0-8]\d*|5\.690*")]
+    [InlineData(1.91, 5.69, LeadingZeros.None, 0, null, @"1\.9[1-9]\d*|[2-4](?:\.\d*)?|5\.?|5\.[0-5]\d*|5\.60*|5\.6[0-8]\d*|5\.690*")]
     [InlineData(24.932, 33, LeadingZeros.None, 0, null, @"24\.93[2-9]\d*|24\.9[4-9]\d*|(?:2[5-9]|3[0-2])(?:\.\d*)?|33(?:\.0*)?")]
-    [InlineData(24, 33.152, LeadingZeros.None, 0, null, @"(?:2[4-9]|3[0-2])(?:\.\d*)?|33\.?|33\.0\d*|33\.1[0-4]\d*|33\.15[01]\d*|33\.1520*")]
+    [InlineData(24, 33.152, LeadingZeros.None, 0, null, @"(?:2[4-9]|3[0-2])(?:\.\d*)?|33\.?|33\.0\d*|33\.10*|33\.1[0-4]\d*|33\.150*|33\.15[01]\d*|33\.1520*")]
     [InlineData(24, 24.5, LeadingZeros.None, 0, null, @"24(?:\.0*)?|24\.[0-4]\d*|24\.50*")]
-    [InlineData(1.2, 2.489, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.4[0-7]\d*|2\.48[0-8]\d*|2\.4890*")]
-    [InlineData(1.2, 2.4894, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.4[0-7]\d*|2\.48[0-8]\d*|2\.489[0-3]\d*|2\.48940*")]
-    [InlineData(5.47, 7.47, LeadingZeros.None, 0, null, @"5\.4[7-9]\d*|5\.[5-9]\d*|6(?:\.\d*)?|7\.?|7\.[0-3]\d*|7\.4[0-6]\d*|7\.470*")]
+    [InlineData(1.2, 2.489, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.40*|2\.4[0-7]\d*|2\.480*|2\.48[0-8]\d*|2\.4890*")]
+    [InlineData(1.2, 2.4894, LeadingZeros.None, 0, null, @"1\.[2-9]\d*|2\.?|2\.[0-3]\d*|2\.40*|2\.4[0-7]\d*|2\.480*|2\.48[0-8]\d*|2\.4890*|2\.489[0-3]\d*|2\.48940*")]
+    [InlineData(5.47, 7.47, LeadingZeros.None, 0, null, @"5\.4[7-9]\d*|5\.[5-9]\d*|6(?:\.\d*)?|7\.?|7\.[0-3]\d*|7\.40*|7\.4[0-6]\d*|7\.470*")]
     [InlineData(1.234, 1.234, LeadingZeros.None, 0, null, @"1\.2340*")]
-    [InlineData(1.1, 1.27, LeadingZeros.None, 0, null, @"1\.1\d*|1\.2|1\.2[0-6]\d*|1\.270*")]
-    [InlineData(1.1, 1.37, LeadingZeros.None, 0, null, @"1\.[12]\d*|1\.3|1\.3[0-6]\d*|1\.370*")]
+    [InlineData(1.1, 1.27, LeadingZeros.None, 0, null, @"1\.1\d*|1\.2|1\.20*|1\.2[0-6]\d*|1\.270*")]
+    [InlineData(1.1, 1.37, LeadingZeros.None, 0, null, @"1\.[12]\d*|1\.3|1\.30*|1\.3[0-6]\d*|1\.370*")]
     [InlineData(1.234, 1.235, LeadingZeros.None, 0, null, @"1\.234\d*|1\.2350*")]
     [InlineData(1.234, 1.236, LeadingZeros.None, 0, null, @"1\.23[45]\d*|1\.2360*")]
-    [InlineData(1.234, 1.2364, LeadingZeros.None, 0, null, @"1\.23[45]\d*|1\.236|1\.236[0-3]\d*|1\.23640*")]
-    [InlineData(1.234, 1.2567, LeadingZeros.None, 0, null, @"1\.23[4-9]\d*|1\.24\d*|1\.25|1\.25[0-5]\d*|1\.256[0-6]\d*|1\.25670*")]
-    [InlineData(1.2345, 1.267, LeadingZeros.None, 0, null, @"1\.234[5-9]\d*|1\.23[5-9]\d*|1\.2[45]\d*|1\.26|1\.26[0-6]\d*|1\.2670*")]
-    [InlineData(0, 1.267, LeadingZeros.None, 0, null, @"0(?:\.\d*)?|1\.?|1\.[01]\d*|1\.2[0-5]\d*|1\.26[0-6]\d*|1\.2670*")]
-    [InlineData(0, 2.267, LeadingZeros.None, 0, null, @"[01](?:\.\d*)?|2\.?|2\.[01]\d*|2\.2[0-5]\d*|2\.26[0-6]\d*|2\.2670*")]
+    [InlineData(1.234, 1.2364, LeadingZeros.None, 0, null, @"1\.23[45]\d*|1\.236|1\.2360*|1\.236[0-3]\d*|1\.23640*")]
+    [InlineData(1.234, 1.2567, LeadingZeros.None, 0, null, @"1\.23[4-9]\d*|1\.24\d*|1\.25|1\.250*|1\.25[0-5]\d*|1\.2560*|1\.256[0-6]\d*|1\.25670*")]
+    [InlineData(1.2345, 1.267, LeadingZeros.None, 0, null, @"1\.234[5-9]\d*|1\.23[5-9]\d*|1\.2[45]\d*|1\.26|1\.260*|1\.26[0-6]\d*|1\.2670*")]
+    [InlineData(0, 1.267, LeadingZeros.None, 0, null, @"0(?:\.\d*)?|1\.?|1\.[01]\d*|1\.20*|1\.2[0-5]\d*|1\.260*|1\.26[0-6]\d*|1\.2670*")]
+    [InlineData(0, 2.267, LeadingZeros.None, 0, null, @"[01](?:\.\d*)?|2\.?|2\.[01]\d*|2\.20*|2\.2[0-5]\d*|2\.260*|2\.26[0-6]\d*|2\.2670*")]
     [InlineData(12, 12, LeadingZeros.None, 0, null, @"12(?:\.0*)?")]
     [InlineData(12, 14, LeadingZeros.None, 0, null, @"1[23](?:\.\d*)?|14(?:\.0*)?")]
 
     [InlineData(4.93, 233.8, LeadingZeros.Optional, 0, null, @"(?:00)?4\.9[3-9]\d*|(?:(?:00)?[5-9]|0?[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d*)?|233\.?|233\.[0-7]\d*|233\.80*")]
     [InlineData(4.93, 233.8, LeadingZeros.Required, 0, null, @"004\.9[3-9]\d*|(?:00[5-9]|0[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d*)?|233\.?|233\.[0-7]\d*|233\.80*")]
 
-    [InlineData(1.234, 1.2567, LeadingZeros.None, 2, null, @"1\.23[4-9]\d*|1\.24\d*|1\.25|1\.25[0-5]\d*|1\.256[0-6]\d*|1\.25670*")]
-    [InlineData(1.234, 1.2567, LeadingZeros.None, 3, null, @"1\.23[4-9]\d*|1\.24\d+|1\.25[0-5]\d*|1\.256[0-6]\d*|1\.25670*")]
+    [InlineData(1.234, 1.2567, LeadingZeros.None, 2, null, @"1\.23[4-9]\d*|1\.24\d*|1\.25|1\.250*|1\.25[0-5]\d*|1\.2560*|1\.256[0-6]\d*|1\.25670*")]
+    [InlineData(1.234, 1.2567, LeadingZeros.None, 3, null, @"1\.23[4-9]\d*|1\.24\d+|1\.250+|1\.25[0-5]\d*|1\.2560*|1\.256[0-6]\d*|1\.25670*")]
     [InlineData(4.93, 233.8, LeadingZeros.None, 2, null, @"4\.9[3-9]\d*|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])\.\d{2,}|233\.[0-7]\d+|233\.80+")]
     [InlineData(4.93, 233.8, LeadingZeros.None, 0, 3, @"4\.9[3-9]\d?|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])(?:\.\d{0,3})?|233\.?|233\.[0-7]\d{0,2}|233\.80{0,2}")]
     [InlineData(4.93, 233.8, LeadingZeros.None, 1, 3, @"4\.9[3-9]\d?|(?:[5-9]|[1-9]\d|1\d{2}|2[0-2]\d|23[0-2])\.\d{1,3}|233\.[0-7]\d{0,2}|233\.80{0,2}")]
@@ -96,11 +98,11 @@ public class NumericRangePatternTest
     [InlineData(12, 14, LeadingZeros.None, 1, null, @"1[23]\.\d+|14\.0+")]
 
     [InlineData(-8.6, -5.97, LeadingZeros.None, 0, null, @"-(?:5\.9[7-9]\d*|[67](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*)")]
-    [InlineData(-8.684, -5.3, LeadingZeros.None, 0, null, @"-(?:5\.[3-9]\d*|[67](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.6[0-7]\d*|8\.68[0-3]\d*|8\.6840*)")]
-    [InlineData(-8.6, 5.97, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*)|[0-4](?:\.\d*)?|5\.?|5\.[0-8]\d*|5\.9[0-6]\d*|5\.970*")]
-    [InlineData(-8.684, 5.3, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.6[0-7]\d*|8\.68[0-3]\d*|8\.6840*)|[0-4](?:\.\d*)?|5\.?|5\.[0-2]\d*|5\.30*")]
-    [InlineData(-8.684, 0, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.6[0-7]\d*|8\.68[0-3]\d*|8\.6840*)|0(?:\.0*)?")]
-    [InlineData(-8.684, 4, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.6[0-7]\d*|8\.68[0-3]\d*|8\.6840*)|[0-3](?:\.\d*)?|4(?:\.0*)?")]
+    [InlineData(-8.684, -5.3, LeadingZeros.None, 0, null, @"-(?:5\.[3-9]\d*|[67](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*|8\.6[0-7]\d*|8\.680*|8\.68[0-3]\d*|8\.6840*)")]
+    [InlineData(-8.6, 5.97, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*)|[0-4](?:\.\d*)?|5\.?|5\.[0-8]\d*|5\.90*|5\.9[0-6]\d*|5\.970*")]
+    [InlineData(-8.684, 5.3, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*|8\.6[0-7]\d*|8\.680*|8\.68[0-3]\d*|8\.6840*)|[0-4](?:\.\d*)?|5\.?|5\.[0-2]\d*|5\.30*")]
+    [InlineData(-8.684, 0, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*|8\.6[0-7]\d*|8\.680*|8\.68[0-3]\d*|8\.6840*)|0(?:\.0*)?")]
+    [InlineData(-8.684, 4, LeadingZeros.None, 0, null, @"-(?:[0-7](?:\.\d*)?|8\.?|8\.[0-5]\d*|8\.60*|8\.6[0-7]\d*|8\.680*|8\.68[0-3]\d*|8\.6840*)|[0-3](?:\.\d*)?|4(?:\.0*)?")]
     public void NumericRange_Double(
         double min,
         double max,
@@ -118,10 +120,14 @@ public class NumericRangePatternTest
     [Fact]
     public void NumericRange_Double_FractionalSeparator()
     {
-        var pattern = Pattern.NumericRange(24, 33.152, fractionalSeparator: ',');
+        var min = 24;
+        var max = 33.152;
 
+        var pattern = Pattern.NumericRange(min, max, fractionalSeparator: ',');
+
+        ShouldMatchNumbers(pattern, min, max, LeadingZeros.None, 0, null, fractionalSeparator: ',');
         pattern.ToString()
-            .ShouldBe(@"(?:2[4-9]|3[0-2])(?:,\d*)?|33,?|33,0\d*|33,1[0-4]\d*|33,15[01]\d*|33,1520*");
+            .ShouldBe(@"(?:2[4-9]|3[0-2])(?:,\d*)?|33,?|33,0\d*|33,10*|33,1[0-4]\d*|33,150*|33,15[01]\d*|33,1520*");
     }
 
     [Fact]
@@ -231,7 +237,8 @@ public class NumericRangePatternTest
         double max,
         LeadingZeros leadingZeros,
         int minFractionalDigits,
-        int? maxFractionalDigits)
+        int? maxFractionalDigits,
+        char fractionalSeparator = '.')
     {
         GetTestRange((long)min, (long)max, out var start, out var end);
 
@@ -257,6 +264,9 @@ public class NumericRangePatternTest
 
             var leadFracZeros = maxFracPart.ToString().Length - 1;
             var lastLength = 1;
+
+            var numStrBuilder = new StringBuilder(intStr.Length + testMaxFractionalDigits + 1);
+
             for (var fracPart = 0; fracPart <= maxFracPart; fracPart++)
             {
                 var fracStr = fracPart.ToString();
@@ -266,38 +276,60 @@ public class NumericRangePatternTest
                     leadFracZeros--;
                 }
 
-                var numStr = intStr + "." + new string('0', leadFracZeros) + fracStr;
-                var numStrWithLeadingZeros = PadZero(numStr, testMaxIntegerDigits - intStr.Length);
-
-                var result = regex.IsMatch(numStr);
-                var resultWithLeadingZeros = regex.IsMatch(numStrWithLeadingZeros);
-
-                var expected = minInt <= cur && cur <= maxInt
-                    && (cur != minInt || (cur >= 0 ? fracPart >= minFrac : fracPart <= minFrac))
-                    && (cur != maxInt || (cur >= 0 ? fracPart <= maxFrac : fracPart >= maxFrac))
-                    && fracStr.Length + leadFracZeros >= minFractionalDigits
-                    && (!maxFractionalDigits.HasValue || fracStr.Length + leadFracZeros <= maxFractionalDigits);
-
-                bool expectedWithLeadingZeros;
-
-                switch (leadingZeros)
+                while (true)
                 {
-                    case LeadingZeros.Optional:
-                        expectedWithLeadingZeros = expected;
-                        break;
-                    case LeadingZeros.Required:
-                        expectedWithLeadingZeros = expected;
-                        expected = expected && testMaxIntegerDigits - curIntDigitCount == 0;
-                        break;
-                    case LeadingZeros.None:
-                        expectedWithLeadingZeros = expected && testMaxIntegerDigits - curIntDigitCount == 0;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    numStrBuilder.Clear();
+                    numStrBuilder.Append(intStr);
+                    numStrBuilder.Append(fractionalSeparator);
 
-                result.ShouldBe(expected, $"{numStr} {(expected ? "should" : "should not")} be between {min} and {max}");
-                resultWithLeadingZeros.ShouldBe(expectedWithLeadingZeros, $"{numStrWithLeadingZeros} {(expectedWithLeadingZeros ? "should" : "should not")} be between {min} and {max}");
+                    if (leadFracZeros > 0)
+                    {
+                        numStrBuilder.Append(new string('0', leadFracZeros));
+                    }
+
+                    numStrBuilder.Append(fracStr);
+
+                    var numStr = numStrBuilder.ToString();
+                    var numStrWithLeadingZeros = PadZero(numStr, testMaxIntegerDigits - intStr.Length);
+
+                    var result = regex.IsMatch(numStr);
+                    var resultWithLeadingZeros = regex.IsMatch(numStrWithLeadingZeros);
+
+                    var expected = minInt <= cur && cur <= maxInt
+                        && (cur != minInt || (cur >= 0 ? fracPart >= minFrac : fracPart <= minFrac))
+                        && (cur != maxInt || (cur >= 0 ? fracPart <= maxFrac : fracPart >= maxFrac))
+                        && fracStr.Length + leadFracZeros >= minFractionalDigits
+                        && (!maxFractionalDigits.HasValue || fracStr.Length + leadFracZeros <= maxFractionalDigits);
+
+                    bool expectedWithLeadingZeros;
+
+                    switch (leadingZeros)
+                    {
+                        case LeadingZeros.Optional:
+                            expectedWithLeadingZeros = expected;
+                            break;
+                        case LeadingZeros.Required:
+                            expectedWithLeadingZeros = expected;
+                            expected = expected && testMaxIntegerDigits - curIntDigitCount == 0;
+                            break;
+                        case LeadingZeros.None:
+                            expectedWithLeadingZeros = expected && testMaxIntegerDigits - curIntDigitCount == 0;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    result.ShouldBe(expected, () => $"{numStr} {(expected ? "should" : "should not")} be between {min} and {max}");
+                    resultWithLeadingZeros.ShouldBe(expectedWithLeadingZeros, () => $"{numStrWithLeadingZeros} {(expectedWithLeadingZeros ? "should" : "should not")} be between {min} and {max}");
+
+                    if (fracStr.Length > 0 && fracStr[^1] == '0')
+                    {
+                        fracStr = fracStr.Remove(fracStr.Length - 1);
+                        continue;
+                    }
+
+                    break;
+                }
             }
         }
 
@@ -309,7 +341,7 @@ public class NumericRangePatternTest
             }
 
             return s[0] == '-'
-                ? $"{s[0]}{new string('0', zeros)}{s[1..]}"
+                ? $"-{new string('0', zeros)}{s[1..]}"
                 : new string('0', zeros) + s;
         }
 
@@ -343,7 +375,7 @@ public class NumericRangePatternTest
 
     private static void ShouldRegexMatch(Regex regex, string match, bool shouldMatch)
     {
-        regex.IsMatch(match).ShouldBe(shouldMatch, $"{match} {(shouldMatch ? "should" : "should not")} match");
+        regex.IsMatch(match).ShouldBe(shouldMatch, () => $"{match} {(shouldMatch ? "should" : "should not")} match");
     }
 
     private static void GetTestRange(long min, long max, out long start, out long end)
@@ -373,6 +405,22 @@ public class NumericRangePatternTest
         if (start == 1)
         {
             start = 0;
+        }
+    }
+}
+
+[ShouldlyMethods]
+public static class ShouldlyExtensions
+{
+    public static void ShouldBe(
+        this bool result,
+        bool expected,
+        Func<string> message,
+        [CallerMemberName] string method = null!)
+    {
+        if (result != expected)
+        {
+            throw new ShouldAssertException(new ExpectedActualShouldlyMessage(expected, result, message(), method).ToString());
         }
     }
 }

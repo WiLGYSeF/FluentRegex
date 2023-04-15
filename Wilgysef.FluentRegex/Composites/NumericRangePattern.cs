@@ -186,6 +186,12 @@ namespace Wilgysef.FluentRegex.Composites
             for (var i = minFractionalPart.Length > 0 ? fractionalPrefixEnd + 1 : 0; i <= maxEnd; i++)
             {
                 var digit = (char)(maxFractionalPart[i] - 1);
+
+                if (i > 0)
+                {
+                    orPattern.Or(Number(maxIntegerPart, maxFractionalPart[..i]));
+                }
+
                 if (digit >= '0')
                 {
                     orPattern.Or(FractionalPattern(
