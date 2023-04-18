@@ -254,6 +254,10 @@ namespace Wilgysef.FluentRegex
                         {
                             builder.Append('?');
                         }
+                        else if (Max.Value == 0)
+                        {
+                            builder.Append("{0}");
+                        }
                         else
                         {
                             builder.Append("{0,");
@@ -309,7 +313,7 @@ namespace Wilgysef.FluentRegex
 
         internal override bool IsEmpty(PatternBuildState state)
         {
-            return IsExactlyZero || state.IsEmpty(Pattern);
+            return state.IsEmpty(Pattern);
         }
 
         internal override bool IsSinglePattern(PatternBuildState state)

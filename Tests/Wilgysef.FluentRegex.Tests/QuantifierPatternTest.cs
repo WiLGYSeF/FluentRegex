@@ -60,7 +60,7 @@ public class QuantifierPatternTest
 
     [Theory]
     [InlineData(3, "a{3}")]
-    [InlineData(0, "")]
+    [InlineData(0, "a{0}")]
     [InlineData(-1, null)]
     [InlineData(1, "a")]
     public void Exactly(int count, string? expected)
@@ -120,7 +120,7 @@ public class QuantifierPatternTest
     }
 
     [Theory]
-    [InlineData(0, true, "")]
+    [InlineData(0, true, "a{0}")]
     [InlineData(1, true, "a?")]
     [InlineData(2, true, "a{0,2}")]
     [InlineData(2, false, "a{0,2}?")]

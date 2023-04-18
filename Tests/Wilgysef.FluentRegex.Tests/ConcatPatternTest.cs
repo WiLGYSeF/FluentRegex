@@ -59,7 +59,7 @@ public class ConcatPatternTest
     {
         var pattern = new PatternBuilder(new ConcatPattern(
             new LiteralPattern("b"),
-            new QuantifierPattern(new LiteralPattern("a"), 0, 0, true)))
+            new GroupPattern(null, capture: false)))
                 .ZeroOrMore();
 
         pattern.ToString().ShouldBe("b*");
@@ -72,7 +72,7 @@ public class ConcatPatternTest
             new OrPattern(
                 new LiteralPattern("zxc"),
                 new LiteralPattern("vbn")),
-            new QuantifierPattern(new LiteralPattern("a"), 0, 0, true));
+            new GroupPattern(null, capture: false));
 
         pattern.ToString().ShouldBe("zxc|vbn");
     }
