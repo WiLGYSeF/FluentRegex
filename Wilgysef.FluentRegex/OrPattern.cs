@@ -138,7 +138,9 @@ namespace Wilgysef.FluentRegex
             for (var i = 0; i < _children.Count; i++)
             {
                 var unwrapped = _children[i].Unwrap();
-                if (unwrapped is CharacterSetPattern characterSet)
+                if (unwrapped is CharacterSetPattern characterSet
+                    && characterSet.SubtractedCharacters.Count == 0
+                    && characterSet.SubtractedCharacterRanges.Count == 0)
                 {
                     if (firstCharacterSetIndex == -1)
                     {

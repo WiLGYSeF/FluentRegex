@@ -180,6 +180,22 @@ public class OrPatternTest
     }
 
     [Fact]
+    public void CharacterSetPattern_Combine_CharacterPattern_Subtracted()
+    {
+        var pattern = new OrPattern(
+            new CharacterSetPattern(new CharacterRange('a', 'm')),
+            new CharacterSetPattern(
+                new[] { new CharacterRange('p', 'v') },
+                Array.Empty<CharacterPattern>(),
+                new[] { new CharacterRange('q', 's') },
+                Array.Empty<CharacterPattern>()),
+            CharacterPattern.Character('0'));
+
+        pattern.ToString().ShouldBe("[a-m0]|[p-v-[q-s]]");
+        ShouldNotBeSingle(pattern);
+    }
+
+    [Fact]
     public void CharacterSetPattern_Combine_SingleLiteral()
     {
         var pattern = new OrPattern(
